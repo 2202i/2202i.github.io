@@ -11,6 +11,14 @@
 <p>strings * | grep -i "flag{"</p>
 <p>strings * filename | grep -i “==”</p>
 <p>strings * | grep -i "=="</p>
+<p>find / -perm -u=s -type f 2>/dev/null</p>
+
+<p>find / -type f -perm -4000 2>/dev/null</p>
+
+<p>find /usr/sbin -perm /4000 -type f 2>/dev/null</p>
+
+<p>find /usr/sbin -perm /2000 -type f 2>/dev/null</p>
+
 </p>
 </body>
 </html>
