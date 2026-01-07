@@ -1,4 +1,7 @@
-# UMBRAL
+# Seol's Website
+
+
+#Theme is UMBRAL
 
 A Pen created on CodePen.
 
