@@ -1,35 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Crossy Road with Leaderboard</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    background: #87ceeb;
+  }
+  canvas.game {
+    display: block;
+  }
+  #ui {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    color: #fff;
+    z-index: 10;
+  }
+  #ui input {
+    padding: 4px;
+    font-size: 14px;
+  }
+  #ui button {
+    padding: 4px 8px;
+    margin-left: 4px;
+  }
+  #score-container {
+    margin-top: 10px;
+  }
+  #result-container {
+    display: none;
+    margin-top: 10px;
+    font-size: 20px;
+    font-weight: bold;
+  }
+  #leaderboard-container {
+    margin-top: 20px;
+    color: #000;
+    background: rgba(255,255,255,0.8);
+    padding: 10px;
+    border-radius: 8px;
+    max-width: 200px;
+  }
+  #leaderboard-container h3 {
+    margin: 0 0 8px 0;
+  }
+  #leaderboard {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+<canvas class="game"></canvas>
 
-  <head>
-    <meta charset="UTF-8">
-    <title>Crossy Road with three.js</title>
-    <link rel="stylesheet" href="css/chicken.css">
-
-  </head>
-    
-  <body>
-  <canvas class="game"></canvas>
-<div id="controls">
-  <div>
-    <button id="forward">▲</button>
-    <button id="left">◀</button>
-    <button id="backward">▼</button>
-    <button id="right">▶</button>
+<div id="ui">
+  <label>Username: <input type="text" id="username" placeholder="Your name"></label>
+  <button id="start">Play</button>
+  
+  <div id="score-container">
+    Score: <span id="score">0</span>
   </div>
-</div>
-<div id="score">0</div>
-<div id="result-container">
-  <div id="result">
-    <h1>Game Over</h1>
-    <p>Your score: <span id="final-score"></span></p>
+
+  <div id="result-container">
+    Game Over! Final Score: <span id="final-score">0</span>
     <button id="retry">Retry</button>
   </div>
+
+  <div id="leaderboard-container">
+    <h3>Leaderboard</h3>
+    <ul id="leaderboard"></ul>
+  </div>
 </div>
 
-
-    <script type="module" src="js/chicken.js"></script>
-
-  </body>
-  
+<script type="module" src="game.js"></script>
+</body>
 </html>
