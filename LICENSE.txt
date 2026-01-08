@@ -1,5 +1,7 @@
 The MIT License (MIT)
 
+Copyright (c) 2026 Paul (https://codepen.io/Maseone/pen/WbbGxeO)
+Copyright (c) 2026 Hunor Marton Borbely (https://codepen.io/HunorMarton/pen/JwWLJo)
 Copyright (c) 2026 Daniel Muñoz (https://codepen.io/daniel-mu-oz/pen/raerGmm)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
