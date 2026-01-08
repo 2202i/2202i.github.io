@@ -1,39 +1,194 @@
-/* Card adjustments for MTG-style preview cards */
-.card {
-  width: 220px;
-  height: 300px;
+@import url("https://fonts.bunny.net/css?family=jura:300,500");
+
+/* ================= ROOT ================= */
+:root {
+  --carousel-duration: 30s;
+  --carousel-depth: 450px; /* increased for larger cards */
+  --card-width: 220px;      /* updated for MTG cards */
+  --card-height: 300px;     /* updated for MTG cards */
+  --glass-width: 240px;
+}
+
+/* ================= BODY ================= */
+body {
+  margin: 0;
+  min-height: 100vh;
   display: grid;
-  justify-content: start;
-  align-content: end;
+  place-items: center;
+  background: radial-gradient(circle at top, #1a1a22, #0b0b0f);
+  font-family: "Jura", sans-serif;
+  color: white;
+  perspective: 1200px;
+  overflow: hidden;
+}
+
+/* ================= CAROUSEL ================= */
+.carousel {
+  position: relative;
+  width: 100%;
+  height: 440px;
+  transform-style: preserve-3d;
+  isolation: isolate;
+  --card-count: 9;
+}
+
+/* Pause rotation on hover */
+.carousel:has(.card:hover) .card {
+  animation-play-state: paused;
+}
+
+/* Dim non-hovered cards */
+.carousel:has(.card:hover) .card:not(:hover) {
+  opacity: 0.25;
+}
+
+/* ================= CARD ================= */
+.card {
+  --i: 1;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--card-width);
+  height: var(--card-height);
+  transform-style: preserve-3d;
+  overflow: hidden;
   border-radius: 1.5rem;
   background: #333;
   cursor: pointer;
-  transition: transform 250ms ease-in-out;
+  display: grid;
+  justify-content: start;
+  align-content: end;
+
+  animation: orbit var(--carousel-duration) linear infinite;
+  animation-delay: calc(
+    -1 * var(--carousel-duration) / var(--card-count) * var(--i)
+  );
 }
 
-.card img.backdrop {
+.card img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: cover; /* cover instead of contain */
   pointer-events: none;
   user-select: none;
-  transition: transform 500ms ease-in-out;
-}
-
-.card:hover {
-  transform: scale(1.05);
+  transition: transform 0.5s ease-in-out;
 }
 
 .card:hover img {
-  transform: scale(1.1);
+  transform: scale(1.08);
 }
 
+/* ================= GLASS PANEL ================= */
+.glass {
+  position: absolute;
+  top: 0;
+  left: calc(100% + 20px);
+  width: var(--glass-width);
+  height: 110%;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.6rem;
+
+  background: linear-gradient(to top, rgba(255,255,255,0.35), rgba(255,255,255,0.08));
+  backdrop-filter: blur(16px) saturate(170%);
+  -webkit-backdrop-filter: blur(16px) saturate(170%);
+  border: 1px solid rgba(255,255,255,0.35);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+
+  opacity: 0;
+  transform: translateX(-12px) scale(0.96);
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+/* Show glass for front-facing card */
+.card.is-front:hover .glass {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+}
+
+/* Hide glass if not front-facing */
+.card:not(.is-front) .glass {
+  display: none;
+}
+
+/* ================= GLASS FLIP LEFT ================= */
+.card.glass-left .glass {
+  left: auto;
+  right: calc(100% + 16px);
+  transform: translateX(12px) scale(0.96);
+}
+
+.card.glass-left.is-front:hover .glass {
+  transform: translateX(0) scale(1);
+}
+
+/* ================= GLASS CONTENT ================= */
+.glass h3 {
+  margin: 0;
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.glass p {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: rgba(255,255,255,0.88);
+}
+
+/* ================= MOBILE RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .carousel {
+    height: 520px;
+  }
+
+  .label {
+    display: none;
+  }
+
+  .glass {
+    position: fixed;
+    bottom: 1rem;
+    left: 50%;
+    right: auto;
+    width: min(90vw, 360px);
+    height: auto;
+    transform: translateX(-50%) scale(0.95);
+    pointer-events: none;
+  }
+
+  .card.is-active .glass {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+    pointer-events: auto;
+  }
+
+  .card:not(.is-active) .glass {
+    opacity: 0;
+  }
+}
+
+/* ================= ORBIT ================= */
+@keyframes orbit {
+  from {
+    transform: translate(-50%, -50%) rotateY(0deg) translateZ(var(--carousel-depth));
+  }
+  to {
+    transform: translate(-50%, -50%) rotateY(360deg) translateZ(var(--carousel-depth));
+  }
+}
+
+/* ================= CARD CONTENT ================= */
 .content {
   position: relative;
   z-index: 2;
   display: grid;
   gap: 0.5rem;
-  bottom: 0;
   justify-content: start;
   align-content: end;
 }
