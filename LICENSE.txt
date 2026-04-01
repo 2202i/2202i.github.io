@@ -1,13 +1,6 @@
 The MIT License (MIT)
 
 
-"The Dark Wraith" (https://skfb.ly/ZPTM) by davidkong is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
-
-Copyright (c) 2026 by Robin (https://codepen.io/lessthanthree/pen/LENwGyZ)
-Copyright (c) 2026 Paul (https://codepen.io/Maseone/pen/WbbGxeO)
-Copyright (c) 2026 Hunor Marton Borbely (https://codepen.io/HunorMarton/pen/JwWLJo)
-Copyright (c) 2026 Daniel Muñoz (https://codepen.io/daniel-mu-oz/pen/raerGmm)
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
