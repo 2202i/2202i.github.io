@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<!-- saved from url=(0221)https://gifypet.neocities.org/pet/pet.html?name=aurelia&dob=1678660983&gender=f&element=Water&pet=https%3A%2F%2Fimg.pokemondb.net%2Fsprites%2Fblack-white%2Fanim%2Fshiny%2Ffrillish-f.gif&map=tree.jpg&background=transparent -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        
+        <meta name="viewport" content="width=device-width, initial-scale=1.35">
+        <title>aurelia</title>
+        <link rel="stylesheet" type="text/css" href="./pet.css">
+    </head>
+
+    <body style="background-image: url(&quot;backgrounds/transparent&quot;);">
+        <table id="petTable">
+            <tbody><tr>
+                <td>Name: <b id="petName">aurelia<img class="uiicon" src="./girl.png"></b></td>
+                <td>Born: <b id="dob">3-2023</b></td>
+                <td><img class="uiicon" src="./zap.png">: <b id="element">Water</b></td>
+            </tr>
+            <tr>
+                <td>Mood: <b id="mood"><img class="uiicon" src="./heart.gif"><img class="uiicon" src="./heart.gif"><img class="uiicon" src="./heart.gif"></b></td>
+                <td>Belly: <b id="belly"><img class="uiicon" src="./meat.png"><img class="uiicon" src="./meat.png"><img class="uiicon" src="./meat.png"></b></td>
+                <td>Coins: <b id="coins">11</b></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div id="map" style="background-image: url(&quot;maps/tree.jpg&quot;);">
+                        <div id="underlay"></div>
+                        <div id="pet" class="pet" style="background-image: url(&quot;https://img.pokemondb.net/sprites/black-white/anim/shiny/frillish-f.gif&quot;); left: 20px; top: 50px;">
+                            <div id="petName-tag">aurelia</div>
+                            <!-- <img id="petHat" src="ui/santa_hat.png" /> -->
+                        </div>
+                    </div>
+                    <div id="overlay"></div>
+                    <div onclick="pettPet();" id="overlay-pet-interact" style="left: 20px; top: 110px;"></div>
+                </td>
+
+                <td class="controls">
+                    <b>Shop: (5c)</b>
+                    <img class="shopitem" src="./burger.png" onclick="feedPet(0);">
+                    <img class="shopitem" src="./meat.png" onclick="feedPet(0);">
+                    <img class="shopitem" src="./coke.png" onclick="feedPet(3);">
+                    <br>
+                    <img class="shopitem" src="./bread.png" onclick="feedPet(2);">
+                    <img class="shopitem" src="./muffin.png" onclick="feedPet(1);">
+                    <img class="shopitem" src="./icecream.png" onclick="feedPet(1);">
+                    <b>Actions:</b>
+                    <input type="button" value="Hello" onclick="talkToPet();">
+                    <input type="button" value="Slots" onclick="openSlots();">
+                    <input type="button" value="Wash 10c" onclick="showerPet();">
+                    <input type="button" value="Party 20c" onclick="petParty();">
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <textarea id="talk" disabled="true"></textarea>
+                </td>
+            </tr>
+        </tbody></table>
+        <footer>GET A <a href="https://gifypet.neocities.org/" target="_blank">GIFYPET!</a> - MADE BY <a href="https://www.melonking.net/" target="_blank">MK</a> &lt;3 - v0.2.1</footer>
+
+        <script src="./pet.js.download" charset="utf-8"></script>
+    
+
+</body></html>
