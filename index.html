@@ -9,13 +9,13 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0a'/%3E%3Ctext x='2' y='24' font-family='monospace' font-size='18' fill='%2300ff00'%3E%3E_%3C/text%3E%3C/svg%3E">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
-        :root{--bg:#0a0a0a;--fg:#b0b0b0;--accent:#00ff00;--pink:#ffb8d0;--pink-glow:rgba(255,184,208,0.5);--dim:#505050;--red:#ff5555;--yellow:#f1fa8c;--cyan:#8be9fd;--purple:#bd93f9}
+        :root{--bg:#0a0a0a;--fg:#b0b0b0;--accent:#00ff00;--pink:#9599ff;--pink-glow:rgba(149,153,255,0.5);--dim:#505050;--red:#ff5555;--yellow:#f1fa8c;--cyan:#8be9fd;--purple:#bd93f9}
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'VT323',monospace;background:var(--bg);color:var(--fg);min-height:100vh;padding:20px;position:relative;overflow-x:hidden;transition:background 0.4s ease,color 0.4s ease}
         body::before{content:"";position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.08),rgba(0,0,0,0.08) 1px,transparent 1px,transparent 2px);z-index:1000}
         ::selection{background:var(--pink);color:var(--bg)}
-        .star{position:fixed;pointer-events:none;z-index:1;color:#fff;opacity:0;transition:opacity var(--fade-in) ease-in}
-        .star.out{transition:opacity var(--fade-out) ease-out}
+        .star{position:fixed;pointer-events:none;z-index:1;color:#9599ff;opacity:0;transition:opacity 0.5s ease-in;font-size:24px;text-shadow:0 0 10px rgba(149,153,255,0.6)}
+        .star.out{transition:opacity 0.8s ease-out;opacity:0!important}
         #terminal{max-width:700px;margin:0 auto;position:relative;z-index:10;font-size:17px;line-height:1.4}
         .o{color:var(--fg);white-space:pre-wrap;word-wrap:break-word}
         .oa{color:var(--accent)}.op{color:var(--pink)}.od{color:var(--dim)}.or{color:var(--red)}.oy{color:var(--yellow)}.oc{color:var(--cyan)}.ou{color:var(--purple)}
@@ -154,7 +154,7 @@
 </div>
 <button id="mochi-tab" onclick="mochiOpen()"><div id="mochi-tab-dot"></div>🍡 MochiAI™</button>
 <!-- MOCHI WIDGET END -->
-<div id="escape-hatch"><div id="eh-panel"><span class="eh-label">~ seol ~</span><span style="color:var(--fg);font-size:14px;display:block;margin-bottom:4px">links & stuff</span><hr class="eh-sep"><span class="eh-label">message me</span><button id="eh-mail" onclick="ehMail()">$ mail seol</button><a id="eh-mail-fallback" href="mailto:mail@seol.ch">mail@seol.ch</a><hr class="eh-sep"><span class="eh-label">websites</span><a href="https://linuxlumi.ch">linuxlumi.ch</a><a href="https://writeups.ch">writeups.ch</a><hr class="eh-sep"><span class="eh-label">social</span><a href="https://x.com/lumiingenii">twitter</a><a href="https://mvm.lol/@lumi">mastodon (mvm.lol)</a><a href="https://infosec.exchange/@lumi">mastodon (infosec)</a><a href="https://www.reddit.com/user/lumiingenii/">reddit</a><hr class="eh-sep"><span class="eh-label">ctf & code</span><a href="https://github.com/seol">github</a><a href="https://ctftime.org/user/231692">ctftime</a><hr class="eh-sep"><button id="eh-surprise" onclick="ehSurprise()">surprise me ~</button><span class="eh-label" style="margin-top:6px;font-size:12px">or type <span style="color:var(--accent)">help</span> in the terminal</span></div><button id="eh-toggle" onclick="document.getElementById('eh-panel').classList.toggle('open')">lost?</button></div>
+<div id="escape-hatch"><div id="eh-panel"><span class="eh-label">~ seol ~</span><span style="color:var(--fg);font-size:14px;display:block;margin-bottom:4px">links & stuff</span><hr class="eh-sep"><span class="eh-label">message me</span><button id="eh-mail" onclick="ehMail()">$ mail seol</button><a id="eh-mail-fallback" href="mailto:mail@seol.ch">mail@seol.ch</a><hr class="eh-sep"><span class="eh-label">websites</span><a href="https://linuxlumi.ch">linuxlumi.ch</a><a href="https://writeups.ch">writeups.ch</a><hr class="eh-sep"><span class="eh-label">social</span><a href="https://x.com/seol">twitter</a><a href="https://mvm.lol/@seol">mastodon (mvm.lol)</a><a href="https://infosec.exchange/@seol">mastodon (infosec)</a><a href="https://www.reddit.com/user/seol/">reddit</a><hr class="eh-sep"><span class="eh-label">ctf & code</span><a href="https://github.com/seol">github</a><a href="https://ctftime.org/user/231692">ctftime</a><hr class="eh-sep"><button id="eh-surprise" onclick="ehSurprise()">surprise me ~</button><span class="eh-label" style="margin-top:6px;font-size:12px">or type <span style="color:var(--accent)">help</span> in the terminal</span></div><button id="eh-toggle" onclick="document.getElementById('eh-panel').classList.toggle('open')">lost?</button></div>
 <div id="dpad">
 <button class="up" ontouchstart="simKey('ArrowUp')" onclick="simKey('ArrowUp')">▲</button>
 <button class="down" ontouchstart="simKey('ArrowDown')" onclick="simKey('ArrowDown')">▼</button>
@@ -429,8 +429,12 @@ cmds.whoami=function(){pr('guest');};
 cmds.hostname=function(){pr('강해린');};
 cmds.pwd=function(){pr(cwdS());};
 cmds.clear=function(){output.innerHTML='';};
-
-updP();
+cmds.mail=function(){
+  pr('<span class="op">-- mail(1) --</span>');
+  pr('<span class="od">To: mail@seol.ch</span>');
+  pr('<span class="oa">From:</span> <span class="od">(your email or name)</span>');
+  pr('<span class="od">Fallback: mail@seol.ch</span>');
+};
 input.addEventListener('keydown',function(e){
     if(e.key==='Escape')return;
     if(e.key==='Enter'){
@@ -470,6 +474,68 @@ function runCmd(str){
 
 pr('<span class="motd">welcome to seol\'s terminal. type help for commands.</span>');
 pr('');
+
+// Escape hatch functions
+function ehMail(){
+  cmds.mail();
+}
+
+function ehSurprise(){
+  var surprises = [
+    'try: cat about.txt',
+    'try: cat .secret',
+    'try: ls -la',
+    'try: fortune',
+    'try: cowsay hello',
+    'type: help'
+  ];
+  var r = surprises[Math.floor(Math.random() * surprises.length)];
+  pr('<span class="od">' + r + '</span>');
+}
+
+// Show escape hatch after a delay
+setTimeout(function(){
+  document.getElementById('escape-hatch').classList.add('visible');
+}, 2000);
+
+// Star animation
+function createStar(){
+  var star = document.createElement('div');
+  star.className = 'star';
+  star.textContent = '✨';
+  star.style.left = Math.random() * 100 + '%';
+  star.style.top = Math.random() * 100 + '%';
+  document.body.appendChild(star);
+  
+  // Trigger fade in
+  setTimeout(function(){
+    star.style.opacity = '1';
+  }, 10);
+  
+  // Trigger fade out and remove
+  setTimeout(function(){
+    star.style.opacity = '0';
+    setTimeout(function(){ star.remove(); }, 1000);
+  }, Math.random() * 2000 + 1000);
+}
+
+setInterval(createStar, 3000);
+
+// Make directories clickable
+document.addEventListener('click', function(e){
+  if(e.target.classList.contains('out-dir')){
+    var cmd = e.target.textContent.trim();
+    if(cmd !== '.' && cmd !== '..'){
+      input.value = 'cd ' + cmd.replace('/', '');
+      input.focus();
+    }
+  }
+  if(e.target.classList.contains('out-link')){
+    var cmd = e.target.textContent.trim();
+    input.value = 'open ' + cmd;
+    input.focus();
+  }
+});
 
 })();
 </script>
