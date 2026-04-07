@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>잠자는 토끼. . ˖Ი𐑼⋆</title>
+
+  <!-- ═══════════════════════════════════
+       FAVICON + STYLESHEETS
+  ═══════════════════════════════════ -->
+  <link rel="icon" type="image/x-icon" href="./seol/bun.png">
+  <link href="./seol/style.css" rel="stylesheet" type="text/css" media="all">
+
+  <style>
+    
+    /* ═══════════════════════════════════
+       PAGE BODY
+       background image, cursor, padding
+    ═══════════════════════════════════ */
+    body {
+      background-image: url('./seol/beegees.png');
+      background-repeat: repeat;
+      background-size: 1700px;
+      background-position: center;
+      padding: 50px;
+      cursor: url("https://file.garden/adMvuUsLaQ5DhcDC/normal.gif"), auto;
+    }
+
+    /* ═══════════════════════════════════
+       UTILITY — centers block elements
+    ═══════════════════════════════════ */
+    .center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      width: auto;
+    }
+
+    /* ═══════════════════════════════════
+       BASE TEXT STYLES
+    ═══════════════════════════════════ */
+    p {
+      color: #333940;
+      font-size: 12px;
+    }
+
+    a {
+      font-size: 15px;
+      color: #333940;
+    }
+
+    b {
+      color: #8a9eab;
+    }
+
+    /* ═══════════════════════════════════
+       TABLE STYLES
+    ═══════════════════════════════════ */
+    table, th, td {
+      border: 1px dashed #8a9eab;
+      color: #8a9eab;
+    }
+
+    /* ═══════════════════════════════════
+       #text01 — cloud border image box
+    ═══════════════════════════════════ */
+    #text01 {
+      border-width: 7px;
+      border-style: solid;
+      border-image: url("./seol/clouddie.png") 7 fill round;
+      height: 100px;
+      width: 100px;
+      padding: 8px;
+      overflow: auto;
+    }
+
+    /* ═══════════════════════════════════
+       NAVIGATION LIST ITEMS
+    ═══════════════════════════════════ */
+    li {
+      width: 95%;
+      border-bottom: 1.5px dashed #333738;
+    }
+
+    li a {
+      display: block;
+      color: #333940;
+      text-decoration: none;
+    }
+
+    li a:hover {
+      background-color: #95a8a9;
+      color: white;
+    }
+
+    /* ═══════════════════════════════════
+       COLLAPSIBLE BUTTON (photocard sidebar)
+    ═══════════════════════════════════ */
+    .collapsible {
+      background-color: white;
+      border: none;
+      color: black;
+      cursor: pointer;
+      padding: 10px;
+      width: 99%;
+      text-align: center;
+      outline: none;
+      font-size: 15px;
+    }
+
+    .active,
+    .collapsible:hover {
+      color: #758181;
+    }
+
+    .content {
+      display: none;
+      overflow: hidden;
+    }
+
+    /* ═══════════════════════════════════
+       SCROLLBAR STYLE (thin + colored)
+    ═══════════════════════════════════ */
+    .container {
+      scrollbar-color: #95a8a9 white;
+      scrollbar-width: thin;
+    }
+
+    /* ═══════════════════════════════════
+       ARTICLE — mini post / status card
+    ═══════════════════════════════════ */
+    article {
+      border: 1px solid #333738;
+      background-image: url('./seol/dottie.jpg');
+    }
+
+    /* ═══════════════════════════════════
+       PHOTOCARD — floating draggable widget
+       position:absolute so it lives on the PAGE
+       grab anywhere on card to drag; snaps back after 10s
+    ═══════════════════════════════════ */
+    .photocard {
+      width: 210px;
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      background-color: #f4f7fb;
+      border: 1.5px solid #b8c8d8;
+      border-radius: 16px;
+      box-shadow: 3px 4px 0px #c8d8e8;
+      cursor: grab;
+      z-index: 99;
+      overflow: hidden;
+    }
+    .photocard:active { cursor: grabbing; }
+
+    .drag-handle {
+      width: 100%;
+      height: 26px;
+      background: linear-gradient(90deg, #c5d8e8 0%, #dce8f4 100%);
+      border-bottom: 1px solid #b0c8d8;
+      cursor: grab;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px;
+      box-sizing: border-box;
+    }
+
+    .drag-handle::before {
+      content: "✦ photocard";
+      font-size: 10px;
+      color: #4a6880;
+      font-weight: bold;
+      letter-spacing: 0.05em;
+    }
+
+    .drag-handle::after {
+      content: "− □ ×";
+      font-size: 10px;
+      color: #7a9ab0;
+      letter-spacing: 3px;
+    }
+
+    .drag-handle:active {
+      cursor: grabbing;
+    }
+
+    .photocard-body {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .collapsible {
+      background-color: #dce8f4;
+      border: 1px solid #a8c0d4;
+      border-radius: 20px;
+      color: #4a6880;
+      cursor: pointer;
+      padding: 5px 14px;
+      width: auto;
+      text-align: center;
+      outline: none;
+      font-size: 12px;
+      transition: background 0.15s;
+    }
+
+    .active,
+    .collapsible:hover {
+      background-color: #c5d8e8;
+      color: #3a5870;
+    }
+
+    /* ═══════════════════════════════════
+       CRT FILTER — scanline + flicker overlay
+       credit: oudkee.neocities.org
+    ═══════════════════════════════════ */
+    .crt::before {
+      content: " ";
+      display: block;
+      position: fixed;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background:
+        linear-gradient(rgba(18, 16, 16, 0) 80%, rgba(0, 0, 0, 0.25) 80%),
+        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      background-size: 100% 2px, 3px 100%;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    @keyframes flicker {
+      0%  { opacity: 0.27861; }
+      5%  { opacity: 0.34769; }
+      10% { opacity: 0.23604; }
+      15% { opacity: 0.10626; }
+      20% { opacity: 0.18128; }
+      25% { opacity: 0.10626; }
+      30% { opacity: 0.18128; }
+      35% { opacity: 0.23604; }
+    }
+
+    .crt::after {
+      content: " ";
+      display: block;
+      position: fixed;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: rgba(18, 16, 16, 0.1);
+      opacity: 0;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* ═══════════════════════════════════
+       CALENDAR WIDGET
+    ═══════════════════════════════════ */
+    .calendar {
+      border: 1px dashed #333738;
+      background-color: #e4e7f6;
+    }
+
+    .header1 {
+      text-align: center;
+      margin-bottom: 5px;
+      height: 10px;
+      background-color: white;
+    }
+
+    .weekdays,
+    .days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+    }
+
+    .weekdays div {
+      font-weight: bold;
+      color: #8a9eab;
+    }
+
+    .days div {
+      color: #8a9eab;
+    }
+
+    /* today's date highlighted in red */
+    .today {
+      color: #e53935;
+      font-weight: bold;
+    }
+
+    /* ═══════════════════════════════════
+       CALENDAR PHOTOCARD WIDGET
+    ═══════════════════════════════════ */
+    .pc-cal {
+      width: 100%;
+      margin-top: 10px;
+      background-color: #f4f7fb;
+      border: 1.5px solid #b8c8d8;
+      border-radius: 14px;
+      overflow: hidden;
+      box-sizing: border-box;
+      box-shadow: 2px 3px 0px #c8d8e8;
+    }
+    .pc-cal-handle {
+      background: linear-gradient(90deg, #c5d8e8 0%, #dce8f4 100%);
+      border-bottom: 1px solid #b0c8d8;
+      padding: 5px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .pc-cal-title {
+      font-size: 10px;
+      color: #4a6880;
+      font-weight: bold;
+      letter-spacing: 0.05em;
+    }
+    .pc-cal-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .pc-cal-btn {
+      background: #dce8f4;
+      border: 1px solid #a8c0d4;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      font-size: 11px;
+      color: #4a6880;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pc-cal-btn:hover { background: #c5d8e8; }
+    .pc-cal-body {
+      padding: 6px 8px 8px;
+    }
+    .pc-cal-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      margin-bottom: 2px;
+    }
+    .pc-cal-weekdays span {
+      font-size: 9px;
+      font-weight: bold;
+      color: #8aaac8;
+      padding: 2px 0;
+    }
+    .pc-cal-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      gap: 1px;
+    }
+    .pc-cal-days span {
+      font-size: 10px;
+      color: #6a8898;
+      padding: 3px 1px;
+      border-radius: 50%;
+    }
+    .pc-cal-today {
+      background-color: #b8c8d8 !important;
+      color: #ffffff !important;
+      font-weight: bold;
+      border-radius: 50%;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- ═══════════════════════════════════
+       CRT OVERLAY — full screen scanline filter
+  ═══════════════════════════════════ -->
+  <div class="crt"></div>
+
+  <span class="text" style="font-size:11px">
+
+    <!-- ═══════════════════════════════════
+         PHOTOCARD 1 — draggable, snaps back after 10s
+    ═══════════════════════════════════ -->
+    <div class="photocard" id="photocard" style="top:50px;left:50px;">
+      <div class="drag-handle" id="dragHandle"></div>
+      <div class="photocard-body">
+        <img src="./seol/tree.jpg" style="border-radius:10px;width:180px;">
+        <button type="button" class="collapsible">click me ! <img src="./seol/bun.png" style="width:14px;vertical-align:middle;"></button>
+        <div class="content" style="width:180px;height:300px;margin-top:4px;border:1px dashed #a8c0d4;border-radius:10px;background-color:#f8faff;display:none;overflow:hidden;">
+          <img src="./seol/haerinphotocard.jpg" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:8px;">
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════
+         PHOTOCARD 2 — sits below photocard 1
+    ═══════════════════════════════════ -->
+    <div class="photocard" id="photocard2" style="top:380px;left:50px;">
+      <div class="drag-handle" id="dragHandle2"></div>
+      <div class="photocard-body">
+        <img src="./seol/tree.jpg" style="border-radius:10px;width:180px;">
+        <button type="button" class="collapsible">click me ! <img src="./seol/bun.png" style="width:14px;vertical-align:middle;"></button>
+        <div class="content" style="width:180px;height:300px;margin-top:4px;border:1px dashed #a8c0d4;border-radius:10px;background-color:#f8faff;display:none;"></div>
+      </div>
+    </div>
+
+
+
+    <!-- ═══════════════════════════════════
+         LACE BORDER WRAPPER
+         uses lace.png as border-image
+         change "20px" and "20" together to resize
+    ═══════════════════════════════════ -->
+    <div style="border:20px solid transparent;border-image:url('./seol/lace.png') 20 fill round;width:823px;height:auto;margin:0 auto;display:block;" class="center">
+
+      <!-- BLUE DOTS TEXTURE LAYER -->
+      <div style="width:822px;height:auto;background-image:url('./seol/blue square with dots.png');background-repeat:repeat;padding:10px;border:1px dashed #333738;border-radius:20px;box-sizing:border-box;">
+
+        <!-- WHITE CONTENT AREA -->
+        <div style="width:800px;height:auto;padding:10px;padding-bottom:24px;border:1px dashed #333738;border-radius:20px;background-color:white;box-sizing:border-box;">
+
+          <!-- BANNER — half height (100px) -->
+          <div style="width:100%;height:162px;margin-bottom:8px;">
+            <img src="./seol/hanni.png" style="width:100%;height:100%;border:1px solid #333738;border-radius:5px;object-fit:cover;object-position:center 20%;">
+          </div>
+
+          <!-- THREE-COLUMN GRID -->
+          <div style="display:grid;grid-template-columns:160px 1fr 160px;gap:8px;align-items:start;">
+
+
+          <!-- LEFT COLUMN -->
+          <div style="display:flex;flex-direction:column;gap:8px;">
+
+            <!-- NAVIGATION BOX -->
+            <div style="box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
+              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ 디렉터리</span>
+              </div>
+              <div style="padding:6px 8px;box-sizing:border-box;">
+                <div style="background-color:white;border:1px dashed #b8c8d8;border-radius:8px;overflow:hidden;">
+                  <ul style="padding:0;margin:0;list-style-type:none;">
+                    <li style="border-bottom:1px dashed #b8c8d8;width:100%;"><a href="https://seolhae.neocities.org/gallery/" style="font-size:15px;padding:4px 8px;display:flex;align-items:center;gap:4px;"><img src="./seol/bunnyicon.png" style="width:13px;height:13px;"> gallery</a></li>
+                    <li style="border-bottom:1px dashed #b8c8d8;width:100%;"><a href="https://seolhae.neocities.org/diary/" style="font-size:15px;padding:4px 8px;display:flex;align-items:center;gap:4px;"><img src="./seol/bunnyicon.png" style="width:13px;height:13px;"> diary</a></li>
+                    <li style="border-bottom:1px dashed #b8c8d8;width:100%;"><a href="https://seolhae.neocities.org/pokemon/" style="font-size:15px;padding:4px 8px;display:flex;align-items:center;gap:4px;"><img src="./seol/bunnyicon.png" style="width:13px;height:13px;"> pokemon</a></li>
+                    <li style="border-bottom:1px dashed #b8c8d8;width:100%;"><a href="https://seolhae.neocities.org/" style="font-size:15px;padding:4px 8px;color:#c0d0dc;">- - - - - - -</a></li>
+                    <li style="border-bottom:1px dashed #b8c8d8;width:100%;"><a href="https://seolhae.neocities.org/" style="font-size:15px;padding:4px 8px;color:#c0d0dc;">- - - - - - -</a></li>
+                    <li style="width:100%;"><a href="https://seolhae.neocities.org/" style="font-size:15px;padding:4px 8px;color:#c0d0dc;">- - - - - - -</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAMAGOTCHI WIDGET -->
+            <div style="box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
+              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ tamanotchi</span>
+              </div>
+              <div style="padding:10px 8px;text-align:center;background-image:url('./seol/plaid.jpg');background-size:cover;">
+                <a href="https://tamanotchi.world/31638c">
+                  <img src="https://tamanotchi.world/i2/31638" alt="It's tamaNOTchi! Click to feed!" style="width:40%;height:auto;">
+                </a>
+              </div>
+            </div>
+
+            <!-- PATCH NOTES / UPDATE LOG -->
+            <div style="height:300px;box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;display:flex;flex-direction:column;">
+              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ patch notes 🐇</span>
+              </div>
+              <!-- scrollable text area -->
+              <div class="container" style="flex:1;overflow-y:scroll;padding:6px 8px;background-color:white;">
+                <div style="background-color:#f9fcff;border:1px dashed #b8c8d8;border-radius:8px;padding:4px 6px;font-size:10px;line-height:1.9;">
+                  <b>❖ 2026년.4월.6일:</b> added bubbles and sparkles<br>
+                  <b>❖ 2026년.4월.6일:</b> added photocards<br>
+                  <b>❖ 2026년.4월.6일:</b> added music, pictures, fixed code<br>
+                  <b>❖ 2026년.4월.1일:</b> created the website<br>
+                </div>
+              </div>
+              <!-- maus stays fixed at bottom of box, not inside the scroll -->
+              <div style="background-color:#f4f7fb;border-top:1px dashed #b8c8d8;padding:6px;text-align:center;">
+                <img src="./seol/mausfamily2.png" style="width:64px;height:auto;">
+              </div>
+            </div>
+
+            <!-- UNDER CONSTRUCTION BOX A -->
+            <div style="box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
+              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ · · ·</span>
+              </div>
+              <div style="padding:10px 8px;background-color:white;text-align:center;">
+                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.05em;">- - - - - - - - - -</p>
+                <p style="font-size:10px;color:#8a9eab;margin:4px 0;">⚙ under construction ⚙</p>
+                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.05em;">- - - - - - - - - -</p>
+              </div>
+            </div>
+
+            <!-- UNDER CONSTRUCTION BOX B -->
+            <div style="box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
+              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ · · ·</span>
+              </div>
+              <div style="padding:10px 8px;background-color:white;text-align:center;">
+                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.05em;">- - - - - - - - - -</p>
+                <p style="font-size:10px;color:#8a9eab;margin:4px 0;">⚙ under construction ⚙</p>
+                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.05em;">- - - - - - - - - -</p>
+              </div>
+            </div>
+
+          </div>
+          <!-- end left column -->
+
+
+          <!-- MIDDLE COLUMN -->
+          <div style="display:flex;flex-direction:column;gap:8px;">
+
+            <!-- ABOUT BOX -->
+            <div style="box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
+              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ about me</span>
+              </div>
+              <div style="background-color:white;padding:8px;display:flex;gap:8px;align-items:flex-start;">
+                <a href="https://pokemondb.net/pokedex/maushold" style="flex-shrink:0;">
+                  <img src="https://img.pokemondb.net/sprites/scarlet-violet/normal/maushold-family3.png" alt="Maushold"
+                    style="width:60px;height:60px;object-fit:cover;object-position:center bottom;transform:scaleX(-1);display:block;">
+                </a>
+                <p style="margin:0;font-size:11px;line-height:1.7;flex:1;color:#333940;">
+                  안녕! welcome to my site,<br>
+                  This space is a quiet archive of the things that I love and create. ♡<br><br>
+                  A place for my thoughts, projects, art, writing, and the little media that holds my memories.
+                  I spend most of my time in gentle, comforting worlds — playing cozy and RPG games, collecting Pokémon cards, and listening to music.
+                  I also enjoy taking photos and singing, keeping moments in ways that feel soft and lasting.<br><br>
+                  inspired by NewJeans.
+                </p>
+                <img src="./seol/newjeans haerin powerpuff girl.jpg" style="width:80px;flex-shrink:0;border-radius:6px;transform: scaleX(-1);">
+              </div>
+            </div>
+
+            <!-- MUSIC PLAYER BAR -->
+            <div style="box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
+              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ now playing</span>
+              </div>
+              <div style="display:flex;align-items:center;padding:6px 8px;background-color:white;gap:8px;">
+                <img src="./seol/rightnow.webp" style="height:44px;width:44px;object-fit:cover;border-radius:6px;border:1px dashed #b8c8d8;flex-shrink:0;">
+                <div style="flex:1;overflow:hidden;">
+                  <marquee behavior="scroll">
+                    <span style="color:#8a9eab;font-size:10px;">𝄞𝄢⋆.˚♪ currently playing ˖ ݁♬⋆.˚𝄞 &nbsp;&nbsp; right now — NewJeans</span>
+                    <audio id="music" src="./seol/Right Now.mp3" autoplay></audio>
+                    <script>
+                      document.addEventListener("click", function () {
+                        const audio = document.getElementById("music");
+                        audio.volume = 0.2;
+                        audio.play();
+                      }, { once: true });
+                    </script>
+                  </marquee>
+                  <p style="margin:2px 0 0;font-size:10px;color:#4a6880;padding-left:2px;">right now — NewJeans</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- POEM + MEDIA ROW -->
+            <div style="box-sizing:border-box;display:flex;gap:6px;height:280px;">
+
+              <!-- POEM BOX (scrollable) -->
+              <div style="flex:1;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;display:flex;flex-direction:column;">
+                <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;flex-shrink:0;">
+                  <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ a poem i found</span>
+                </div>
+                <div class="container" style="flex:1;overflow-y:scroll;background-color:white;padding:6px 8px;">
+                  <img src="./seol/buni.png" class="center" style="width:50%;margin:4px auto 6px;">
+                  <p style="text-align:center;color:#7d9acf;margin:0;font-size:10px;">2026년 3월 14일</p>
+                  <p style="text-align:center;font-size:10px;margin:2px 0 0;color:#333940;">The Snow Path · Chung Ho-seung</p>
+                  <p style="text-align:center;font-size:10px;color:#8a9eab;margin:0 0 4px;">눈길 · 정호승</p>
+                  <p style="font-size:10px;margin:0;line-height:1.8;color:#333940;">
+                    I see someone's footsteps<br>
+                    that have walked<br>
+                    on the all white snow path.<br>
+                    They belong to a bird.<br>
+                    Good heavens.<br><br>
+                    희디흰 눈길 위로<br>
+                    누가 걸어간<br>
+                    발자국이 보인다<br>
+                    새의 발자욱이다<br>
+                    다행이다
+                  </p>
+                </div>
+              </div>
+
+              <!-- MEDIA IMAGE BOX -->
+              <div style="flex:1;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;display:flex;flex-direction:column;">
+                <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;flex-shrink:0;">
+                  <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ media</span>
+                </div>
+                <div style="flex:1;overflow:hidden;">
+                  <img src="./seol/mediabbg.png" style="width:100%;height:100%;object-fit:cover;display:block;">
+                </div>
+              </div>
+
+            </div>
+            <!-- end poem + media row -->
+
+            <!-- ASAP BANNER IMAGE -->
+            <div style="box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
+              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ currently obsessed</span>
+              </div>
+              <div style="height:140px;overflow:hidden;">
+                <img src="./seol/ASAP.webp" style="width:100%;height:100%;object-fit:cover;object-position:center 70%;display:block;">
+              </div>
+            </div>
+
+            <!-- UNDER CONSTRUCTION BOX A -->
+            <div style="box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
+              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ · · ·</span>
+              </div>
+              <div style="padding:16px 8px;background-color:white;text-align:center;">
+                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - - - - - - - - - - - -</p>
+                <p style="font-size:10px;color:#8a9eab;margin:6px 0;">⚙ under construction ⚙</p>
+                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - - - - - - - - - - - -</p>
+              </div>
+            </div>
+
+            <!-- UNDER CONSTRUCTION BOX B -->
+            <div style="box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
+              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ · · ·</span>
+              </div>
+              <div style="padding:16px 8px;background-color:white;text-align:center;">
+                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - - - - - - - - - - - -</p>
+                <p style="font-size:10px;color:#8a9eab;margin:6px 0;">⚙ under construction ⚙</p>
+                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - - - - - - - - - - - -</p>
+              </div>
+            </div>
+
+          </div>
+          <!-- end middle column -->
+
+
+          <!-- ═══════════════════════════════════
+               RIGHT COLUMN (21%)
+               status card, calendar, currently,
+               image, contact links, extra boxes
+          ═══════════════════════════════════ -->
+          <div style="display:flex;flex-direction:column;gap:8px;">
+
+            <!-- STATUS POST CARD -->
+            <div style="width:100%;box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
+              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ seol's post</span>
+              </div>
+              <div style="padding:8px;background-color:white;">
+                <div style="background-color:#f9fcff;border:1px dashed #b8c8d8;border-radius:8px;padding:6px;">
+                  <div style="display:flex;gap:6px;align-items:flex-start;">
+                    <div style="width:50px;height:54px;border:1px dashed #e8c8d8;border-radius:6px;overflow:hidden;flex-shrink:0;">
+                      <img src="./seol/hanni3.png" style="width:100%;height:100%;object-fit:cover;display:block;">
+                    </div>
+                    <div style="flex:1;min-width:0;">
+                      <p style="font-size:10px;margin:0 0 2px;color:#4a6880;border-bottom:1px dashed #b8c8d8;padding-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">seol wrote: i love 하니♥</p>
+                      <p style="font-size:10px;color:#8a9eab;margin:2px 0 0;">뭐 해?</p>
+                    </div>
+                  </div>
+                  <div style="margin-top:5px;background-color:#eef4fb;border-radius:6px;padding:4px 6px;">
+                    <p style="font-size:11px;margin:0;color:#4a6880;">i love sleeping ♡</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- CALENDAR PHOTOCARD WIDGET -->
+            <div class="pc-cal" id="pcCal">
+              <div class="pc-cal-handle">
+                <span class="pc-cal-title">calendar ✦</span>
+                <span class="pc-cal-nav">
+                  <button class="pc-cal-btn" onclick="pcCalMove(-1)">‹</button>
+                  <span id="pcMonthYear" style="font-size:10px;color:#4a6880;font-weight:bold;"></span>
+                  <button class="pc-cal-btn" onclick="pcCalMove(1)">›</button>
+                </span>
+              </div>
+              <div class="pc-cal-body">
+                <div class="pc-cal-weekdays">
+                  <span>일</span><span>월</span><span>화</span>
+                  <span>수</span><span>목</span><span>금</span><span>토</span>
+                </div>
+                <div class="pc-cal-days" id="pcDays"></div>
+              </div>
+            </div>
+            <script>
+              var pcYear, pcMonth;
+              (function() {
+                var t = new Date();
+                pcYear  = t.getFullYear();
+                pcMonth = t.getMonth();
+                pcCalRender();
+              })();
+              function pcCalMove(dir) {
+                pcMonth += dir;
+                if (pcMonth > 11) { pcMonth = 0;  pcYear++; }
+                if (pcMonth < 0)  { pcMonth = 11; pcYear--; }
+                pcCalRender();
+              }
+              function pcCalRender() {
+                var t        = new Date();
+                var isToday  = (pcYear === t.getFullYear() && pcMonth === t.getMonth());
+                var firstDay = new Date(pcYear, pcMonth, 1).getDay();
+                var total    = new Date(pcYear, pcMonth + 1, 0).getDate();
+                var months   = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
+                document.getElementById("pcMonthYear").textContent = pcYear + "년 " + months[pcMonth];
+                var grid = document.getElementById("pcDays");
+                grid.innerHTML = "";
+                for (var i = 0; i < firstDay; i++) {
+                  var blank = document.createElement("span");
+                  grid.appendChild(blank);
+                }
+                for (var d = 1; d <= total; d++) {
+                  var span = document.createElement("span");
+                  span.textContent = d;
+                  if (isToday && d === t.getDate()) span.classList.add("pc-cal-today");
+                  grid.appendChild(span);
+                }
+              }
+            </script>
+
+            <!-- CURRENTLY BOX -->
+            <div style="width:100%;margin-top:8px;box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
+              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ currently</span>
+              </div>
+              <div style="padding:8px;background-color:white;">
+                <p style="margin:0 0 4px;text-align:center;font-size:10px;color:#8a9eab;">2026년 4월 1일</p>
+                <div style="background-color:#f9fcff;border:1px dashed #b8c8d8;border-radius:8px;padding:5px 7px;font-size:10px;line-height:2;">
+                  <b>♪ listening :</b> the marias — back to me<br>
+                  <b>◎ watching :</b> n/a<br>
+                  <b>✎ reading :</b> n/a
+                </div>
+              </div>
+            </div>
+
+            <!-- DECORATIVE IMAGE -->
+            <div style="width:100%;margin-top:8px;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
+              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ newjeans</span>
+              </div>
+              <img src="./seol/newjeans.webp" style="width:100%;display:block;">
+            </div>
+
+            <!-- CONTACT / LINKS BOX -->
+            <div style="width:100%;margin-top:8px;box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
+              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ find me</span>
+              </div>
+              <div style="padding:8px;background-color:white;text-align:center;">
+                <p style="font-size:10px;color:#8a9eab;margin:0 0 6px;">⤷ feel free to message me ᝰ.ᐟ</p>
+                <div style="background-color:#f9fcff;border:1px dashed #b8c8d8;border-radius:8px;padding:6px;">
+                  <p style="font-size:11px;text-align:center;margin:3px 0;">
+                    <a href="https://www.instagram.com/" target="_blank"
+                      style="text-decoration:none;color:#4a6880;font-size:11px;opacity:0.8;display:inline-flex;align-items:center;gap:4px;transition:all 0.2s ease;"
+                      onmouseover="this.style.opacity='1';this.style.transform='translateY(-1px)';"
+                      onmouseout="this.style.opacity='0.8';this.style.transform='none';">
+                      <img src="https://www.vectorlogo.zone/logos/instagram/instagram-icon.svg" style="width:10px;height:10px;">
+                      instagram
+                    </a>
+                  </p>
+                  <p style="font-size:11px;text-align:center;margin:3px 0;">
+                    <a href="https://www.tiktok.com/@pokeseol" target="_blank"
+                      style="text-decoration:none;color:#4a6880;font-size:11px;opacity:0.8;display:inline-flex;align-items:center;gap:4px;transition:all 0.2s ease;"
+                      onmouseover="this.style.opacity='1';this.style.transform='translateY(-1px)';"
+                      onmouseout="this.style.opacity='0.8';this.style.transform='none';">
+                      <img src="https://www.vectorlogo.zone/logos/tiktok/tiktok-icon.svg" style="width:10px;height:10px;">
+                      tiktok
+                    </a>
+                  </p>
+                </div>
+                <img src="./seol/Bunny GIF.gif" class="center" style="margin-top:6px;">
+              </div>
+            </div>
+
+            <!-- UNDER CONSTRUCTION BOX A -->
+            <div style="width:100%;margin-top:8px;box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
+              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ · · ·</span>
+              </div>
+              <div style="padding:12px 8px;background-color:white;text-align:center;">
+                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - -</p>
+                <p style="font-size:10px;color:#8a9eab;margin:5px 0;">⚙ under construction ⚙</p>
+                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - -</p>
+              </div>
+            </div>
+
+            <!-- UNDER CONSTRUCTION BOX B -->
+            <div style="width:100%;margin-top:8px;box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
+              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ · · ·</span>
+              </div>
+              <div style="padding:12px 8px;background-color:white;text-align:center;">
+                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - -</p>
+                <p style="font-size:10px;color:#8a9eab;margin:5px 0;">⚙ under construction ⚙</p>
+                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - -</p>
+              </div>
+            </div>
+
+          </div>
+          <!-- end right column -->
+
+
+        </div>
+        <!-- end white content area -->
+
+      </div>
+      <!-- end blue dots texture layer -->
+
+    </div>
+    <!-- end lace border wrapper -->
+
+
+    <!-- ═══════════════════════════════════
+         COLLAPSIBLE SCRIPT
+         toggles the photocard chatbox open/closed
+    ═══════════════════════════════════ -->
+    <script>
+      var coll = document.getElementsByClassName("collapsible");
+      for (var i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function () {
+          this.classList.toggle("active");
+          var content = this.nextElementSibling;
+          content.style.display = (content.style.display === "block") ? "none" : "block";
+        });
+      }
+    </script>
+
+    <!-- ═══════════════════════════════════
+         DRAG AND DROP SCRIPT
+         position:absolute — drag anywhere on page
+         snaps back to home position after 10s
+    ═══════════════════════════════════ -->
+    <script>
+      function makeCard(cardId, handleId, homeLeft, homeTop) {
+        var card   = document.getElementById(cardId);
+        var handle = document.getElementById(handleId);
+        var drag = false, sx, sy, sl, st, timer;
+
+        card.addEventListener("mousedown", function(e) {
+          if (e.target.tagName === "BUTTON") return;
+          e.preventDefault();
+          drag = true;
+          clearTimeout(timer);
+          card.style.transition = "";
+          sx = e.clientX;
+          sy = e.clientY;
+          sl = card.offsetLeft;
+          st = card.offsetTop;
+          card.style.cursor = "grabbing";
+        });
+
+        document.addEventListener("mousemove", function(e) {
+          if (!drag) return;
+          card.style.left = (sl + e.clientX - sx) + "px";
+          card.style.top  = (st + e.clientY - sy) + "px";
+        });
+
+        document.addEventListener("mouseup", function() {
+          if (!drag) return;
+          drag = false;
+          card.style.cursor = "grab";
+          timer = setTimeout(function() {
+            card.style.transition = "left 1s ease, top 1s ease";
+            card.style.left = homeLeft + "px";
+            card.style.top  = homeTop  + "px";
+            setTimeout(function() { card.style.transition = ""; }, 1100);
+          }, 10000);
+        });
+      }
+
+      makeCard("photocard",  "dragHandle",  50, 50);
+      makeCard("photocard2", "dragHandle2", 50, 380);
+    </script>
+    <!-- ═══════════════════════════════════
+          Custom Scripts
+      ═══════════════════════════════════ -->
+    <script src="./cursor.js"></script>
+    <script src="./bubbles.js"></script>
+
+  </span>
+</body>
+</html>
