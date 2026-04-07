@@ -1,4 +1,4 @@
-nvar colours=new Array("#dce8f4", "#b8c8d8", "#b8c8d8", "#dce8f4", "#f0f6ff");
+var colours=new Array("#dce8f4", "#b8c8d8", "#b8c8d8", "#dce8f4", "#f0f6ff");
 var bubbles=66;
 var over_or_under="under";
 
