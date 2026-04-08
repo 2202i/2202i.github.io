@@ -2,31 +2,7 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <meta name="viewport" content="width=1536">
-  <style>
-    /* ═══════════════════════════════════
-       RESOLUTION LOCK — 1536×864
-       Scales the entire page so it always
-       looks exactly like your screen,
-       regardless of the visitor's display.
-    ═══════════════════════════════════ */
-    html {
-      width: 1536px;
-      transform-origin: top left;
-    }
-  </style>
-  <script>
-    (function() {
-      var TARGET_W = 1536;
-      function applyScale() {
-        var scale = window.innerWidth / TARGET_W;
-        document.documentElement.style.transform = "scale(" + scale + ")";
-        document.documentElement.style.height = (100 / scale) + "vh";
-      }
-      applyScale();
-      window.addEventListener("resize", applyScale);
-    })();
-  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>잠자는 토끼. . ˖Ი𐑼⋆</title>
 
   <!-- ═══════════════════════════════════
@@ -261,24 +237,13 @@
       pointer-events: none;
     }
 
-    @keyframes flicker {
-      0%  { opacity: 0.27861; }
-      5%  { opacity: 0.34769; }
-      10% { opacity: 0.23604; }
-      15% { opacity: 0.10626; }
-      20% { opacity: 0.18128; }
-      25% { opacity: 0.10626; }
-      30% { opacity: 0.18128; }
-      35% { opacity: 0.23604; }
-    }
-
     .crt::after {
       content: " ";
       display: block;
       position: fixed;
       top: 0; left: 0; bottom: 0; right: 0;
-      background: rgba(18, 16, 16, 0.1);
-      opacity: 0;
+      background: rgba(18, 16, 16, 0.08);
+      opacity: 1;
       z-index: 2;
       pointer-events: none;
     }
