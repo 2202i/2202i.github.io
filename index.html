@@ -2,7 +2,31 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=1536">
+  <style>
+    /* ═══════════════════════════════════
+       RESOLUTION LOCK — 1536×864
+       Scales the entire page so it always
+       looks exactly like your screen,
+       regardless of the visitor's display.
+    ═══════════════════════════════════ */
+    html {
+      width: 1536px;
+      transform-origin: top left;
+    }
+  </style>
+  <script>
+    (function() {
+      var TARGET_W = 1536;
+      function applyScale() {
+        var scale = window.innerWidth / TARGET_W;
+        document.documentElement.style.transform = "scale(" + scale + ")";
+        document.documentElement.style.height = (100 / scale) + "vh";
+      }
+      applyScale();
+      window.addEventListener("resize", applyScale);
+    })();
+  </script>
   <title>잠자는 토끼. . ˖Ი𐑼⋆</title>
 
   <!-- ═══════════════════════════════════
@@ -2402,7 +2426,7 @@
               </div>
               <div style="padding:10px 8px;background-color:white;text-align:center;">
                 <div style="background-color:#f9fcff;border:1px dashed #b8c8d8;border-radius:8px;padding:6px;display:inline-block;">
-                  <img src="https://archives.bulbagarden.net/media/upload/6/6d/0134Vaporeon.png" style="width:90px;height:auto;display:block;margin:auto;">
+                  <img src="https://archives.bulbagarden.net/media/upload/thumb/6/6d/0134Vaporeon.png/375px-0134Vaporeon.png" style="width:90px;height:auto;display:block;margin:auto;">
                 </div>
                 <p style="font-size:10px;color:#8a9eab;margin:6px 0;">vapoman my fav ♡</p>
               </div>
@@ -2548,7 +2572,7 @@
                 </div>
                 <!-- name badge -->
                 <div style="text-align:center;margin-top:-10px;position:relative;z-index:1;">
-                  <span style="display:inline-block;background-color:#dce8f4;border:1px solid #b8c8d8;border-radius:20px;padding:2px 14px;font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.08em;">✦ florence ✦</span>
+                  <span style="display:inline-block;background-color:#dce8f4;border:1px solid #b8c8d8;border-radius:20px;padding:2px 14px;font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.08em;">✦ seol ✦</span>
                 </div>
                 <!-- ascii deco -->
                 <p style="text-align:center;font-size:9px;color:#b8c8d8;margin:4px 0 0;letter-spacing:0.05em;">｡･:*˚:✧｡ ˖ ˚ ˖ ｡✧:˚*:･｡</p>
