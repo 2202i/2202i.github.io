@@ -188,6 +188,10 @@
       cursor: grabbing;
     }
 
+    /* Override for media player — suppress the generic "✦ photocard" pseudo label */
+    #dragHandleMedia::before { content: none; }
+    #dragHandleMedia::after  { content: none; }
+
     .photocard-body {
       padding: 10px;
       display: flex;
@@ -533,6 +537,96 @@
       title: "NewJeans Fan",
       desc: "Scrolled all the way down.",
     },
+    "patted_fern": {
+      emoji: "🌿",
+      title: "Pat a Mage",
+      desc: "You patted Fern. She's a little annoyed.",
+    },
+    "patted_frieren": {
+      emoji: "🧝",
+      title: "Pat an Elf",
+      desc: "You patted Frieren. She barely noticed.",
+    },
+    "patted_mimikyu": {
+      emoji: "🎃",
+      title: "Pat a Mystery",
+      desc: "You patted Mimikyu. It seems happy... maybe.",
+    },
+    "patted_mimikyu5": {
+      emoji: "💛",
+      title: "Mimikyu Trusts You",
+      desc: "5 pats. It's warming up to you.",
+    },
+    "patted_mimikyu25": {
+      emoji: "🌟",
+      title: "Mimikyu's Best Friend",
+      desc: "25 pats. You're its favorite human.",
+    },
+    "patted_stark": {
+      emoji: "⚡",
+      title: "Stark's Sparring Partner",
+      desc: "You patted Stark. He's lowkey embarrassed.",
+    },
+    "patted_stark5": {
+      emoji: "🗡️",
+      title: "Fellow Warrior",
+      desc: "5 pats. He lets you stay.",
+    },
+    "patted_stark25": {
+      emoji: "🔥",
+      title: "Battle-Bonded",
+      desc: "25 pats. He trusts you now.",
+    },
+    "spell_alohomora": {
+      emoji: "🔑",
+      title: "First Incantation",
+      desc: "Alohomora. May all doors open for you.",
+    },
+    "spell_zoltraak": {
+      emoji: "🔮",
+      title: "Offensive Magic",
+      desc: "Zoltraak. A standard offensive spell. Fern uses it well.",
+    },
+    "spell_accio": {
+      emoji: "💫",
+      title: "Summoner",
+      desc: "Accio. Come to me.",
+    },
+    "spell_judradjim": {
+      emoji: "🌿",
+      title: "Ancient Grimoire",
+      desc: "Judradjim. Plant-binding magic from an ancient age.",
+    },
+    "spell_expelliarmus": {
+      emoji: "⚔️",
+      title: "The Disarmer",
+      desc: "Expelliarmus. Harry's signature. Simple but perfect.",
+    },
+    "all_spells": {
+      emoji: "📖",
+      title: "Grimoire Complete",
+      desc: "All 5 spells discovered. Frieren would be pleased.",
+    },
+    "tarot_reading": {
+      emoji: "🃏",
+      title: "The Wanderer's Card",
+      desc: "You drew a card from the ancient collection.",
+    },
+    "tarot_all": {
+      emoji: "✨",
+      title: "Fortune's Witness",
+      desc: "You've seen all cards. The journey continues.",
+    },
+    "konami": {
+      emoji: "🕹️",
+      title: "Old Ways",
+      desc: "↑↑↓↓←→←→. You know the code.",
+    },
+    "idle_watcher": {
+      emoji: "🌙",
+      title: "Still Here",
+      desc: "You've been here a while. Comfortable?",
+    },
   };
 
   function isAchievementUnlocked(id) {
@@ -560,23 +654,28 @@
       '</div>';
     container.appendChild(toast);
 
-    // Play a soft chime if available
+    // Play chime SFX — synth chime first, then mp3 fallback
     try {
-      var ctx = new (window.AudioContext || window.webkitAudioContext)();
-      var osc = ctx.createOscillator();
-      var gain = ctx.createGain();
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.frequency.setValueAtTime(660, ctx.currentTime);
-      osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1);
-      gain.gain.setValueAtTime(0.08, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
-      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.5);
-    } catch(e) {}
+      var achCtx = new (window.AudioContext || window.webkitAudioContext)();
+      var osc  = achCtx.createOscillator();
+      var gain = achCtx.createGain();
+      osc.connect(gain); gain.connect(achCtx.destination);
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(660, achCtx.currentTime);
+      osc.frequency.setValueAtTime(880, achCtx.currentTime + 0.12);
+      osc.frequency.setValueAtTime(1100, achCtx.currentTime + 0.24);
+      gain.gain.setValueAtTime(0.09, achCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, achCtx.currentTime + 0.7);
+      osc.start(achCtx.currentTime);
+      osc.stop(achCtx.currentTime + 0.7);
+    } catch(e) {
+      try { var c2 = new Audio('./chime.mp3'); c2.volume = 0.4; c2.play(); } catch(e2) {}
+    }
 
     setTimeout(function() {
       toast.classList.add("fade-out");
       setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 500);
-    }, 4000);
+    }, 7000);
   }
 
   // Welcome achievement on first visit
@@ -593,6 +692,19 @@
     var pageHeight = document.body.scrollHeight;
     if (scrollBottom > pageHeight * 0.9) triggerAchievement("newjeans_fan");
   });
+
+  // Konami code easter egg ↑↑↓↓←→←→
+  (function() {
+    var seq = [38,38,40,40,37,39,37,39];
+    var pos = 0;
+    document.addEventListener("keydown", function(e) {
+      if (e.keyCode === seq[pos]) { pos++; } else { pos = 0; }
+      if (pos === seq.length) { pos = 0; triggerAchievement("konami"); }
+    });
+  })();
+
+  // Idle watcher — stay on page for 3 minutes
+  setTimeout(function() { triggerAchievement("idle_watcher"); }, 3 * 60 * 1000);
   </script>
 
   <span class="text" style="font-size:11px">
@@ -637,6 +749,9 @@
       </div>
     </div>
 
+    <!-- ═══════════════════════════════════
+         PHOTOCARD 7 — pattable photocard, left side, below photocard 2
+    ═══════════════════════════════════ -->
     <div class="photocard" id="photocard7" style="top:1050px;left:120px;">
       <div class="drag-handle" id="dragHandle7"></div>
       <div class="photocard-body">
@@ -652,8 +767,8 @@
       try { patCount = parseInt(localStorage.getItem("seol_patcount") || "0", 10) || 0; } catch(e) {}
 
       var msgs = [
-        "♡", "ehehe~", "( ˘ ³˘)♥", "thank u...", "hehe",
-        "꼭 안아줄게", "mwah!", "(>‿◠)✌", "so soft...", "꺄!"
+        "huh", "the pats are cute", "woah dude", "thanks?", "h-hey calm down",
+        "cool", "meow~", "yo?", "so soft...", "꺄!"
       ];
       var bubble = document.getElementById("headpat-bubble");
       var counter = document.getElementById("headpat-counter");
@@ -724,14 +839,279 @@
     <div class="photocard" id="photocard9" style="top:1790px;left:35px;">
       <div class="drag-handle" id="dragHandle9"></div>
       <div class="photocard-body">
-        <img src="./seol/tree.jpg" style="border-radius:10px;width:180px;">
+        <img id="mimikyu-avatar" src="./seol/tree.jpg" style="border-radius:10px;width:180px;cursor:pointer;transition:transform 0.1s;user-select:none;" title="click to pat ♡">
+        <div id="mimikyu-bubble" style="background:linear-gradient(135deg,#f4f7fb,#dce8f4);border:1.5px solid #b8c8d8;border-radius:12px 12px 12px 2px;padding:5px 10px;font-size:10px;color:#4a6880;display:none;text-align:center;margin-top:4px;box-shadow:2px 2px 0 #c8d8e8;"></div>
+        <p id="mimikyu-counter" style="font-size:10px;color:#8a9eab;text-align:center;margin:2px 0;">pats: 0</p>
         <button type="button" class="collapsible"><img src="./seol/bun.png" style="width:14px;vertical-align:middle;"></button>
         <div class="content" style="width:180px;height:300px;margin-top:4px;border:1px dashed #a8c0d4;border-radius:10px;background-color:#f8faff;display:none;"></div>
       </div>
     </div>
+    <script>
+    (function() {
+      var mimikyuPatCount = 0;
+      try { mimikyuPatCount = parseInt(localStorage.getItem("seol_mimikyupats") || "0", 10) || 0; } catch(e) {}
+
+      var mimikyuMsgs = [
+        "kii ♡",
+        "*wiggles happily*",
+        "...!!",
+        "kiiii~",
+        "*the cloth trembles*",
+        "it likes you.",
+        "!!!! ♡",
+        "*happy shuffling noises*",
+        "kii kii ♡",
+        "*spins in place*",
+        "you're its favorite.",
+        "...kii."
+      ];
+
+      var avatar   = document.getElementById("mimikyu-avatar");
+      var bubble   = document.getElementById("mimikyu-bubble");
+      var counter  = document.getElementById("mimikyu-counter");
+      var normalSrc = "./seol/tree.jpg";
+      var patSrc    = "./seol/fern-borgar.gif";
+      var bubbleTimer, resetTimer;
+
+      function updateCounter() { counter.textContent = "pats: " + mimikyuPatCount; }
+      updateCounter();
+
+      avatar.addEventListener("click", function() {
+        mimikyuPatCount++;
+        try { localStorage.setItem("seol_mimikyupats", mimikyuPatCount); } catch(e) {}
+        updateCounter();
+
+        avatar.src = patSrc;
+        avatar.style.transform = "scale(0.94)";
+        clearTimeout(resetTimer);
+        resetTimer = setTimeout(function() {
+          avatar.src = normalSrc;
+          avatar.style.transform = "";
+        }, 1000);
+
+        bubble.textContent = mimikyuMsgs[Math.floor(Math.random() * mimikyuMsgs.length)];
+        bubble.style.display = "block";
+        clearTimeout(bubbleTimer);
+        bubbleTimer = setTimeout(function() { bubble.style.display = "none"; }, 2200);
+
+        if (mimikyuPatCount >= 1)  triggerAchievement("patted_mimikyu");
+        if (mimikyuPatCount >= 5)  triggerAchievement("patted_mimikyu5");
+        if (mimikyuPatCount >= 25) triggerAchievement("patted_mimikyu25");
+      });
+    })();
+    </script>
 
     <!-- ═══════════════════════════════════
-         DANCING DOGGO GIF — static, left side
+         FLOATING MEDIA PLAYER WINDOW
+         draggable, positioned below photocard9
+    ═══════════════════════════════════ -->
+    <div id="media-player-window" class="photocard" style="top:2080px;left:20px;width:240px;z-index:102;">
+      <div class="drag-handle" id="dragHandleMedia" style="background:linear-gradient(90deg,#9888c0 0%,#c4b8e0 100%);border-bottom:1px solid #7a6aa0;">
+        <span style="font-size:10px;color:#f0eeff;font-weight:bold;letter-spacing:0.05em;">✦ mypod</span>
+        <span style="font-size:10px;color:#d4c8f0;letter-spacing:3px;">− □ ×</span>
+      </div>
+      <div style="padding:10px;background:linear-gradient(160deg,#f0eef8 0%,#e8e4f4 100%);display:flex;flex-direction:column;gap:8px;">
+
+        <!-- album art -->
+        <div style="position:relative;width:100%;aspect-ratio:1;border-radius:10px;overflow:hidden;border:1.5px solid #c4b8e0;box-shadow:2px 3px 0 #d4c8f0;">
+          <img id="mp-album-art" src="./seol/rightnow.webp" style="width:100%;height:100%;object-fit:cover;display:block;transition:opacity 0.3s;">
+          <!-- spinning vinyl overlay -->
+          <div id="mp-vinyl" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
+            <div id="mp-vinyl-disc" style="width:60px;height:60px;border-radius:50%;background:radial-gradient(circle at 50%,#1a1a2e 18%,transparent 18%),conic-gradient(#1a1a2e,#2a2a3e,#1a1a2e,#2a2a3e,#1a1a2e);opacity:0.55;border:1.5px solid #3a3a5e;animation:vinyl-spin 4s linear infinite;animation-play-state:paused;"></div>
+          </div>
+        </div>
+
+        <!-- track info -->
+        <div style="text-align:center;">
+          <div id="mp-track-name" style="font-size:11px;font-weight:bold;color:#3a2a6a;letter-spacing:0.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Right Now</div>
+          <div id="mp-artist-name" style="font-size:10px;color:#9888c0;margin-top:1px;">NewJeans</div>
+        </div>
+
+        <!-- progress bar -->
+        <div style="display:flex;align-items:center;gap:5px;">
+          <span id="mp-time-cur" style="font-size:9px;color:#9888c0;width:28px;text-align:right;">0:00</span>
+          <div id="mp-progress-track" onclick="seolSeek(event)" style="flex:1;height:4px;background:#d4c8f0;border-radius:4px;cursor:pointer;position:relative;">
+            <div id="mp-progress-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#9888c0,#c4b8e0);border-radius:4px;pointer-events:none;"></div>
+          </div>
+          <span id="mp-time-tot" style="font-size:9px;color:#9888c0;width:28px;">0:00</span>
+        </div>
+
+        <!-- controls row -->
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
+          <button onclick="seolPlayerPrev()" title="previous" style="background:#e4dff4;border:1px solid #c4b8e0;border-radius:50%;width:28px;height:28px;font-size:12px;color:#5a4a8a;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:background 0.15s;">⏮</button>
+          <button id="mp-playpause-btn" onclick="seolPlayerToggle()" style="background:linear-gradient(135deg,#9888c0,#7a6aaa);border:none;border-radius:50%;width:38px;height:38px;font-size:16px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;box-shadow:0 2px 6px rgba(120,100,180,0.4);transition:transform 0.1s;">▶</button>
+          <button onclick="seolPlayerNext()" title="next" style="background:#e4dff4;border:1px solid #c4b8e0;border-radius:50%;width:28px;height:28px;font-size:12px;color:#5a4a8a;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:background 0.15s;">⏭</button>
+        </div>
+
+        <!-- volume -->
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:10px;color:#9888c0;">♪</span>
+          <input id="mp-volume" type="range" min="0" max="100" value="20" oninput="seolSetVolume(this.value)" style="flex:1;accent-color:#9888c0;height:4px;cursor:pointer;">
+        </div>
+
+        <!-- playlist -->
+        <div style="border-top:1px dashed #c4b8e0;padding-top:6px;">
+          <div style="font-size:9px;color:#9888c0;font-weight:bold;letter-spacing:0.05em;margin-bottom:4px;">✦ playlist</div>
+          <div id="mp-playlist" style="display:flex;flex-direction:column;gap:3px;"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <style>
+      @keyframes vinyl-spin {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
+      }
+    </style>
+
+    <!-- ═══════════════════════════════════
+         SHARED MUSIC ENGINE
+         Controls both the bar widget and the
+         floating player window in sync.
+    ═══════════════════════════════════ -->
+    <audio id="music" preload="metadata"></audio>
+    <script>
+    (function() {
+      var PLAYLIST = [
+        {
+          title:  "Right Now",
+          artist: "NewJeans",
+          src:    "./seol/Right Now.mp3",
+          art:    "./seol/rightnow.webp"
+        },
+        {
+          title:  "terrible4u",
+          artist: "Luke Chiang",
+          src:    "./seol/terrible4u.mp3",
+          art:    "./seol/terrible4u.jpg"   // add album art or it falls back gracefully
+        },
+        {
+          title:  "Exploration",
+          artist: "Coraline OST",
+          src:    "./seol/exploration.mp3",
+          art:    "./seol/exploration.jpg"  // add album art or fallback
+        }
+      ];
+
+      var audio   = document.getElementById("music");
+      var curIdx  = 0;
+      var started = false;
+
+      // ── helpers ──────────────────────────────
+      function fmt(sec) {
+        sec = Math.floor(sec) || 0;
+        return Math.floor(sec/60) + ":" + ("0" + (sec%60)).slice(-2);
+      }
+
+      function syncUI() {
+        var t = PLAYLIST[curIdx];
+
+        // bar widget
+        var barArt   = document.getElementById("bar-album-art");
+        var barLabel = document.getElementById("bar-track-label");
+        var barMq    = document.getElementById("bar-marquee-text");
+        var barBtn   = document.getElementById("bar-playpause");
+        if (barArt)   { barArt.src   = t.art;  barArt.onerror = function(){ barArt.src="./seol/bun.png"; }; }
+        if (barLabel) barLabel.textContent = t.title + " — " + t.artist;
+        if (barMq)    barMq.textContent    = "𝄞 " + t.title + " · " + t.artist + " ♬  𝄞 " + t.title + " · " + t.artist + " ♬ ";
+        if (barBtn)   barBtn.textContent   = audio.paused ? "▶" : "⏸";
+
+        // player window
+        var mpArt   = document.getElementById("mp-album-art");
+        var mpTitle = document.getElementById("mp-track-name");
+        var mpArtist= document.getElementById("mp-artist-name");
+        var mpBtn   = document.getElementById("mp-playpause-btn");
+        var vinyl   = document.getElementById("mp-vinyl-disc");
+        if (mpArt)    { mpArt.style.opacity="0"; setTimeout(function(){ mpArt.src=t.art; mpArt.onerror=function(){mpArt.src="./seol/bun.png";}; mpArt.style.opacity="1"; },300); }
+        if (mpTitle)  mpTitle.textContent  = t.title;
+        if (mpArtist) mpArtist.textContent = t.artist;
+        if (mpBtn)    mpBtn.textContent    = audio.paused ? "▶" : "⏸";
+        if (vinyl)    vinyl.style.animationPlayState = audio.paused ? "paused" : "running";
+
+        // playlist highlight
+        var rows = document.querySelectorAll(".mp-pl-row");
+        rows.forEach(function(r, i) {
+          r.style.background   = (i === curIdx) ? "#e4dff4" : "transparent";
+          r.style.fontWeight   = (i === curIdx) ? "bold"    : "normal";
+          r.style.color        = (i === curIdx) ? "#5a4a8a" : "#8a9eab";
+        });
+      }
+
+      function loadTrack(idx, autoplay) {
+        curIdx = ((idx % PLAYLIST.length) + PLAYLIST.length) % PLAYLIST.length;
+        audio.src    = PLAYLIST[curIdx].src;
+        audio.volume = (document.getElementById("mp-volume") ? document.getElementById("mp-volume").value/100 : 0.2);
+        syncUI();
+        if (autoplay) audio.play().catch(function(){});
+      }
+
+      // ── public API ────────────────────────────
+      window.seolPlayerToggle = function() {
+        if (!started) { started=true; loadTrack(0, true); return; }
+        if (audio.paused) { audio.play().catch(function(){}); }
+        else              { audio.pause(); }
+        syncUI();
+      };
+      window.seolPlayerNext = function() { loadTrack(curIdx+1, !audio.paused); };
+      window.seolPlayerPrev = function() {
+        if (audio.currentTime > 3) { audio.currentTime=0; }
+        else { loadTrack(curIdx-1, !audio.paused); }
+      };
+      window.seolSetVolume = function(v) { audio.volume = v/100; };
+      window.seolSeek = function(e) {
+        var rect = document.getElementById("mp-progress-track").getBoundingClientRect();
+        var pct  = Math.max(0, Math.min(1, (e.clientX - rect.left)/rect.width));
+        if (audio.duration) audio.currentTime = pct * audio.duration;
+      };
+
+      // ── audio events ─────────────────────────
+      audio.addEventListener("play",  function() { syncUI(); });
+      audio.addEventListener("pause", function() { syncUI(); });
+      audio.addEventListener("ended", function() { loadTrack(curIdx+1, true); });
+      audio.addEventListener("timeupdate", function() {
+        var cur  = document.getElementById("mp-time-cur");
+        var tot  = document.getElementById("mp-time-tot");
+        var fill = document.getElementById("mp-progress-fill");
+        if (cur)  cur.textContent  = fmt(audio.currentTime);
+        if (tot)  tot.textContent  = fmt(audio.duration);
+        if (fill) fill.style.width = (audio.duration ? (audio.currentTime/audio.duration*100) : 0) + "%";
+      });
+
+      // ── build playlist UI ─────────────────────
+      window.addEventListener("load", function() {
+        var pl = document.getElementById("mp-playlist");
+        if (!pl) return;
+        PLAYLIST.forEach(function(t, i) {
+          var row = document.createElement("div");
+          row.className = "mp-pl-row";
+          row.style.cssText = "display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:7px;cursor:pointer;font-size:10px;color:#8a9eab;transition:background 0.15s;";
+          row.innerHTML =
+            '<span style="font-size:14px;flex-shrink:0;">' + ["🎵","💔","🌙"][i] + '</span>' +
+            '<div style="flex:1;overflow:hidden;">' +
+              '<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + t.title + '</div>' +
+              '<div style="font-size:9px;opacity:0.7;">' + t.artist + '</div>' +
+            '</div>';
+          row.addEventListener("click", function() { loadTrack(i, true); started=true; });
+          pl.appendChild(row);
+        });
+        syncUI();
+
+        // First-click-to-start (browser autoplay policy)
+        document.addEventListener("click", function() {
+          if (!started) { started=true; loadTrack(0, true); }
+        }, { once: true });
+      });
+
+      // register this card as draggable (same system as other photocards)
+      window.addEventListener("load", function() {
+        if (typeof makeCard === "function") makeCard("media-player-window","dragHandleMedia", 20, 2080);
+      });
+
+    })();
+    </script>
+
+    <!-- ═══════════════════════════════════
          between the photocards and the lace
          adjust top/left values to reposition
     ═══════════════════════════════════ -->
@@ -797,11 +1177,72 @@
     <div class="photocard" id="photocard10" style="top:1000px;right:150px;left:auto;z-index:98;">
       <div class="drag-handle" id="dragHandle10"></div>
       <div class="photocard-body">
-        <img src="./seol/Grad.jpg" style="border-radius:10px;width:180px;">
-          <p>starky boy</p>
+        <img id="stark-avatar" src="./seol/Grad.jpg" style="border-radius:10px;width:180px;cursor:pointer;transition:transform 0.1s;user-select:none;" title="click to pat ♡">
+        <div id="stark-bubble" style="background:linear-gradient(135deg,#f4f7fb,#dce8f4);border:1.5px solid #b8c8d8;border-radius:12px 12px 12px 2px;padding:5px 10px;font-size:10px;color:#4a6880;display:none;text-align:center;margin-top:4px;box-shadow:2px 2px 0 #c8d8e8;"></div>
+        <p id="stark-counter" style="font-size:10px;color:#8a9eab;text-align:center;margin:2px 0;">pats: 0</p>
+        <p>starky boy</p>
         <div class="content" style="width:180px;height:300px;margin-top:4px;border:1px dashed #a8c0d4;border-radius:10px;background-color:#f8faff;display:none;"></div>
       </div>
     </div>
+    <script>
+    (function() {
+      var starkPatCount = 0;
+      try { starkPatCount = parseInt(localStorage.getItem("seol_starkpats") || "0", 10) || 0; } catch(e) {}
+
+      var starkMsgs = [
+        "...what.",
+        "don't do that.",
+        "i'm not a pet.",
+        "hmph.",
+        "i didn't say stop.",
+        "you're weird.",
+        "...okay.",
+        "don't tell anyone.",
+        "this is embarrassing.",
+        "...stronger than you look.",
+        "you'd survive one hit. maybe.",
+        "Frieren would laugh at this.",
+        "i've killed demon generals. and now this.",
+        "...not bad.",
+        "yeah yeah whatever.",
+        "i'm not soft. shut up.",
+        "...once more."
+      ];
+
+      var avatar    = document.getElementById("stark-avatar");
+      var bubble    = document.getElementById("stark-bubble");
+      var counter   = document.getElementById("stark-counter");
+      var normalSrc = "./seol/Grad.jpg";
+      var patSrc    = "./seol/fern-borgar.gif";
+      var bubbleTimer, resetTimer;
+
+      function updateCounter() { counter.textContent = "pats: " + starkPatCount; }
+      updateCounter();
+
+      avatar.addEventListener("click", function() {
+        starkPatCount++;
+        try { localStorage.setItem("seol_starkpats", starkPatCount); } catch(e) {}
+        updateCounter();
+
+        avatar.src = patSrc;
+        avatar.style.transform = "scale(0.94)";
+        clearTimeout(resetTimer);
+        resetTimer = setTimeout(function() {
+          avatar.src = normalSrc;
+          avatar.style.transform = "";
+        }, 1000);
+
+        bubble.textContent = starkMsgs[Math.floor(Math.random() * starkMsgs.length)];
+        bubble.style.display = "block";
+        clearTimeout(bubbleTimer);
+        bubbleTimer = setTimeout(function() { bubble.style.display = "none"; }, 2200);
+
+        if (starkPatCount >= 1)  triggerAchievement("patted_stark");
+        if (starkPatCount >= 5)  triggerAchievement("patted_stark5");
+        if (starkPatCount >= 25) triggerAchievement("patted_stark25");
+      });
+    })();
+    </script>
 
     <!-- ═══════════════════════════════════
          PHOTOCARD 11 — right side, below photocard 10
@@ -809,12 +1250,80 @@
     <div class="photocard" id="photocard11" style="top:1370px;right:50px;left:auto;">
       <div class="drag-handle" id="dragHandle11"></div>
       <div class="photocard-body">
-        <img src="./seol/fern.jpg" style="border-radius:10px;width:180px;">
+        <img id="fern-avatar" src="./seol/fern.jpg" style="border-radius:10px;width:180px;cursor:pointer;transition:transform 0.1s;user-select:none;" title="click to pat ♡">
+        <div id="fern-bubble" style="background:linear-gradient(135deg,#f4f7fb,#dce8f4);border:1.5px solid #b8c8d8;border-radius:12px 12px 12px 2px;padding:5px 10px;font-size:10px;color:#4a6880;display:none;text-align:center;margin-top:4px;box-shadow:2px 2px 0 #c8d8e8;"></div>
+        <p id="fern-counter" style="font-size:10px;color:#8a9eab;text-align:center;margin:2px 0;">pats: 0</p>
           <p>ferniewernie</p>
           <p style="font-size:10px;color:#7a9ab0;text-align: center;">too pretty</p>
         <div class="content" style="width:180px;height:300px;margin-top:4px;border:1px dashed #a8c0d4;border-radius:10px;background-color:#f8faff;display:none;"></div>
       </div>
     </div>
+    <script>
+    (function() {
+      var fernPatCount = 0;
+      try { fernPatCount = parseInt(localStorage.getItem("seol_fernpats") || "0", 10) || 0; } catch(e) {}
+
+      var fernMsgs = [
+        "...what are you doing.",
+        "stop that.",
+        "i'm trying to study.",
+        "hmph.",
+        "you're so childish.",
+        "...fine. just once.",
+        "don't make it weird.",
+        "eimerie-",
+        "i said stop!",
+        "...okay that was kind of nice.",
+        "you have way too much free time.",
+        "master would never do this.",
+        "i have spells to practice.",
+        "...don't tell master.",
+        "i'm not blushing. shut up.",
+        "are you done yet?",
+        "...again?",
+        "this is unprofessional.",
+        "do you treat all mages this way?",
+        "i'm going to charge you for this.",
+        "...you're persistent, i'll give you that.",
+        "stark would never.",
+        "...please be quieter about it."
+      ];
+
+      var avatar = document.getElementById("fern-avatar");
+      var bubble = document.getElementById("fern-bubble");
+      var counter = document.getElementById("fern-counter");
+      var normalSrc = "./seol/fern.jpg";
+      var patSrc    = "./seol/fern-borgar.gif";
+      var bubbleTimer, resetTimer;
+
+      function updateCounter() { counter.textContent = "pats: " + fernPatCount; }
+      updateCounter();
+
+      avatar.addEventListener("click", function() {
+        fernPatCount++;
+        try { localStorage.setItem("seol_fernpats", fernPatCount); } catch(e) {}
+        updateCounter();
+
+        // swap to borgar gif
+        avatar.src = patSrc;
+        avatar.style.transform = "scale(0.94)";
+        clearTimeout(resetTimer);
+        resetTimer = setTimeout(function() {
+          avatar.src = normalSrc;
+          avatar.style.transform = "";
+        }, 1000);
+
+        // speech bubble
+        bubble.textContent = fernMsgs[Math.floor(Math.random() * fernMsgs.length)];
+        bubble.style.display = "block";
+        clearTimeout(bubbleTimer);
+        bubbleTimer = setTimeout(function() { bubble.style.display = "none"; }, 2200);
+
+        // achievements
+        if (fernPatCount >= 1) triggerAchievement("patted_fern");
+      });
+    })();
+    </script>
 
     <!-- ═══════════════════════════════════
          PHOTOCARD 12 — right side, below photocard 11
@@ -822,11 +1331,77 @@
     <div class="photocard" id="photocard12" style="top:1720px;right:98px;left:auto;">
       <div class="drag-handle" id="dragHandle12"></div>
       <div class="photocard-body">
-        <img src="./seol/tree.jpg" style="border-radius:10px;width:180px;">
+        <img id="frieren-avatar" src="./seol/tree.jpg" style="border-radius:10px;width:180px;cursor:pointer;transition:transform 0.1s;user-select:none;" title="click to pat ♡">
+        <div id="frieren-bubble" style="background:linear-gradient(135deg,#f4f7fb,#dce8f4);border:1.5px solid #b8c8d8;border-radius:12px 12px 12px 2px;padding:5px 10px;font-size:10px;color:#4a6880;display:none;text-align:center;margin-top:4px;box-shadow:2px 2px 0 #c8d8e8;"></div>
+        <p id="frieren-counter" style="font-size:10px;color:#8a9eab;text-align:center;margin:2px 0;">pats: 0</p>
         <button type="button" class="collapsible"><img src="./seol/bun.png" style="width:14px;vertical-align:middle;"></button>
         <div class="content" style="width:180px;height:300px;margin-top:4px;border:1px dashed #a8c0d4;border-radius:10px;background-color:#f8faff;display:none;"></div>
       </div>
     </div>
+    <script>
+    (function() {
+      var frierenPatCount = 0;
+      try { frierenPatCount = parseInt(localStorage.getItem("seol_frierenpats") || "0", 10) || 0; } catch(e) {}
+
+      var frierenMsgs = [
+        "...oh.",
+        "humans are strange.",
+        "i don't mind.",
+        "Fern would be jealous.",
+        "...is this a greeting?",
+        "i've seen stranger things in 1000 years.",
+        "you're warm.",
+        "...don't stop.",
+        "humans have always been like this.",
+        "i'll remember this for a while.",
+        "...thank you.",
+        "Himmel used to do this too.",
+        "...i forgot what this felt like.",
+        "fleeting, like all things.",
+        "i like this.",
+        "...stay a little longer.",
+        "you remind me of someone.",
+        "i'll add this to my collection of memories.",
+        "even elves need this sometimes.",
+        "...you're not bad, for a human.",
+        "the journey feels lighter now.",
+        "...i won't forget.",
+        "this is a good moment.",
+        "you have a gentle hand."
+      ];
+
+      var avatar   = document.getElementById("frieren-avatar");
+      var bubble   = document.getElementById("frieren-bubble");
+      var counter  = document.getElementById("frieren-counter");
+      var normalSrc = "./seol/tree.jpg";
+      var patSrc    = "./seol/fern-borgar.gif";
+      var bubbleTimer, resetTimer;
+
+      function updateCounter() { counter.textContent = "pats: " + frierenPatCount; }
+      updateCounter();
+
+      avatar.addEventListener("click", function() {
+        frierenPatCount++;
+        try { localStorage.setItem("seol_frierenpats", frierenPatCount); } catch(e) {}
+        updateCounter();
+
+        avatar.src = patSrc;
+        avatar.style.transform = "scale(0.94)";
+        clearTimeout(resetTimer);
+        resetTimer = setTimeout(function() {
+          avatar.src = normalSrc;
+          avatar.style.transform = "";
+        }, 1000);
+
+        bubble.textContent = frierenMsgs[Math.floor(Math.random() * frierenMsgs.length)];
+        bubble.style.display = "block";
+        clearTimeout(bubbleTimer);
+        bubbleTimer = setTimeout(function() { bubble.style.display = "none"; }, 2200);
+
+        if (frierenPatCount >= 1) triggerAchievement("patted_frieren");
+      });
+    })();
+    </script>
 
     <!-- ═══════════════════════════════════
          JELLYFISH IMAGE — static, right side
@@ -1426,7 +2001,11 @@
             </div>
             <script>
             (function() {
-              var achIds = ["welcome","headpat1","headpat5","headpat25","headpat100","chatted","night_visitor","newjeans_fan"];
+              var achIds = ["welcome","headpat1","headpat5","headpat25","headpat100","chatted","night_visitor","newjeans_fan",
+                "patted_fern","patted_frieren","patted_mimikyu","patted_mimikyu5","patted_mimikyu25",
+                "patted_stark","patted_stark5","patted_stark25",
+                "spell_alohomora","spell_zoltraak","spell_accio","spell_judradjim","spell_expelliarmus","all_spells",
+                "tarot_reading","tarot_all","konami","idle_watcher"];
               var grid = document.getElementById("ach-grid");
               var bar  = document.getElementById("ach-progress-bar");
               var lbl  = document.getElementById("ach-progress-label");
@@ -1623,7 +2202,7 @@
                     A place for my thoughts, projects, art, writing, and the little media that holds my memories.
                     I spend most of my time in gentle, comforting worlds — playing cozy and RPG games, collecting Pokémon cards, and listening to music.
                     I also enjoy taking photos and singing, keeping moments in ways that feel soft and lasting.<br><br>
-                    inspired by NewJeans. 
+                    by seol. 
                   </p>
                 </div>
               </div>
@@ -1635,23 +2214,23 @@
                 <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ now playing</span>
               </div>
               <div style="display:flex;align-items:center;padding:6px 8px;background-color:white;gap:8px;">
-                <img src="./seol/rightnow.webp" style="height:44px;width:44px;object-fit:cover;border-radius:6px;border:1px dashed #b8c8d8;flex-shrink:0;">
+                <img id="bar-album-art" src="./seol/rightnow.webp" style="height:44px;width:44px;object-fit:cover;border-radius:6px;border:1px dashed #b8c8d8;flex-shrink:0;">
                 <div style="flex:1;overflow:hidden;">
-                  <marquee behavior="scroll">
-                    <span style="color:#8a9eab;font-size:10px;">𝄞𝄢⋆.˚♪ currently playing ˖ ݁♬⋆.˚𝄞 &nbsp;&nbsp; right now — NewJeans</span>
-                    <audio id="music" src="./seol/Right Now.mp3" autoplay></audio>
-                    <script>
-                      document.addEventListener("click", function () {
-                        const audio = document.getElementById("music");
-                        audio.volume = 0.2;
-                        audio.play();
-                      }, { once: true });
-                    </script>
-                  </marquee>
-                  <p style="margin:2px 0 0;font-size:10px;color:#4a6880;padding-left:2px;">right now — NewJeans</p>
+                  <div style="overflow:hidden;white-space:nowrap;">
+                    <span id="bar-marquee-text" style="display:inline-block;color:#8a9eab;font-size:10px;animation:marquee-scroll 14s linear infinite;">𝄞 currently playing ♬ &nbsp;&nbsp;</span>
+                  </div>
+                  <p id="bar-track-label" style="margin:2px 0 0;font-size:10px;color:#4a6880;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">right now — NewJeans</p>
                 </div>
+                <!-- mini play/pause -->
+                <button id="bar-playpause" onclick="seolPlayerToggle()" style="background:#dce8f4;border:1px solid #b8c8d8;border-radius:50%;width:26px;height:26px;font-size:12px;color:#4a6880;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;">▶</button>
               </div>
             </div>
+            <style>
+              @keyframes marquee-scroll {
+                0%   { transform: translateX(100%); }
+                100% { transform: translateX(-100%); }
+              }
+            </style>
 
             <!-- POEM + MEDIA ROW -->
             <div style="box-sizing:border-box;display:flex;gap:6px;height:280px;">
@@ -2049,29 +2628,254 @@
               </div>
             </div>
 
-            <!-- UNDER CONSTRUCTION BOX C (right) -->
+            <!-- SPELLS COLLECTED BOX -->
             <div style="width:100%;box-sizing:border-box;margin:0;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
-              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
-                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ · · ·</span>
+              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ spells collected</span>
+                <span id="spell-count-label" style="font-size:9px;color:#8aaac8;">0 / 5</span>
               </div>
-              <div style="padding:12px 8px;background-color:white;text-align:center;">
-                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - -</p>
-                <p style="font-size:10px;color:#8a9eab;margin:5px 0;">⚙ under construction ⚙</p>
-                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - -</p>
+              <div style="padding:8px;background-color:white;">
+                <!-- spell nav row -->
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                  <button id="spell-prev" onclick="spellNav(-1)" style="background:#dce8f4;border:1px solid #b8c8d8;border-radius:50%;width:20px;height:20px;font-size:12px;color:#4a6880;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;">◂</button>
+                  <span id="spell-index-label" style="font-size:9px;color:#8a9eab;letter-spacing:0.05em;">spell 1 of 5</span>
+                  <button id="spell-next" onclick="spellNav(1)" style="background:#dce8f4;border:1px solid #b8c8d8;border-radius:50%;width:20px;height:20px;font-size:12px;color:#4a6880;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;">▸</button>
+                </div>
+                <!-- spell card -->
+                <div id="spell-card" style="background:#f9fcff;border:1px dashed #b8c8d8;border-radius:10px;padding:10px 8px;text-align:center;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;" title="click to cast ✦" onclick="castSpell()">
+                  <div id="spell-icon" style="font-size:26px;margin-bottom:2px;">🔑</div>
+                  <div id="spell-name" style="font-size:11px;font-weight:bold;color:#4a6880;letter-spacing:0.05em;">Alohomora</div>
+                  <div id="spell-origin" style="font-size:9px;color:#8aaac8;font-style:italic;">Harry Potter · Unlocking Charm</div>
+                  <div id="spell-desc" style="font-size:10px;color:#6a8898;margin-top:4px;line-height:1.5;">Opens locked doors. The very first spell many learn — and somehow, it never stops being useful.</div>
+                  <div id="spell-cast-msg" style="font-size:10px;color:#7aa8a1;margin-top:4px;display:none;font-style:italic;"></div>
+                </div>
+                <p style="font-size:9px;color:#b8c8d8;text-align:center;margin:6px 0 0;letter-spacing:0.05em;">click the spell card to cast ✦</p>
               </div>
             </div>
+            <script>
+            (function() {
+              var SPELLS = [
+                {
+                  id: "spell_alohomora",
+                  icon: "🔑",
+                  name: "Alohomora",
+                  origin: "Harry Potter · Unlocking Charm",
+                  desc: "Opens locked doors. The very first spell many learn — and somehow, it never stops being useful.",
+                  cast: ["*click* — the lock gives way.", "doors are just suggestions.", "alohomora! ✦", "every door opens eventually."]
+                },
+                {
+                  id: "spell_zoltraak",
+                  icon: "🔮",
+                  name: "Zoltraak",
+                  origin: "Frieren · Standard Offensive Magic",
+                  desc: "Once a fearsome demon spell. Fern made it into an art form. Now it's just standard.",
+                  cast: ["*the air tears apart*", "zoltraak! ✦", "fern would be proud.", "clean and efficient."]
+                },
+                {
+                  id: "spell_accio",
+                  icon: "💫",
+                  name: "Accio",
+                  origin: "Harry Potter · Summoning Charm",
+                  desc: "Summons objects to the caster. Useful, elegant, and occasionally chaotic.",
+                  cast: ["accio! ✦", "*something comes flying*", "come to me.", "always handy."]
+                },
+                {
+                  id: "spell_judradjim",
+                  icon: "🌿",
+                  name: "Judradjim",
+                  origin: "Frieren · Ancient Plant Magic",
+                  desc: "Binds the target with rapidly growing plants. An ancient spell from a time when elves roamed freely.",
+                  cast: ["*roots spiral upward*", "judradjim ✦", "nature answers.", "from an older age."]
+                },
+                {
+                  id: "spell_expelliarmus",
+                  icon: "⚔️",
+                  name: "Expelliarmus",
+                  origin: "Harry Potter · Disarming Charm",
+                  desc: "Disarms your opponent. Harry's signature spell. Simple, but it saved the world.",
+                  cast: ["expelliarmus! ✦", "*the wand flies away*", "classic for a reason.", "sometimes simple wins."]
+                }
+              ];
 
-            <!-- UNDER CONSTRUCTION BOX D (right) -->
-            <div style="width:100%;box-sizing:border-box;margin:0;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
-              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
-                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ · · ·</span>
+              var current = 0;
+              var castCount = {};
+              try { castCount = JSON.parse(localStorage.getItem("seol_castcount") || "{}"); } catch(e) {}
+
+              function updateSpellDisplay() {
+                var s = SPELLS[current];
+                document.getElementById("spell-icon").textContent = s.icon;
+                document.getElementById("spell-name").textContent = s.name;
+                document.getElementById("spell-origin").textContent = s.origin;
+                document.getElementById("spell-desc").textContent = s.desc;
+                document.getElementById("spell-index-label").textContent = "spell " + (current+1) + " of " + SPELLS.length;
+                document.getElementById("spell-cast-msg").style.display = "none";
+
+                // count how many spell achievements unlocked
+                var unlocked = 0;
+                SPELLS.forEach(function(sp) {
+                  try { if (localStorage.getItem("seol_ach_" + sp.id)) unlocked++; } catch(e) {}
+                });
+                document.getElementById("spell-count-label").textContent = unlocked + " / " + SPELLS.length;
+              }
+
+              window.spellNav = function(dir) {
+                current = (current + dir + SPELLS.length) % SPELLS.length;
+                updateSpellDisplay();
+              };
+
+              window.castSpell = function() {
+                var s = SPELLS[current];
+                var msgs = s.cast;
+                var msg = msgs[Math.floor(Math.random() * msgs.length)];
+                var el = document.getElementById("spell-cast-msg");
+                el.textContent = msg;
+                el.style.display = "block";
+                setTimeout(function() { el.style.display = "none"; }, 2000);
+
+                // spell card bounce
+                var card = document.getElementById("spell-card");
+                card.style.transform = "scale(0.96)";
+                setTimeout(function() { card.style.transform = ""; }, 150);
+
+                // trigger achievement for this spell
+                if (typeof triggerAchievement === "function") {
+                  triggerAchievement(s.id);
+                  // check if all spells cast
+                  var allDone = SPELLS.every(function(sp) {
+                    try { return !!localStorage.getItem("seol_ach_" + sp.id); } catch(e) { return false; }
+                  });
+                  if (allDone) triggerAchievement("all_spells");
+                  // update count label
+                  var unlocked2 = 0;
+                  SPELLS.forEach(function(sp) {
+                    try { if (localStorage.getItem("seol_ach_" + sp.id)) unlocked2++; } catch(e) {}
+                  });
+                  document.getElementById("spell-count-label").textContent = unlocked2 + " / " + SPELLS.length;
+                }
+              };
+
+              updateSpellDisplay();
+            })();
+            </script>
+
+            <!-- TAROT READING BOX -->
+            <div style="width:100%;box-sizing:border-box;margin:0;background-color:#f0eef8;border:1.5px solid #c4b8e0;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #d4c8f0;">
+              <div style="background:linear-gradient(90deg,#d4c8f0 0%,#eae4f8 100%);border-bottom:1px solid #c4b8e0;padding:5px 8px;display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:10px;color:#5a4a7a;font-weight:bold;letter-spacing:0.05em;">✦ 占 frieren's card reading</span>
+                <span id="tarot-seen-label" style="font-size:9px;color:#9888c0;">0 drawn</span>
               </div>
-              <div style="padding:12px 8px;background-color:white;text-align:center;">
-                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - -</p>
-                <p style="font-size:10px;color:#8a9eab;margin:5px 0;">⚙ under construction ⚙</p>
-                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - -</p>
+              <div style="padding:10px 8px;background-color:white;text-align:center;">
+                <p style="font-size:9px;color:#b8a8d8;margin:0 0 6px;letter-spacing:0.05em;font-style:italic;">"i've read these cards for a thousand years.<br>they still surprise me."</p>
+                <!-- card display -->
+                <div id="tarot-card" style="background:linear-gradient(135deg,#f0eef8,#e4e0f4);border:1.5px dashed #c4b8e0;border-radius:12px;padding:12px 8px;min-height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;transition:transform 0.15s;" title="draw a card ✦" onclick="drawTarot()">
+                  <div id="tarot-icon" style="font-size:28px;">🃏</div>
+                  <div id="tarot-name" style="font-size:11px;font-weight:bold;color:#5a4a7a;letter-spacing:0.06em;">draw a card</div>
+                  <div id="tarot-sub" style="font-size:9px;color:#9888c0;font-style:italic;">click to receive a reading</div>
+                  <div id="tarot-reading" style="font-size:10px;color:#6a5a8a;margin-top:4px;line-height:1.5;display:none;"></div>
+                  <div id="tarot-frieren-note" style="font-size:9px;color:#b8a8d8;margin-top:3px;font-style:italic;display:none;"></div>
+                </div>
+                <p style="font-size:9px;color:#b8c8d8;text-align:center;margin:6px 0 0;letter-spacing:0.05em;">click the card to draw ✦</p>
               </div>
             </div>
+            <script>
+            (function() {
+              var TAROT = [
+                {
+                  icon: "☀️", name: "The Sun", sub: "upright · joy",
+                  reading: "Light finds you. Something you've waited for is beginning to bloom. Don't look away.",
+                  frieren: "...Himmel loved sunny days. I understand why, now."
+                },
+                {
+                  icon: "🌙", name: "The Moon", sub: "upright · the unknown",
+                  reading: "Things are not what they seem. Follow the uncertain path — it leads somewhere real.",
+                  frieren: "I've walked by moonlight for centuries. It's honest in ways the sun is not."
+                },
+                {
+                  icon: "⭐", name: "The Star", sub: "upright · hope",
+                  reading: "After difficulty, a quiet light. Trust that you are on the right path, even if slowly.",
+                  frieren: "Stars don't move much in a human lifetime. That's comforting, I think."
+                },
+                {
+                  icon: "🗼", name: "The Tower", sub: "upright · upheaval",
+                  reading: "Something breaks. But what remains is true. The collapse is not the end — it is the clearing.",
+                  frieren: "...I've seen many towers fall. What mattered was never the tower."
+                },
+                {
+                  icon: "⚖️", name: "Justice", sub: "upright · balance",
+                  reading: "What you have given will return to you. Act with honesty. The scales remember everything.",
+                  frieren: "Demons lie. Humans also lie. But the world keeps its accounts."
+                },
+                {
+                  icon: "🌊", name: "The High Priestess", sub: "upright · intuition",
+                  reading: "You already know the answer. Be still. Let the surface calm so you can see what's beneath.",
+                  frieren: "...I have learned more from silence than from any grimoire."
+                },
+                {
+                  icon: "🔥", name: "The Emperor", sub: "upright · structure",
+                  reading: "Build something that lasts. Discipline is not restriction — it is devotion given form.",
+                  frieren: "A thousand years teaches you which things hold."
+                },
+                {
+                  icon: "🌿", name: "The Hermit", sub: "upright · solitude",
+                  reading: "Retreat is not retreat. You are gathering light to share it later. The road is walked alone, for now.",
+                  frieren: "I walked alone for a long time. I did not know what I was missing."
+                },
+                {
+                  icon: "🌀", name: "Wheel of Fortune", sub: "upright · cycles",
+                  reading: "Things turn. The low moment is not permanent. Seasons know this. So do you.",
+                  frieren: "Humans mark time so carefully. Each loop of the wheel matters to them. I find that... touching."
+                },
+                {
+                  icon: "💀", name: "Death", sub: "upright · transformation",
+                  reading: "An ending that is also a beginning. Let go of what no longer fits. What survives will be stronger.",
+                  frieren: "...I've mourned many endings. But Himmel taught me to look at what comes after."
+                }
+              ];
+
+              var seenIds = {};
+              try { seenIds = JSON.parse(localStorage.getItem("seol_tarots") || "{}"); } catch(e) {}
+              var lastIdx = -1;
+
+              function updateSeenLabel() {
+                var n = Object.keys(seenIds).length;
+                document.getElementById("tarot-seen-label").textContent = n + " drawn";
+                if (typeof triggerAchievement === "function") {
+                  if (n >= 1) triggerAchievement("tarot_reading");
+                  if (n >= TAROT.length) triggerAchievement("tarot_all");
+                }
+              }
+              updateSeenLabel();
+
+              window.drawTarot = function() {
+                // pick a card, prefer unseen ones
+                var unseen = [];
+                TAROT.forEach(function(c, i) { if (!seenIds[i]) unseen.push(i); });
+                var pool = unseen.length > 0 ? unseen : TAROT.map(function(_,i){return i;});
+                var idx;
+                do { idx = pool[Math.floor(Math.random() * pool.length)]; } while (idx === lastIdx && pool.length > 1);
+                lastIdx = idx;
+                seenIds[idx] = 1;
+                try { localStorage.setItem("seol_tarots", JSON.stringify(seenIds)); } catch(e) {}
+
+                var card = TAROT[idx];
+                var cardEl = document.getElementById("tarot-card");
+
+                // flip animation
+                cardEl.style.transform = "rotateY(90deg)";
+                setTimeout(function() {
+                  document.getElementById("tarot-icon").textContent = card.icon;
+                  document.getElementById("tarot-name").textContent = card.name;
+                  document.getElementById("tarot-sub").textContent = card.sub;
+                  document.getElementById("tarot-reading").textContent = card.reading;
+                  document.getElementById("tarot-reading").style.display = "block";
+                  document.getElementById("tarot-frieren-note").textContent = card.frieren;
+                  document.getElementById("tarot-frieren-note").style.display = "block";
+                  cardEl.style.transform = "rotateY(0deg)";
+                  updateSeenLabel();
+                }, 180);
+              };
+            })();
+            </script>
 
           </div>
           <!-- end right column -->
@@ -2115,6 +2919,8 @@
 
         card.addEventListener("mousedown", function(e) {
           if (e.target.tagName === "BUTTON") return;
+          if (e.target.tagName === "INPUT")  return;
+          if (e.target.tagName === "A")      return;
           e.preventDefault();
           drag = true;
           clearTimeout(timer);
