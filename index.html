@@ -146,10 +146,10 @@
       position: absolute;
       left: 10px;
       top: 10px;
-      background-color: #f4f7fb;
-      border: 1.5px solid #b8c8d8;
+      background-color: #FAF6FA;
+      border: 1.5px solid #C4B0D4;
       border-radius: 16px;
-      box-shadow: 3px 4px 0px #c8d8e8;
+      box-shadow: 3px 4px 0px #D8C4E8;
       cursor: grab;
       z-index: 99;
       overflow: hidden;
@@ -159,8 +159,8 @@
     .drag-handle {
       width: 100%;
       height: 26px;
-      background: linear-gradient(90deg, #c5d8e8 0%, #dce8f4 100%);
-      border-bottom: 1px solid #b0c8d8;
+      background: linear-gradient(90deg, #CBBDCC 0%, #EAE4F0 100%);
+      border-bottom: 1px solid #C4A4CC;
       cursor: grab;
       display: flex;
       align-items: center;
@@ -172,7 +172,7 @@
     .drag-handle::before {
       content: "✦ photocard";
       font-size: 10px;
-      color: #4a6880;
+      color: #5A4A7A;
       font-weight: bold;
       letter-spacing: 0.05em;
     }
@@ -180,7 +180,7 @@
     .drag-handle::after {
       content: "− □ ×";
       font-size: 10px;
-      color: #7a9ab0;
+      color: #8878B0;
       letter-spacing: 3px;
     }
 
@@ -197,10 +197,10 @@
     }
 
     .collapsible {
-      background-color: #dce8f4;
-      border: 1px solid #a8c0d4;
+      background-color: #EAE4F0;
+      border: 1px solid #AA88CC;
       border-radius: 20px;
-      color: #4a6880;
+      color: #5A4A7A;
       cursor: pointer;
       padding: 5px 14px;
       width: auto;
@@ -212,8 +212,8 @@
 
     .active,
     .collapsible:hover {
-      background-color: #c5d8e8;
-      color: #3a5870;
+      background-color: #CBBDCC;
+      color: #4A3A7A;
     }
 
     /* ═══════════════════════════════════
@@ -259,8 +259,8 @@
        CALENDAR WIDGET
     ═══════════════════════════════════ */
     .calendar {
-      border: 1px dashed #333738;
-      background-color: #e4e7f6;
+      border: 1px dashed #3A3A5A;
+      background-color: #EAE4F0;
     }
 
     .header1 {
@@ -286,10 +286,107 @@
       color: #8a9eab;
     }
 
-    /* today's date highlighted in red */
+    /* today's date highlighted in green */
     .today {
-      color: #e53935;
+      color: #21ff51;
       font-weight: bold;
+    }
+
+    /* ═══════════════════════════════════
+       ACHIEVEMENT TOAST SYSTEM
+    ═══════════════════════════════════ */
+    #achievement-toast-container {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 8px;
+      z-index: 9999;
+      pointer-events: none;
+    }
+    .achievement-toast {
+      background: linear-gradient(135deg, #f4f7fb 0%, #dce8f4 100%);
+      border: 1.5px solid #b8c8d8;
+      border-radius: 12px;
+      box-shadow: 3px 4px 0px #c8d8e8;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;  
+      min-width: 320px;
+      max-width: 400px;
+      pointer-events: all;
+      animation: toast-slide-in 0.4s cubic-bezier(.22,.8,.44,1) forwards;
+    }
+    .achievement-toast.fade-out {
+      animation: toast-fade-out 0.5s ease forwards;
+    }
+    @keyframes toast-slide-in {
+      from { opacity: 0; transform: translateX(60px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes toast-fade-out {
+      from { opacity: 1; transform: translateX(0); }
+      to   { opacity: 0; transform: translateX(60px); }
+    }
+    .achievement-toast-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid #b8c8d8;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #eef4fb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .achievement-toast-text {
+      flex: 1;
+    }
+    .achievement-toast-label {
+      font-size: 11px;
+      color: #8aaac8;
+      font-weight: bold;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .achievement-toast-title {
+      font-size: 13px;
+      color: #4a6880;
+      font-weight: bold;
+    }
+    .achievement-toast-desc {
+      font-size: 12px;
+      color: #8a9eab;
+      margin-top: 2px;
+    }
+
+    /* ═══════════════════════════════════
+       HEADPAT AVATAR STYLES
+    ═══════════════════════════════════ */
+    #headpat-avatar {
+      cursor: pointer;
+      transition: transform 0.1s;
+      user-select: none;
+      display: block;
+    }
+    #headpat-avatar:active {
+      transform: scale(0.94);
+    }
+    #headpat-bubble {
+      background: linear-gradient(135deg, #f4f7fb, #dce8f4);
+      border: 1.5px solid #b8c8d8;
+      border-radius: 12px 12px 12px 2px;
+      padding: 5px 10px;
+      font-size: 10px;
+      color: #4a6880;
+      display: none;
+      text-align: center;
+      margin-top: 4px;
+      box-shadow: 2px 2px 0 #c8d8e8;
     }
 
     /* ═══════════════════════════════════
@@ -384,6 +481,120 @@
   ═══════════════════════════════════ -->
   <div class="crt"></div>
 
+  <!-- ═══════════════════════════════════
+       ACHIEVEMENT TOAST CONTAINER
+  ═══════════════════════════════════ -->
+  <div id="achievement-toast-container"></div>
+
+  <script>
+  // ══════════════════════════════════════════════════════
+  //  SEOL ACHIEVEMENT SYSTEM
+  //  Uses localStorage to persist which achievements
+  //  have been unlocked. Call triggerAchievement(id) to unlock.
+  // ══════════════════════════════════════════════════════
+  var ACHIEVEMENTS = {
+    "welcome": {
+      emoji: "🐇",
+      title: "잠자는 토끼",
+      desc: "You found the site!",
+    },
+    "headpat1": {
+      emoji: "🤍",
+      title: "Gentle Visitor",
+      desc: "Pat the avatar once.",
+    },
+    "headpat5": {
+      emoji: "💙",
+      title: "Soft Hands",
+      desc: "Pat the avatar 5 times.",
+    },
+    "headpat25": {
+      emoji: "💜",
+      title: "Devoted Patter",
+      desc: "Pat the avatar 25 times.",
+    },
+    "headpat100": {
+      emoji: "⭐",
+      title: "True Enjoyer",
+      desc: "100 pats. You really care.",
+    },
+    "chatted": {
+      emoji: "💬",
+      title: "Said Hello",
+      desc: "You joined the chat!",
+    },
+    "night_visitor": {
+      emoji: "🌙",
+      title: "Night Visitor",
+      desc: "Visited after midnight.",
+    },
+    "newjeans_fan": {
+      emoji: "🐰",
+      title: "NewJeans Fan",
+      desc: "Scrolled all the way down.",
+    },
+  };
+
+  function isAchievementUnlocked(id) {
+    try { return !!localStorage.getItem("seol_ach_" + id); } catch(e) { return false; }
+  }
+  function unlockAchievement(id) {
+    try { localStorage.setItem("seol_ach_" + id, "1"); } catch(e) {}
+  }
+
+  function triggerAchievement(id) {
+    if (isAchievementUnlocked(id)) return;
+    unlockAchievement(id);
+    var ach = ACHIEVEMENTS[id];
+    if (!ach) return;
+
+    var container = document.getElementById("achievement-toast-container");
+    var toast = document.createElement("div");
+    toast.className = "achievement-toast";
+    toast.innerHTML =
+      '<div class="achievement-toast-icon">' + ach.emoji + '</div>' +
+      '<div class="achievement-toast-text">' +
+        '<div class="achievement-toast-label">✦ achievement unlocked</div>' +
+        '<div class="achievement-toast-title">' + ach.title + '</div>' +
+        '<div class="achievement-toast-desc">' + ach.desc + '</div>' +
+      '</div>';
+    container.appendChild(toast);
+
+    // Play a soft chime if available
+    try {
+      var ctx = new (window.AudioContext || window.webkitAudioContext)();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.setValueAtTime(660, ctx.currentTime);
+      osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.5);
+    } catch(e) {}
+
+    setTimeout(function() {
+      toast.classList.add("fade-out");
+      setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 500);
+    }, 4000);
+  }
+
+  // Welcome achievement on first visit
+  window.addEventListener("load", function() {
+    setTimeout(function() { triggerAchievement("welcome"); }, 1200);
+    // Night visitor
+    var h = new Date().getHours();
+    if (h >= 0 && h < 5) setTimeout(function() { triggerAchievement("night_visitor"); }, 2000);
+  });
+
+  // NewJeans fan — scrolled near bottom
+  window.addEventListener("scroll", function() {
+    var scrollBottom = window.scrollY + window.innerHeight;
+    var pageHeight = document.body.scrollHeight;
+    if (scrollBottom > pageHeight * 0.9) triggerAchievement("newjeans_fan");
+  });
+  </script>
+
   <span class="text" style="font-size:11px">
 
     <!-- ═══════════════════════════════════
@@ -426,17 +637,52 @@
       </div>
     </div>
 
-    <!-- ═══════════════════════════════════
-         PHOTOCARD 7 — left side, below photocard 3
-    ═══════════════════════════════════ -->
     <div class="photocard" id="photocard7" style="top:1050px;left:120px;">
       <div class="drag-handle" id="dragHandle7"></div>
       <div class="photocard-body">
-        <img src="./seol/seolfie.png" style="border-radius:10px;width:180px;">
-        <p>izz mee</p>
+        <img id="headpat-avatar" src="./seol/seolfie.png" style="border-radius:10px;width:180px;" title="click to pat ♡">
+        <div id="headpat-bubble"></div>
+        <p id="headpat-counter" style="font-size:10px;color:#8a9eab;text-align:center;margin:2px 0;">pats: 0</p>
         <div class="content" style="width:180px;height:300px;margin-top:4px;border:1px dashed #a8c0d4;border-radius:10px;background-color:#f8faff;display:none;"></div>
       </div>
     </div>
+    <script>
+    (function() {
+      var patCount = 0;
+      try { patCount = parseInt(localStorage.getItem("seol_patcount") || "0", 10) || 0; } catch(e) {}
+
+      var msgs = [
+        "♡", "ehehe~", "( ˘ ³˘)♥", "thank u...", "hehe",
+        "꼭 안아줄게", "mwah!", "(>‿◠)✌", "so soft...", "꺄!"
+      ];
+      var bubble = document.getElementById("headpat-bubble");
+      var counter = document.getElementById("headpat-counter");
+      var bubbleTimer;
+
+      function updateCounter() {
+        counter.textContent = "pats: " + patCount;
+      }
+      updateCounter();
+
+      document.getElementById("headpat-avatar").addEventListener("click", function() {
+        patCount++;
+        try { localStorage.setItem("seol_patcount", patCount); } catch(e) {}
+        updateCounter();
+
+        // Show speech bubble
+        bubble.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+        bubble.style.display = "block";
+        clearTimeout(bubbleTimer);
+        bubbleTimer = setTimeout(function() { bubble.style.display = "none"; }, 1800);
+
+        // Achievement milestones
+        if (patCount >= 1)   triggerAchievement("headpat1");
+        if (patCount >= 5)   triggerAchievement("headpat5");
+        if (patCount >= 25)  triggerAchievement("headpat25");
+        if (patCount >= 100) triggerAchievement("headpat100");
+      });
+    })();
+    </script>
 
 
     <!-- ═══════════════════════════════════
@@ -552,7 +798,7 @@
       <div class="drag-handle" id="dragHandle10"></div>
       <div class="photocard-body">
         <img src="./seol/Grad.jpg" style="border-radius:10px;width:180px;">
-          <p>graduation!</p>
+          <p>starky boy</p>
         <div class="content" style="width:180px;height:300px;margin-top:4px;border:1px dashed #a8c0d4;border-radius:10px;background-color:#f8faff;display:none;"></div>
       </div>
     </div>
@@ -563,9 +809,9 @@
     <div class="photocard" id="photocard11" style="top:1370px;right:50px;left:auto;">
       <div class="drag-handle" id="dragHandle11"></div>
       <div class="photocard-body">
-        <img src="./seol/nomnom.jpg" style="border-radius:10px;width:180px;">
-          <p>nomnom</p>
-          <p style="font-size:10px;color:#7a9ab0;text-align: center;">(idk why i close my eyes on photos)</p>
+        <img src="./seol/fern.jpg" style="border-radius:10px;width:180px;">
+          <p>ferniewernie</p>
+          <p style="font-size:10px;color:#7a9ab0;text-align: center;">too pretty</p>
         <div class="content" style="width:180px;height:300px;margin-top:4px;border:1px dashed #a8c0d4;border-radius:10px;background-color:#f8faff;display:none;"></div>
       </div>
     </div>
@@ -1110,21 +1356,110 @@
               </div>
             </div>
 
-            <!-- CURRENTLY BOX -->
-            <div style="width:100%;margin-top:1px;box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
-              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
-                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ currently</span>
+            <!-- PAT ME BOX (moved from right column) -->
+            <div style="width:100%;box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;margin:0;">
+              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ pat me ♡</span>
+                <span id="sidebar-pat-count" style="font-size:9px;color:#8aaac8;">0 pats</span>
               </div>
-              <div style="padding:8px;background-color:white;">
-                <p style="margin:0 0 4px;text-align:center;font-size:10px;color:#8a9eab;">2026년 4월 7일</p>
-                <div style="background-color:#f9fcff;border:1px dashed #b8c8d8;border-radius:8px;padding:5px 7px;font-size:10px;line-height:2;">
-                  <b>♫ listening :</b> the marías — back to me<br>
-                  <b>🖳 playing :</b> pokémon<br>
-                  <b>✧ working on :</b> website<br>
-                  <b>★ mood :</b> wiggly
+              <div style="padding:8px;background-color:white;text-align:center;">
+                <div style="position:relative;display:inline-block;">
+                  <img id="sidebar-pat-avatar"
+                    src="./seol/fern-borgar.gif"
+                    style="width:100%;max-width:180px;border-radius:10px;border:1px dashed #b8c8d8;cursor:pointer;transition:transform 0.1s;display:block;"
+                    title="click to pat ♡">
+                  <!-- speech bubble overlaying the avatar -->
+                  <div id="sidebar-pat-bubble"
+                    style="display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#f4f7fb,#dce8f4);border:1.5px solid #b8c8d8;border-radius:10px 10px 10px 2px;padding:4px 10px;font-size:11px;color:#4a6880;white-space:nowrap;box-shadow:2px 2px 0 #c8d8e8;pointer-events:none;z-index:10;">
+                  </div>
                 </div>
+                <p style="font-size:9px;color:#b8c8d8;margin:4px 0 0;letter-spacing:0.05em;">click to send pats ♡</p>
               </div>
             </div>
+            <script>
+            (function() {
+              var patCount = 0;
+              try { patCount = parseInt(localStorage.getItem("seol_patcount") || "0", 10) || 0; } catch(e) {}
+              var msgs = ["♡","ehehe~","( ˘ ³˘)♥","thank u...","hehe","꼭 안아줄게","mwah!","(>‿◠)✌","so soft...","꺄!"];
+              var avatar = document.getElementById("sidebar-pat-avatar");
+              var bubble = document.getElementById("sidebar-pat-bubble");
+              var countEl = document.getElementById("sidebar-pat-count");
+              var timer;
+              function syncCount() { countEl.textContent = patCount + " pats"; }
+              syncCount();
+              avatar.addEventListener("click", function() {
+                patCount++;
+                try { localStorage.setItem("seol_patcount", patCount); } catch(e) {}
+                syncCount();
+                // Also sync the photocard counter if visible
+                var pc = document.getElementById("headpat-counter");
+                if (pc) pc.textContent = "pats: " + patCount;
+                bubble.textContent = msgs[Math.floor(Math.random()*msgs.length)];
+                bubble.style.display = "block";
+                avatar.style.transform = "scale(0.95)";
+                setTimeout(function() { avatar.style.transform = ""; }, 120);
+                clearTimeout(timer);
+                timer = setTimeout(function() { bubble.style.display = "none"; }, 1800);
+                if (typeof triggerAchievement === "function") {
+                  if (patCount >= 1)   triggerAchievement("headpat1");
+                  if (patCount >= 5)   triggerAchievement("headpat5");
+                  if (patCount >= 25)  triggerAchievement("headpat25");
+                  if (patCount >= 100) triggerAchievement("headpat100");
+                }
+              });
+            })();
+            </script>
+
+            <!-- ACHIEVEMENTS LIST (moved from right column) -->
+            <div style="width:100%;box-sizing:border-box;background-color:#FFF8F3;border:1.5px solid #D9A898;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #E8C4B4;margin:0;">
+              <div style="background:linear-gradient(90deg, #EDBBAA 0%, #F5E6D8 100%);border-bottom:1px solid #D4A090;padding:5px 8px;display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:10px;color:#7A4A3A;font-weight:bold;letter-spacing:0.05em;">✦ achievements</span>
+                <span id="ach-progress-label" style="font-size:9px;color:#C4896E;">0 / 8</span>
+              </div>
+              <div style="padding:8px;background-color:#FFF8F3;">
+                <!-- progress bar -->
+                <div style="background:#FDF0E8;border-radius:20px;height:6px;overflow:hidden;margin-bottom:8px;border:1px solid #F5E6D8;">
+                  <div id="ach-progress-bar" style="height:100%;background:linear-gradient(90deg,#D9A898,#C4896E);border-radius:20px;transition:width 0.4s;width:0%;"></div>
+                </div>
+                <div id="ach-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;"></div>
+              </div>
+            </div>
+            <script>
+            (function() {
+              var achIds = ["welcome","headpat1","headpat5","headpat25","headpat100","chatted","night_visitor","newjeans_fan"];
+              var grid = document.getElementById("ach-grid");
+              var bar  = document.getElementById("ach-progress-bar");
+              var lbl  = document.getElementById("ach-progress-label");
+
+              function renderAchievements() {
+                if (!grid || typeof ACHIEVEMENTS === "undefined") return;
+                grid.innerHTML = "";
+                var unlocked = 0;
+                achIds.forEach(function(id) {
+                  var ach = ACHIEVEMENTS[id];
+                  var done = isAchievementUnlocked(id);
+                  if (done) unlocked++;
+                  var cell = document.createElement("div");
+                  cell.title = (done ? ach.title + "\n" + ach.desc : "???");
+                  cell.style.cssText = "display:flex;align-items:center;justify-content:center;height:36px;border-radius:8px;font-size:18px;border:1px dashed " + (done ? "#b8c8d8" : "#dce8f4") + ";background:" + (done ? "#f0f7ff" : "#f8fafb") + ";cursor:default;" + (done ? "" : "filter:grayscale(1) opacity(0.35);");
+                  cell.textContent = ach.emoji;
+                  grid.appendChild(cell);
+                });
+                var pct = Math.round(unlocked / achIds.length * 100);
+                bar.style.width = pct + "%";
+                lbl.textContent = unlocked + " / " + achIds.length;
+              }
+
+              // Render on load and after each achievement
+              window.addEventListener("load", renderAchievements);
+              // Monkey-patch triggerAchievement to re-render
+              var _origTrigger = window.triggerAchievement;
+              window.triggerAchievement = function(id) {
+                _origTrigger(id);
+                renderAchievements();
+              };
+            })();
+            </script>
 
             <!-- PATCH NOTES / UPDATE LOG -->
             <div style="height:300px;box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;display:flex;flex-direction:column;">
@@ -1134,6 +1469,9 @@
               <!-- scrollable text area -->
               <div class="container" style="flex:1;overflow-y:scroll;padding:6px 8px;background-color:white;">
                 <div style="background-color:#f9fcff;border:1px dashed #b8c8d8;border-radius:8px;padding:4px 6px;font-size:10px;line-height:1.9;">
+                  <b>❖ 2026년.4월.8일:</b> added an achievement system (still buggy af)<br>
+                  <b>❖ 2026년.4월.8일:</b> fixed the color scheme a bit for the photocards and the boxes<br>
+                  <b>❖ 2026년.4월.8일:</b> put a bunch of widgets<br>
                   <b>❖ 2026년.4월.7일:</b> added powerpuff girls and trails<br>
                   <b>❖ 2026년.4월.6일:</b> added bubbles and sparkles<br>
                   <b>❖ 2026년.4월.6일:</b> added photocards<br>
@@ -1160,22 +1498,73 @@
             <!-- Haerinnie Photo Box -->
             <div style="width:100%;margin-top:1px;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
               <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
-                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ Her.</span>
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ haerin</span>
               </div>
               <img src="./seol/haelfie.jpg" style="width:100%;display:block;">
             </div>
 
-          <!-- UNDER CONSTRUCTION BOX C -->
+            <!-- CTF BOX -->
             <div style="box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
+              
               <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
-                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ · · ·</span>
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ ctf</span>
               </div>
+
               <div style="padding:10px 8px;background-color:white;text-align:center;">
+                
                 <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.05em;">- - - - - - - - - -</p>
-                <p style="font-size:10px;color:#8a9eab;margin:4px 0;">⚙ under construction ⚙</p>
-                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.05em;">- - - - - - - - - -</p>
+                <p style="font-size:10px;color:#8a9eab;margin:4px 0;">enter the flag</p>
+
+                <form onsubmit="checkFlag(event)" style="margin-top:6px;">
+                  <input 
+                    id="ctf-input"
+                    type="text" 
+                    placeholder="flag{...}" 
+                    style="font-size:10px;padding:4px 6px;border:1px solid #b8c8d8;border-radius:6px;width:80%;outline:none;">
+                  
+                  <button 
+                    type="submit" 
+                    style="font-size:10px;margin-top:6px;padding:4px 8px;border:1px solid #b8c8d8;border-radius:6px;background:#dce8f4;color:#4a6880;cursor:pointer;">
+                    submit
+                  </button>
+                </form>
+
+                <p id="ctf-result" style="font-size:10px;color:#8a9eab;margin-top:6px;"></p>
+
+                <p style="font-size:10px;color:#b8c8d8;margin:6px 0;letter-spacing:0.05em;">- - - - - - - - - -</p>
+
               </div>
             </div>
+
+            <script>
+            /* Base64 encoded flag (no plaintext flag in code) */
+            const hiddenFlag = "ZmxhZ3tZb3VfRm91bmRfTWUhIX0=";
+            /* maybe you could try plugging it in AI and asking them to decode it for you? */
+            /* or just head here https://www.base64decode.org/ */
+
+            function checkFlag(e) {
+              e.preventDefault();
+
+              const input = document.getElementById("ctf-input").value.trim();
+              const result = document.getElementById("ctf-result");
+
+              try {
+                const decodedInput = input;
+                const decodedFlag = atob(hiddenFlag);
+
+                if (decodedInput === decodedFlag) {
+                  result.textContent = "correct ♡";
+                  result.style.color = "#7aa8a1";
+                } else {
+                  result.textContent = "nope...";
+                  result.style.color = "#c4896e";
+                }
+              } catch {
+                result.textContent = "error";
+                result.style.color = "#c4896e";
+              }
+            }
+            </script>
 
           <!-- UNDER CONSTRUCTION BOX D -->
             <div style="box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
@@ -1423,14 +1812,20 @@
 
             <!-- UNDER CONSTRUCTION BOX B -->
             <div style="box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
+              
+              <!-- Header -->
               <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
                 <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ · · ·</span>
               </div>
-              <div style="padding:16px 8px;background-color:white;text-align:center;">
-                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - - - - - - - - - - - -</p>
-                <p style="font-size:10px;color:#8a9eab;margin:6px 0;">⚙ under construction ⚙</p>
-                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - - - - - - - - - - - -</p>
+
+              <!-- IFRAME CONTENT -->
+              <div style="width:100%;height:700px;background:white;">
+                <iframe 
+                  src="https://seol.atabook.org"
+                  style="width:100%;height:100%;border:none;display:block;">
+                </iframe>
               </div>
+
             </div>
 
             <!-- UNDER CONSTRUCTION BOX C (middle) -->
@@ -1470,7 +1865,7 @@
           ═══════════════════════════════════ -->
           <div style="display:flex;flex-direction:column;gap:8px;align-items:stretch;">
 
-            <!-- STATUS POST CARD -->
+            <!-- STATUS POST CARD (site visitors) -->
             <div style="width:100%;box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;margin:0;">
               <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
                 <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ site visitors</span>
@@ -1498,7 +1893,7 @@
                 <span class="pc-cal-title">calendar ✦</span>
                 <span class="pc-cal-nav">
                   <button class="pc-cal-btn" onclick="pcCalMove(-1)">‹</button>
-                  <span id="pcMonthYear" style="font-size:10px;color:#4a6880;font-weight:bold;"></span>
+                  <span id="pcMonthYear" style="font-size:10px;color:#5A4A7A;font-weight:bold;"></span>
                   <button class="pc-cal-btn" onclick="pcCalMove(1)">›</button>
                 </span>
               </div>
@@ -1556,6 +1951,20 @@
               <img src="./seol/newjeans.webp" style="width:100%;display:block;">
             </div>
 
+            <!-- CHAT BOX -->
+            <div style="width:100%;box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;margin:0;">
+              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ chat</span>
+              </div>
+              <div style="height:320px;">
+                <iframe
+                  src="https://beta.iframe.chat/embed?chat=seolhae_site"
+                  style="width:100%;height:100%;border:none;display:block;"
+                  title="chat">
+                </iframe>
+              </div>
+            </div>
+
             <!-- CONTACT / LINKS BOX -->
             <div style="width:100%;box-sizing:border-box;margin:0;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
               <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
@@ -1596,27 +2005,47 @@
               </div>
             </div>
 
-            <!-- UNDER CONSTRUCTION BOX A -->
+            <!-- Favorite Eeveelution -->
             <div style="width:100%;box-sizing:border-box;margin:0;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
+              
               <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
-                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ · · ·</span>
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ eeveelutions</span>
               </div>
-              <div style="padding:12px 8px;background-color:white;text-align:center;">
-                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - -</p>
-                <p style="font-size:10px;color:#8a9eab;margin:5px 0;">⚙ under construction ⚙</p>
-                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - -</p>
+
+              <div style="padding:10px 8px;background-color:white;text-align:center;">
+                
+                <!-- dashed image frame -->
+                <div style="background-color:#f9fcff;border:1px dashed #b8c8d8;border-radius:8px;padding:6px;display:inline-block;">
+                  <img src="https://archives.bulbagarden.net/media/upload/thumb/6/6d/0134Vaporeon.png/375px-0134Vaporeon.png" 
+                      style="width:90px;height:auto;display:block;margin:auto;">
+                </div>
+
+                <p style="font-size:10px;color:#8a9eab;margin:6px 0;">
+                  vapoman my fav ♡
+                </p>
+
               </div>
             </div>
 
-            <!-- UNDER CONSTRUCTION BOX B -->
+            <!-- Favorite Eeveelution -->
             <div style="width:100%;box-sizing:border-box;margin:0;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
+              
               <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
-                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ · · ·</span>
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ eeveelutions</span>
               </div>
-              <div style="padding:12px 8px;background-color:white;text-align:center;">
-                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - -</p>
-                <p style="font-size:10px;color:#8a9eab;margin:5px 0;">⚙ under construction ⚙</p>
-                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - -</p>
+
+              <div style="padding:10px 8px;background-color:white;text-align:center;">
+                
+                <!-- dashed image frame -->
+                <div style="background-color:#f9fcff;border:1px dashed #b8c8d8;border-radius:8px;padding:6px;display:inline-block;">
+                  <img src="https://archives.bulbagarden.net/media/upload/thumb/d/d0/0700Sylveon.png/375px-0700Sylveon.png" 
+                      style="width:90px;height:auto;display:block;margin:auto;">
+                </div>
+
+                <p style="font-size:10px;color:#8a9eab;margin:6px 0;">
+                  she's my girlfriends favorite ♡
+                </p>
+
               </div>
             </div>
 
