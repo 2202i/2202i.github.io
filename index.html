@@ -703,8 +703,8 @@
     });
   })();
 
-  // Idle watcher — stay on page for 3 minutes
-  setTimeout(function() { triggerAchievement("idle_watcher"); }, 3 * 60 * 1000);
+  // Idle watcher — stay on page for 1 minute
+  setTimeout(function() { triggerAchievement("idle_watcher"); }, 60000);
   </script>
 
   <span class="text" style="font-size:11px">
@@ -863,7 +863,60 @@
         "kii kii ♡",
         "*spins in place*",
         "you're its favorite.",
-        "...kii."
+        "...kii.",
+        "*leans into your hand*",
+        "kii...? ♡",
+        "*tiny excited hops*",
+        "...you touched it.",
+        "*clings softly*",
+        "kii~ kii~",
+        "*the disguise perks up*",
+        "...it feels safe.",
+        "*gentle nuzzle*",
+        "kii!! ♡♡",
+        "*hides for a second, then peeks back*",
+        "...don't go.",
+        "*holds onto your sleeve*",
+        "kii...",
+        "*soft rustling*",
+        "...more?",
+        "*stays very still*",
+        "...it doesn't want this to stop.",
+        "kii ♡ kii ♡",
+        "*wiggles closer*",
+        "...it trusts you.",
+        "*quiet happy noises*",
+        "...this is nice.",
+        "*tiny spin*",
+        "kii~!",
+        "*clings tighter*",
+        "...stay.",
+        "*shy shuffle*",
+        "...it gets lonely.",
+        "kii...",
+        "*leans its head into your palm*",
+        "...thank you.",
+        "*soft, content stillness*",
+        "...you're warm.",
+        "*the cloth relaxes*",
+        "...it feels real.",
+        "*gentle sway*",
+        "kii ♡",
+        "*doesn't move away*",
+        "...it chose you.",
+        "*very soft wiggle*",
+        "...again?",
+        "*quiet cling*",
+        "...please don't disappear.",
+        "...you won't look under it, right?",
+        "*the cloth shifts slightly*",
+        "...don't be scared.",
+        "*something underneath moves*",
+        "...it just wants to be loved.",
+        "*tightens its grip on you*",
+        "...don't leave like the others.",
+        "*the air feels colder for a moment*",
+        "...stay."
       ];
 
       var avatar   = document.getElementById("mimikyu-avatar");
@@ -984,13 +1037,25 @@
           title:  "terrible4u",
           artist: "Luke Chiang",
           src:    "./seol/terrible4u.mp3",
-          art:    "./seol/terrible4u.jpg"   // add album art or it falls back gracefully
+          art:    "./seol/typhoon.jpg"   // add album art or it falls back gracefully
         },
         {
-          title:  "Exploration",
-          artist: "Coraline OST",
-          src:    "./seol/exploration.mp3",
-          art:    "./seol/exploration.jpg"  // add album art or fallback
+          title:  "Journey To The Past",
+          artist: "Anastasia Broadway Musical OST",
+          src:    "./seol/JourneyToThePast.mp3",
+          art:    "./seol/anastasiaalbum.jpg"  // add album art or fallback
+        },
+        {
+          title:  "Soldier, Poet, King",
+          artist: "The Oh Hellos",
+          src:    "./seol/SPK.mp3",
+          art:    "./seol/SPKalbum.jpg"  // add album art or fallback
+        },
+        {
+          title:  "Legendary Theme",
+          artist: "Gitaroo Man OST",
+          src:    "./seol/gitaroo.mp3",
+          art:    "./seol/gitarooalbum.jpg"  // add album art or fallback
         }
       ];
 
@@ -1087,7 +1152,7 @@
           row.className = "mp-pl-row";
           row.style.cssText = "display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:7px;cursor:pointer;font-size:10px;color:#8a9eab;transition:background 0.15s;";
           row.innerHTML =
-            '<span style="font-size:14px;flex-shrink:0;">' + ["🎵","💔","🌙"][i] + '</span>' +
+            '<span style="font-size:14px;flex-shrink:0;">' + ["🎵","💔","🌙","✨","🎸"][i] + '</span>' +
             '<div style="flex:1;overflow:hidden;">' +
               '<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + t.title + '</div>' +
               '<div style="font-size:9px;opacity:0.7;">' + t.artist + '</div>' +
@@ -1118,6 +1183,40 @@
     <div id="doggo-floater" style="position:absolute;top:380px;left:320px;z-index:50;pointer-events:none;">
       <img src="./seol/dancing doggo2.gif" draggable="false" style="width:100px;height:auto;display:block;">
     </div>
+
+    <!-- ═══════════════════════════════════
+         CELEBRITY CRUSH — floating draggable card
+         lives outside the lace, independently positioned
+    ═══════════════════════════════════ -->
+    <div id="celeb-card" class="photocard" style="top:1310px;right:300px;left:auto;width:180px;z-index:99;">
+      <div class="drag-handle" id="dragHandleCeleb"></div>
+      <div class="photocard-body" style="padding:8px;">
+        <div style="font-size:9px;color:#9888b0;font-weight:bold;letter-spacing:0.06em;text-align:center;margin-bottom:2px;">✦ celebrity crush</div>
+        <div style="width:160px;height:200px;border-radius:10px;overflow:hidden;border:1px dashed #c4b8d4;flex-shrink:0;">
+          <img src="./seol/anneh.jpg"
+            style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;">
+        </div>
+        <p style="font-size:11px;font-weight:bold;color:#4a3a6a;margin:5px 0 1px;text-align:center;">Anne Hathaway</p>
+        <p style="font-size:9px;color:#9888b0;margin:0;text-align:center;">timeless. always. ♡</p>
+      </div>
+    </div>
+    <style>
+      #celeb-card .drag-handle::before { content: "✦ celeb crush"; }
+    </style>
+    <script>
+      window.addEventListener("load", function() {
+        (function() {
+          var card = document.getElementById("celeb-card");
+          if (!card) return;
+          function initCeleb() {
+            var hl = card.offsetLeft;
+            if (typeof makeCard === "function") makeCard("celeb-card", "dragHandleCeleb", hl, 1310);
+          }
+          if (document.readyState === "complete") { initCeleb(); }
+          else { window.addEventListener("load", initCeleb); }
+        })();
+      });
+    </script>
 
     <!-- ═══════════════════════════════════
         PNGS WITH TRANSPARENT BACKGROUND — static, can layer on top of other elements
@@ -1177,7 +1276,7 @@
     <div class="photocard" id="photocard10" style="top:1000px;right:150px;left:auto;z-index:98;">
       <div class="drag-handle" id="dragHandle10"></div>
       <div class="photocard-body">
-        <img id="stark-avatar" src="./seol/Grad.jpg" style="border-radius:10px;width:180px;cursor:pointer;transition:transform 0.1s;user-select:none;" title="click to pat ♡">
+        <img id="stark-avatar" src="./seol/stark.jpg" style="border-radius:10px;width:180px;cursor:pointer;transition:transform 0.1s;user-select:none;" title="click to pat ♡">
         <div id="stark-bubble" style="background:linear-gradient(135deg,#f4f7fb,#dce8f4);border:1.5px solid #b8c8d8;border-radius:12px 12px 12px 2px;padding:5px 10px;font-size:10px;color:#4a6880;display:none;text-align:center;margin-top:4px;box-shadow:2px 2px 0 #c8d8e8;"></div>
         <p id="stark-counter" style="font-size:10px;color:#8a9eab;text-align:center;margin:2px 0;">pats: 0</p>
         <p>starky boy</p>
@@ -1190,30 +1289,78 @@
       try { starkPatCount = parseInt(localStorage.getItem("seol_starkpats") || "0", 10) || 0; } catch(e) {}
 
       var starkMsgs = [
-        "...what.",
-        "don't do that.",
-        "i'm not a pet.",
-        "hmph.",
-        "i didn't say stop.",
-        "you're weird.",
-        "...okay.",
-        "don't tell anyone.",
-        "this is embarrassing.",
-        "...stronger than you look.",
-        "you'd survive one hit. maybe.",
-        "Frieren would laugh at this.",
-        "i've killed demon generals. and now this.",
-        "...not bad.",
-        "yeah yeah whatever.",
-        "i'm not soft. shut up.",
-        "...once more."
+        "...huh?",
+        "w-wait what are you doing?!",
+        "don't just touch my head like that!",
+        "...i'm not a kid.",
+        "...i mean— i'm not saying stop.",
+        "this is kinda weird...",
+        "...but it's not bad.",
+        "h-hey, not so suddenly!",
+        "...you're gonna mess up my hair.",
+        "you always do things out of nowhere.",
+        "...i wasn't prepared for that.",
+        "th-this is embarrassing...",
+        "don't let anyone see this.",
+        "...seriously, don't.",
+        "if master eisen saw this...",
+        "...he'd probably laugh.",
+        "or say something about discipline...",
+        "...yeah, definitely that.",
+        "i should stop you.",
+        "...but i'm not.",
+        "you're lucky i'm in a good mood.",
+        "...i think.",
+        "why am i letting you do this.",
+        "...it's kinda relaxing.",
+        "just... don't tell anyone, okay?",
+        "...especially frieren.",
+        "she'd never let me hear the end of it.",
+        "...or maybe she wouldn't care.",
+        "still— don't.",
+        "...hey, be a bit gentler.",
+        "i'm not made of steel, you know.",
+        "...well, not completely.",
+        "you've got guts doing this to me.",
+        "...i'll give you that.",
+        "most people wouldn't dare.",
+        "...not that i'm scary or anything!",
+        "...okay maybe a little.",
+        "you're smiling, aren't you.",
+        "...i can tell.",
+        "this is so unfair.",
+        "...why do i feel calmer.",
+        "i should be training right now.",
+        "...master eisen would say i'm slacking.",
+        "...but just for a bit is fine, right?",
+        "just a little longer.",
+        "...i didn't say stop yet.",
+        "w-wait, don't stop suddenly!",
+        "...i mean— you can if you want.",
+        "...but you don't have to.",
+        "this is confusing.",
+        "...you're confusing.",
+        "...but it's nice.",
+        "d-don't make a big deal out of it.",
+        "...seriously.",
+        "i'm trusting you here.",
+        "...so don't make it weird.",
+        "you're... kinda gentle.",
+        "...thanks.",
+        "okay that's enough—",
+        "...actually, maybe not yet.",
+        "...just a bit more.",
+        "alright, now i'm done.",
+        "...probably.",
+        "...hey.",
+        "thanks."
       ];
 
       var avatar    = document.getElementById("stark-avatar");
       var bubble    = document.getElementById("stark-bubble");
       var counter   = document.getElementById("stark-counter");
-      var normalSrc = "./seol/Grad.jpg";
-      var patSrc    = "./seol/fern-borgar.gif";
+      var normalSrc = "./seol/stark.jpg";
+      var patSrc    = "./seol/stark pat.jpg";
       var bubbleTimer, resetTimer;
 
       function updateCounter() { counter.textContent = "pats: " + starkPatCount; }
@@ -1271,13 +1418,13 @@
         "you're so childish.",
         "...fine. just once.",
         "don't make it weird.",
-        "eimerie-",
+        "eimerie—",
         "i said stop!",
         "...okay that was kind of nice.",
         "you have way too much free time.",
-        "master would never do this.",
+        "frieren-sama would never do this.",
         "i have spells to practice.",
-        "...don't tell master.",
+        "...don't tell frieren-sama.",
         "i'm not blushing. shut up.",
         "are you done yet?",
         "...again?",
@@ -1286,7 +1433,57 @@
         "i'm going to charge you for this.",
         "...you're persistent, i'll give you that.",
         "stark would never.",
-        "...please be quieter about it."
+        "...please be quieter about it.",
+        "...your hand is heavy.",
+        "you're distracting me.",
+        "if i mess up my spell, it's your fault.",
+        "...just a little longer.",
+        "i didn't say you could stop.",
+        "...i mean— i didn't say continue either.",
+        "why are you like this.",
+        "you're enjoying this way too much.",
+        "...it's not unpleasant.",
+        "focus. i need to focus.",
+        "...your timing is terrible.",
+        "you always pick the worst moments.",
+        "...do you have nothing better to do?",
+        "this is why people think you're strange.",
+        "...just... be gentle.",
+        "if anyone sees this, i'm blaming you.",
+        "...you're surprisingly careful.",
+        "don't get used to this.",
+        "...that's enough.",
+        "...okay, maybe a little more.",
+        "you're smiling, aren't you.",
+        "...i can feel it.",
+        "you're insufferable.",
+        "...but not entirely.",
+        "this doesn't mean anything.",
+        "...understood?",
+        "you're lucky i'm in a good mood.",
+        "...rare as that is.",
+        "don't touch my hair like that.",
+        "...actually, that part is fine.",
+        "just don't ruin it.",
+        "...i just fixed it this morning.",
+        "you owe me if it gets messy.",
+        "...why am i allowing this.",
+        "...i should stop you.",
+        "...but i won't. for now.",
+        "you're really persistent.",
+        "...annoyingly so.",
+        "i hope you're satisfied.",
+        "...you look like you are.",
+        "this is the last time.",
+        "...probably.",
+        "...you're still here?",
+        "...fine.",
+        "just... don't say anything.",
+        "...it's quieter like this.",
+        "…this is oddly calming.",
+        "don’t misunderstand.",
+        "...i'm only tolerating this.",
+        "…but you can continue."
       ];
 
       var avatar = document.getElementById("fern-avatar");
@@ -1331,10 +1528,11 @@
     <div class="photocard" id="photocard12" style="top:1720px;right:98px;left:auto;">
       <div class="drag-handle" id="dragHandle12"></div>
       <div class="photocard-body">
-        <img id="frieren-avatar" src="./seol/tree.jpg" style="border-radius:10px;width:180px;cursor:pointer;transition:transform 0.1s;user-select:none;" title="click to pat ♡">
+        <img id="frieren-avatar" src="./seol/frieren.gif" style="border-radius:10px;width:180px;cursor:pointer;transition:transform 0.1s;user-select:none;" title="click to pat ♡">
         <div id="frieren-bubble" style="background:linear-gradient(135deg,#f4f7fb,#dce8f4);border:1.5px solid #b8c8d8;border-radius:12px 12px 12px 2px;padding:5px 10px;font-size:10px;color:#4a6880;display:none;text-align:center;margin-top:4px;box-shadow:2px 2px 0 #c8d8e8;"></div>
         <p id="frieren-counter" style="font-size:10px;color:#8a9eab;text-align:center;margin:2px 0;">pats: 0</p>
-        <button type="button" class="collapsible"><img src="./seol/bun.png" style="width:14px;vertical-align:middle;"></button>
+          <p>frieren-sama</p>
+          <p style="font-size:10px;color:#7a9ab0;text-align: center;">the slayer</p>
         <div class="content" style="width:180px;height:300px;margin-top:4px;border:1px dashed #a8c0d4;border-radius:10px;background-color:#f8faff;display:none;"></div>
       </div>
     </div>
@@ -1347,15 +1545,15 @@
         "...oh.",
         "humans are strange.",
         "i don't mind.",
-        "Fern would be jealous.",
+        "fern would be jealous.",
         "...is this a greeting?",
-        "i've seen stranger things in 1000 years.",
+        "i've seen stranger things in a thousand years.",
         "you're warm.",
         "...don't stop.",
         "humans have always been like this.",
         "i'll remember this for a while.",
         "...thank you.",
-        "Himmel used to do this too.",
+        "himmel used to do this too.",
         "...i forgot what this felt like.",
         "fleeting, like all things.",
         "i like this.",
@@ -1367,14 +1565,66 @@
         "the journey feels lighter now.",
         "...i won't forget.",
         "this is a good moment.",
-        "you have a gentle hand."
+        "you have a gentle hand.",
+        "...this feeling is familiar.",
+        "it's been a long time since someone did this.",
+        "...longer than you could imagine.",
+        "your hand is small.",
+        "...but kind.",
+        "humans pass so quickly.",
+        "...moments like this even more so.",
+        "i should treasure this.",
+        "...before it's gone.",
+        "you remind me of him.",
+        "...in small ways.",
+        "not the same, but...",
+        "...still warm.",
+        "fern would scold you for this.",
+        "...but she might try it too.",
+        "stark would panic if you did this to him.",
+        "...he's easy to read.",
+        "this is inefficient.",
+        "...yet i don't want it to end.",
+        "strange.",
+        "...i've lived long, but...",
+        "moments like this are rare.",
+        "...unexpected things stay the longest.",
+        "i've forgotten many spells.",
+        "...but not feelings like this.",
+        "your touch is careful.",
+        "...you've done this before.",
+        "is this how humans show affection?",
+        "...i see.",
+        "then i suppose...",
+        "...i'll accept it.",
+        "you may continue.",
+        "...for a while.",
+        "time feels slower like this.",
+        "...just a little.",
+        "i wonder how long you'll remember this.",
+        "...i will remember it longer.",
+        "that's the difference between us.",
+        "...and yet,",
+        "...this moment belongs to both of us.",
+        "don't rush.",
+        "...there's no need.",
+        "we have time.",
+        "...at least for now.",
+        "you can stay.",
+        "...until you get bored.",
+        "i won't mind.",
+        "...i rarely do.",
+        "this is nice.",
+        "...quiet.",
+        "...gentle.",
+        "...enough."
       ];
 
       var avatar   = document.getElementById("frieren-avatar");
       var bubble   = document.getElementById("frieren-bubble");
       var counter  = document.getElementById("frieren-counter");
-      var normalSrc = "./seol/tree.jpg";
-      var patSrc    = "./seol/fern-borgar.gif";
+      var normalSrc = "./seol/frieren.gif";
+      var patSrc    = "./seol/frieren pat.gif";
       var bubbleTimer, resetTimer;
 
       function updateCounter() { counter.textContent = "pats: " + frierenPatCount; }
@@ -2145,27 +2395,29 @@
             }
             </script>
 
-          <!-- UNDER CONSTRUCTION BOX D -->
+          <!-- VAPOREON BOX -->
             <div style="box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
               <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
-                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ · · ·</span>
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ eeveelutions</span>
               </div>
               <div style="padding:10px 8px;background-color:white;text-align:center;">
-                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.05em;">- - - - - - - - - -</p>
-                <p style="font-size:10px;color:#8a9eab;margin:4px 0;">⚙ under construction ⚙</p>
-                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.05em;">- - - - - - - - - -</p>
+                <div style="background-color:#f9fcff;border:1px dashed #b8c8d8;border-radius:8px;padding:6px;display:inline-block;">
+                  <img src="https://archives.bulbagarden.net/media/upload/thumb/6/6d/0134Vaporeon.png/375px-0134Vaporeon.png" style="width:90px;height:auto;display:block;margin:auto;">
+                </div>
+                <p style="font-size:10px;color:#8a9eab;margin:6px 0;">vapoman my fav ♡</p>
               </div>
             </div>
 
-          <!-- UNDER CONSTRUCTION BOX E -->
+          <!-- SYLVEON BOX -->
             <div style="box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
               <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
-                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ · · ·</span>
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ eeveelutions</span>
               </div>
               <div style="padding:10px 8px;background-color:white;text-align:center;">
-                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.05em;">- - - - - - - - - -</p>
-                <p style="font-size:10px;color:#8a9eab;margin:4px 0;">⚙ under construction ⚙</p>
-                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.05em;">- - - - - - - - - -</p>
+                <div style="background-color:#f9fcff;border:1px dashed #b8c8d8;border-radius:8px;padding:6px;display:inline-block;">
+                  <img src="https://archives.bulbagarden.net/media/upload/thumb/d/d0/0700Sylveon.png/375px-0700Sylveon.png" style="width:90px;height:auto;display:block;margin:auto;">
+                </div>
+                <p style="font-size:10px;color:#8a9eab;margin:6px 0;">she's my girlfriends favorite ♡</p>
               </div>
             </div>
           </div>
@@ -2213,13 +2465,13 @@
               <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
                 <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ now playing</span>
               </div>
-              <div style="display:flex;align-items:center;padding:6px 8px;background-color:white;gap:8px;">
+              <div style="display:flex;align-items:center;padding:6px 8px;background-color:white;gap:8px;min-width:0;overflow:hidden;">
                 <img id="bar-album-art" src="./seol/rightnow.webp" style="height:44px;width:44px;object-fit:cover;border-radius:6px;border:1px dashed #b8c8d8;flex-shrink:0;">
-                <div style="flex:1;overflow:hidden;">
-                  <div style="overflow:hidden;white-space:nowrap;">
-                    <span id="bar-marquee-text" style="display:inline-block;color:#8a9eab;font-size:10px;animation:marquee-scroll 14s linear infinite;">𝄞 currently playing ♬ &nbsp;&nbsp;</span>
+                <div style="flex:1;min-width:0;overflow:hidden;">
+                  <div style="position:relative;height:14px;overflow:hidden;">
+                    <span id="bar-marquee-text" style="position:absolute;white-space:nowrap;color:#8a9eab;font-size:10px;animation:marquee-scroll 16s linear infinite;">𝄞 currently playing ♬ &nbsp;&nbsp;</span>
                   </div>
-                  <p id="bar-track-label" style="margin:2px 0 0;font-size:10px;color:#4a6880;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">right now — NewJeans</p>
+                  <p id="bar-track-label" style="margin:2px 0 0;font-size:10px;color:#4a6880;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;">right now — NewJeans</p>
                 </div>
                 <!-- mini play/pause -->
                 <button id="bar-playpause" onclick="seolPlayerToggle()" style="background:#dce8f4;border:1px solid #b8c8d8;border-radius:50%;width:26px;height:26px;font-size:12px;color:#4a6880;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;">▶</button>
@@ -2227,8 +2479,8 @@
             </div>
             <style>
               @keyframes marquee-scroll {
-                0%   { transform: translateX(100%); }
-                100% { transform: translateX(-100%); }
+                0%   { transform: translateX(110%); }
+                100% { transform: translateX(-110%); }
               }
             </style>
 
@@ -2584,47 +2836,29 @@
               </div>
             </div>
 
-            <!-- Favorite Eeveelution -->
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+
+
+            <!-- PHOTO BOX -->
             <div style="width:100%;box-sizing:border-box;margin:0;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
-              
               <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
-                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ eeveelutions</span>
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ photos</span>
               </div>
-
-              <div style="padding:10px 8px;background-color:white;text-align:center;">
-                
-                <!-- dashed image frame -->
-                <div style="background-color:#f9fcff;border:1px dashed #b8c8d8;border-radius:8px;padding:6px;display:inline-block;">
-                  <img src="https://archives.bulbagarden.net/media/upload/thumb/6/6d/0134Vaporeon.png/375px-0134Vaporeon.png" 
-                      style="width:90px;height:auto;display:block;margin:auto;">
-                </div>
-
-                <p style="font-size:10px;color:#8a9eab;margin:6px 0;">
-                  vapoman my fav ♡
-                </p>
-
-              </div>
-            </div>
-
-            <!-- Favorite Eeveelution -->
-            <div style="width:100%;box-sizing:border-box;margin:0;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
-              
-              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
-                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ eeveelutions</span>
-              </div>
-
-              <div style="padding:10px 8px;background-color:white;text-align:center;">
-                
-                <!-- dashed image frame -->
-                <div style="background-color:#f9fcff;border:1px dashed #b8c8d8;border-radius:8px;padding:6px;display:inline-block;">
-                  <img src="https://archives.bulbagarden.net/media/upload/thumb/d/d0/0700Sylveon.png/375px-0700Sylveon.png" 
-                      style="width:90px;height:auto;display:block;margin:auto;">
-                </div>
-
-                <p style="font-size:10px;color:#8a9eab;margin:6px 0;">
-                  she's my girlfriends favorite ♡
-                </p>
-
+              <div style="background-color:white;overflow:hidden;">
+                <img src="./seol/haerinnie.jpg" style="width:100%;display:block;object-fit:cover;">
               </div>
             </div>
 
