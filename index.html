@@ -664,6 +664,66 @@
       title: "Against the Current",
       desc: "←→←→↓↓↑↑. You found the other way.",
     },
+    "moved_ppg1": {
+      emoji: "💙",
+      title: "Minji",
+      desc: "The sporty Minji. She was waiting at the corner.",
+    },
+    "moved_ppg2": {
+      emoji: "💚",
+      title: "Haerin",
+      desc: "The long-haired Haerin. Quiet but she moves fast.",
+    },
+    "moved_ppg3": {
+      emoji: "💛",
+      title: "Danielle",
+      desc: "The curly Danielle. Brown hair, blue cap. She has her own style.",
+    },
+    "moved_ppg4": {
+      emoji: "💛",
+      title: "Danielle",
+      desc: "The bee-stripe Danielle. Black buns, bold stripes. Buzzing with energy.",
+    },
+    "moved_ppg5": {
+      emoji: "💜",
+      title: "Hyein",
+      desc: "The magenta Hyein. She landed right in the middle.",
+    },
+    "moved_ppg6": {
+      emoji: "🩷",
+      title: "Hanni",
+      desc: "The butterfly Hanni. She was watching from the top.",
+    },
+    "moved_ppg7": {
+      emoji: "💙",
+      title: "Minji",
+      desc: "The hidden Minji. She wasn't supposed to be found.",
+    },
+    "moved_ppg8": {
+      emoji: "🩷",
+      title: "Hanni",
+      desc: "The updo Hanni. She was tucked away on the left.",
+    },
+    "moved_ppg9": {
+      emoji: "💚",
+      title: "Haerin",
+      desc: "The short-hair Haerin. She was at the top corner all along.",
+    },
+    "moved_ppg10": {
+      emoji: "💜",
+      title: "Hyein",
+      desc: "The ponytail Hyein. Center stage, always composed.",
+    },
+    "found_hidden_minji": {
+      emoji: "🌟",
+      title: "You Found Her",
+      desc: "The hidden Minji. She wasn't supposed to be moved. But here we are.",
+    },
+    "moved_all_ppg": {
+      emoji: "🌸",
+      title: "NewJeans Forever",
+      desc: "All ten powerpuffs moved. The whole group goes together.",
+    },
   };
 
   function isAchievementUnlocked(id) {
@@ -856,7 +916,7 @@
 
       var msgs = [
         "huh", "the pats are cute", "woah dude", "thanks?", "h-hey calm down",
-        "cool", "meow~", "yo?", "so soft...", "꺄!"
+        "cool", "staph", "yo?", "uh", "꺄!"
       ];
       var bubble = document.getElementById("headpat-bubble");
       var counter = document.getElementById("headpat-counter");
@@ -1179,6 +1239,18 @@
         { id:"konami",          emoji:"🕹️", hint:"↑↑↓↓←→←→ — the old code. type it on your keyboard. the site remembers." },
         { id:"konami_twice",    emoji:"🕹️", hint:"the code has a mirror. what happens if you walk it backwards? ←→←→↓↓↑↑" },
         { id:"idle_watcher",    emoji:"🌙", hint:"stay. do not click. do not leave. wait one full minute. the page will notice." },
+        { id:"moved_ppg1",  emoji:"💙", hint:"bottom-left corner. a minji in a cap and striped socks. she won't move herself." },
+        { id:"moved_ppg2",  emoji:"💚", hint:"bottom-right corner. haerin with long hair. drag her away from the edge." },
+        { id:"moved_ppg3",  emoji:"💛", hint:"mid-right, lower. danielle with curly hair and a blue cap. she's been hovering there." },
+        { id:"moved_ppg4",  emoji:"💛", hint:"mid-right, upper. danielle with black buns and bee stripes. give her room to float." },
+        { id:"moved_ppg5",  emoji:"💜", hint:"bottom-center. hyein in magenta. she's right in the middle — pull her out." },
+        { id:"moved_ppg6",  emoji:"🩷", hint:"top-left corner. hanni with butterflies in her hair. she watches from above." },
+        { id:"moved_ppg7",  emoji:"💙", hint:"mid-left, upper. something's off. that's not who you'd expect to find there." },
+        { id:"moved_ppg8",  emoji:"🩷", hint:"mid-left, lower. hanni with the updo. she was tucked away quietly." },
+        { id:"moved_ppg9",  emoji:"💚", hint:"top-right corner. haerin, shorter hair. she's been at the corner since the start." },
+        { id:"moved_ppg10", emoji:"💜", hint:"top-center. hyein with the ponytail. calm, composed. drag her somewhere new." },
+        { id:"found_hidden_minji", emoji:"🌟", hint:"one of the minji ppgs isn't where you'd expect. look at mid-left. really look." },
+        { id:"moved_all_ppg", emoji:"🌸", hint:"ten powerpuffs. all of them. don't leave a single one behind." },
       ];
 
       var open = true;
@@ -1216,9 +1288,28 @@
     })();
     </script>
 
-
-
-    <audio id="music" preload="metadata"></audio>
+    <!-- ═══════════════════════════════════
+         CREDITS / REFERENCE CARD
+         Soft sage green, right side, opposite hints
+         draggable only — no collapse
+    ═══════════════════════════════════ -->
+    <div class="photocard" id="credits-card" style="top:2780px;right:40px;left:auto;width:220px;z-index:102;background-color:#e8f0e8;border-color:#a8c4a8;box-shadow:3px 4px 0px #c4d8c4;">
+      <div class="drag-handle" id="dragHandleCredits" style="background:linear-gradient(90deg,#c4d8c4 0%,#deeede 100%);border-bottom:1px solid #a8c4a8;">
+        <span style="font-size:10px;color:#3a5a3a;font-weight:bold;letter-spacing:0.05em;">✦ credits</span>
+      </div>
+      <div style="padding:10px 10px;background-color:#e8f0e8;">
+        <p style="font-size:10px;color:#4a6a4a;line-height:1.7;margin:0;text-align:center;">
+          this little corner of the web was lovingly shaped by the wonderful work of
+          <a href="https://rottenware.neocities.org/" target="_blank" style="color:#3a6a3a;font-weight:bold;text-decoration:underline dotted;">rottenware</a>
+          — whose site is a gem worth visiting. thank you for the inspiration. ♡
+        </p>
+      </div>
+    </div>
+    <style>
+      #dragHandleCredits::before { content: none; }
+      #dragHandleCredits::after  { content: none; }
+    </style>
+    <audio id="music" preload="none"></audio>
     <script>
     (function() {
       var PLAYLIST = [
@@ -1241,7 +1332,7 @@
           art:    "./seol/unpostedlettersalbum.png"  // add album art or fallback
         },
         {
-          title:  "Everyone Adores You.mp3",
+          title:  "Everyone Adores You",
           artist: "Matt Maltese",
           src:    "./seol/Everyone Adores You.mp3",
           art:    "./seol/everyoneadoresualbum.jpg"  // add album art or fallback
@@ -1426,14 +1517,14 @@
     <!-- ═══════════════════════════════════
          PHOTOCARD 16 — right side, photo + text
     ═══════════════════════════════════ -->
-    <div class="photocard" id="photocard16" style="top:2380px;right:80px;left:auto;width:210px;">
+    <div class="photocard" id="photocard16" style="top:2470px;right:0px;left:auto;width:210px;">
       <div class="drag-handle" id="dragHandle16"></div>
       <div class="photocard-body" style="padding:8px;align-items:center;">
-        <div style="width:180px;height:180px;border-radius:10px;overflow:hidden;border:1px dashed #c4b8d4;flex-shrink:0;background:#f4f0fa;display:flex;align-items:center;justify-content:center;">
-          <p style="font-size:10px;color:#b8c8d8;text-align:center;">add image here ♡</p>
+        <div style="width:180px;height:240px;border-radius:10px;overflow:hidden;border:1px dashed #c4b8d4;flex-shrink:0;">
+          <img src="./seol/__light_blue_haerin_poster_print__.jpg" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;">
         </div>
-        <p style="font-size:11px;font-weight:bold;color:#4a3a6a;margin:6px 0 1px;text-align:center;">title here</p>
-        <p style="font-size:9px;color:#9888b0;margin:0;text-align:center;">caption here ♡</p>
+        <p style="font-size:11px;font-weight:bold;color:#4a3a6a;margin:6px 0 1px;text-align:center;">강해린</p>
+        <p style="font-size:9px;color:#9888b0;margin:0;text-align:center;">kang haerin ♡</p>
       </div>
     </div>
 
@@ -2371,6 +2462,18 @@
               card.style.top  = card._homeTop  + "px";
               setTimeout(function() { card.style.transition = ""; }, 1100);
             }, 5000);
+
+            // ── Achievement triggers ──────────────────────────────────
+            triggerAchievement("moved_" + id);
+
+            // m6 = the hidden Minji — special secret achievement
+            if (id === "ppg7") triggerAchievement("found_hidden_minji");
+
+            // Check if all 10 ppgs have been moved
+            var allMoved = ["ppg1","ppg2","ppg3","ppg4","ppg5","ppg6","ppg7","ppg8","ppg9","ppg10"].every(function(pid) {
+              try { return !!localStorage.getItem("seol_ach_moved_" + pid); } catch(e) { return false; }
+            });
+            if (allMoved) triggerAchievement("moved_all_ppg");
           });
         }
 
@@ -2386,7 +2489,7 @@
     <div style="border:20px solid transparent;border-image:url('./seol/lace.png') 20 fill round;width:823px;height:auto;margin:0 auto;display:block;" class="center">
 
       <!-- BLUE DOTS TEXTURE LAYER -->
-      <div style="width:822px;height:auto;background-image:url('./seol/blue square with dots.png');background-repeat:repeat;padding:10px;border:1px dashed #81a9ff;border-radius:20px;box-sizing:border-box;">
+      <div style="width:822px;height:auto;background-image:url('./seol/pureblue.jpg');background-repeat:repeat;background-size:24px 24px;padding:10px;border:1px dashed #81a9ff;border-radius:20px;box-sizing:border-box;">
 
         <!-- WHITE CONTENT AREA -->
         <div style="width:800px;height:auto;padding:10px;padding-bottom:24px;border:1px dashed #81a9ff;border-radius:20px;background-color:white;box-sizing:border-box;">
@@ -2511,7 +2614,10 @@
                 "patted_stark","patted_stark5","patted_stark25",
                 "spell_alohomora","spell_zoltraak","spell_accio","spell_judradjim","spell_expelliarmus","all_spells",
                 "tarot_reading","drew_tarot5","tarot_all","konami","konami_twice","idle_watcher",
-                "dragged_card","visited_zekrom","played_music","saw_anne","headpat_night"];
+                "dragged_card","visited_zekrom","played_music","saw_anne","headpat_night",
+                "moved_ppg1","moved_ppg2","moved_ppg3","moved_ppg4","moved_ppg5",
+                "moved_ppg6","moved_ppg7","moved_ppg8","moved_ppg9","moved_ppg10",
+                "found_hidden_minji","moved_all_ppg"];
               var grid = document.getElementById("ach-grid");
               var bar  = document.getElementById("ach-progress-bar");
               var lbl  = document.getElementById("ach-progress-label");
@@ -3391,15 +3497,37 @@
             })();
             </script>
 
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            
+            
+
             <!-- UNDER CONSTRUCTION BOX — right column, below frieren's card reading -->
             <div style="width:100%;box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;margin:0;">
               <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
                 <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ · · ·</span>
               </div>
-              <div style="padding:16px 8px;background-color:white;text-align:center;">
-                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - - - - - - - - - - - -</p>
-                <p style="font-size:10px;color:#8a9eab;margin:6px 0;">⚙ under construction ⚙</p>
-                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - - - - - - - - - - - -</p>
+              <div style="background-color:white;overflow:hidden;height:340px;">
+                <img src="./seol/jellyfush.jpg" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;">
               </div>
             </div>
 
@@ -3514,7 +3642,8 @@
         makeRightCard("photocard11", "dragHandle11", 1370);
         makeRightCard("photocard12", "dragHandle12", 2080);
         makeRightCard("photocard15", "dragHandle15", 1720);
-        makeRightCard("photocard16", "dragHandle16", 2380);
+        makeRightCard("photocard16", "dragHandle16", 2470);
+        makeRightCard("credits-card", "dragHandleCredits", 2780);
       })();
     </script>
     <!-- ═══════════════════════════════════

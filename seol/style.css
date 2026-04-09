@@ -1,80 +1,111 @@
-/* CSS is how you can add style to your website, such as colors, fonts, and positioning of your
-   HTML content. To learn how to do something, just try searching Google for questions like
-   "how to change link color." */
+/* ═══════════════════════════════════════
+   seol's stylesheet ♡
+   font: Ms Gothic
+   layout: three-column, fixed width
+═══════════════════════════════════════ */
 
+
+/* ───────────────────────────────────────
+   BASE — page foundation
+   sets background, font, and spacing
+─────────────────────────────────────── */
 body {
-background-color: black;
-padding: 10px;
-margin: 0 auto;
-font-family: "Ms Gothic", "sans serif";
+  background-color: black;
+  font-family: "Ms Gothic", "sans serif";
+  padding: 10px;
+  margin: 0 auto;
+}
 
-}
-.holder {
-margin: 0 auto;
-width: 1100px;
-text-align: center;
-  }
-.main {
-width: 1120px;
-height: 930px;
-overflow:hidden;
-background:transparent;
-margin-top: 10px;
-}
-.text {
-color: black;
-font-weight:400;
-font-size: 15px;
-}
-.columnone {
-height:930px;
-width:200px;
-float: left;
-background-image: url('871a30d5e333.jpg');
-box-shadow: 0px 0px 200px inset white ;
-padding: 10px;
-position: relative;
-border-top: white;
-border-left: white;
-border-bottom: white;
 
-}
+/* ───────────────────────────────────────
+   TYPOGRAPHY — text and link defaults
+─────────────────────────────────────── */
 a {
-color: black;
+  color: black;
 }
-.columntwo {
-  width:700px;
-  height:928px;
-  background-color: white;
-  background-image:url('gfhf.jpg');
-  float:left;
-  border: 1px solid rgb(65, 55, 60);
+
+.text {
+  color: black;
+  font-weight: 400;
+  font-size: 15px;
 }
-.article {
-  background-color: transparent;
-  box-shadow: 0px 0px 400px inset white ;
-}
+
 mark {
   color: black;
   background: rgb(255, 209, 231);
   opacity: 50;
   font-size: 18px;
 }
+
 .p1 {
   color: black;
+  margin-top: 2px;
   margin-bottom: 0px;
-margin-top: 2px;
-margin-left: 4px;
+  margin-left: 4px;
 }
+
+
+/* ───────────────────────────────────────
+   LAYOUT — page wrapper and main container
+─────────────────────────────────────── */
+.holder {
+  margin: 0 auto;
+  width: 1100px;
+  text-align: center;
+}
+
+.main {
+  width: 1120px;
+  height: 930px;
+  overflow: hidden;
+  background: transparent;
+  margin-top: 10px;
+}
+
+
+/* ───────────────────────────────────────
+   COLUMNS — three-column layout
+   left sidebar, main content, right sidebar
+─────────────────────────────────────── */
+.columnone {
+  float: left;
+  width: 200px;
+  height: 930px;
+  padding: 10px;
+  position: relative;
+  box-shadow: 0px 0px 200px inset white;
+  border-top: white;
+  border-left: white;
+  border-bottom: white;
+}
+
+.columntwo {
+  float: left;
+  width: 700px;
+  height: 928px;
+  background-color: white;
+  border: 1px solid rgb(65, 55, 60);
+}
+
+.columnthree {
+  float: right;
+  width: 197px;
+  height: 871px;
+  background: transparent;
+}
+
+
+/* ───────────────────────────────────────
+   UTILITY — reusable helpers
+─────────────────────────────────────── */
 .center {
   display: block;
   margin-left: auto;
   margin-right: auto;
-  max-width:100%;
+  max-width: 100%;
 }
-.columnthree {
-  width: 197px;
-  height: 871px;
-  float: right;
-  background: transparent;
+
+.article {
+  background-color: transparent;
+  box-shadow: 0px 0px 400px inset white;
 }
