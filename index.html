@@ -191,6 +191,8 @@
     /* Override for media player — suppress the generic "✦ photocard" pseudo label */
     #dragHandleMedia::before { content: none; }
     #dragHandleMedia::after  { content: none; }
+    #dragHandleHints::before { content: none; }
+    #dragHandleHints::after  { content: none; }
 
     .photocard-body {
       padding: 10px;
@@ -627,6 +629,41 @@
       title: "Still Here",
       desc: "You've been here a while. Comfortable?",
     },
+    "dragged_card": {
+      emoji: "🃏",
+      title: "Rearranged the Dream",
+      desc: "You dragged a photocard. Nothing stays in one place.",
+    },
+    "visited_zekrom": {
+      emoji: "⚫",
+      title: "The Dragon Stirs",
+      desc: "You found Zekrom. It was waiting.",
+    },
+    "played_music": {
+      emoji: "🎵",
+      title: "The Music Box Opens",
+      desc: "Something plays. Something always plays.",
+    },
+    "saw_anne": {
+      emoji: "🌹",
+      title: "Timeless",
+      desc: "You found the celebrity crush card. Taste confirmed.",
+    },
+    "drew_tarot5": {
+      emoji: "🔮",
+      title: "The Cards Remember",
+      desc: "5 cards drawn. The deck knows your face now.",
+    },
+    "headpat_night": {
+      emoji: "🌛",
+      title: "Midnight Patter",
+      desc: "You patted the avatar past midnight. Couldn't sleep?",
+    },
+    "konami_twice": {
+      emoji: "🕹️",
+      title: "You Know the Old Ways",
+      desc: "The code, entered twice. A true believer.",
+    },
   };
 
   function isAchievementUnlocked(id) {
@@ -697,14 +734,49 @@
   (function() {
     var seq = [38,38,40,40,37,39,37,39];
     var pos = 0;
+    var konamiCount = 0;
+    try { konamiCount = parseInt(localStorage.getItem("seol_konamicount") || "0", 10) || 0; } catch(e) {}
     document.addEventListener("keydown", function(e) {
       if (e.keyCode === seq[pos]) { pos++; } else { pos = 0; }
-      if (pos === seq.length) { pos = 0; triggerAchievement("konami"); }
+      if (pos === seq.length) {
+        pos = 0;
+        triggerAchievement("konami");
+        konamiCount++;
+        try { localStorage.setItem("seol_konamicount", konamiCount); } catch(e) {}
+        if (konamiCount >= 2) triggerAchievement("konami_twice");
+      }
     });
   })();
 
   // Idle watcher — stay on page for 1 minute
   setTimeout(function() { triggerAchievement("idle_watcher"); }, 60000);
+
+  // Anne Hathaway card seen — triggered when celeb-card is visible in viewport
+  window.addEventListener("load", function() {
+    var anneSeen = false;
+    window.addEventListener("scroll", function() {
+      if (anneSeen) return;
+      var card = document.getElementById("celeb-card");
+      if (!card) return;
+      var rect = card.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        anneSeen = true;
+        triggerAchievement("saw_anne");
+      }
+    });
+    // Zekrom card seen
+    var zekromSeen = false;
+    window.addEventListener("scroll", function() {
+      if (zekromSeen) return;
+      var card = document.getElementById("photocard13");
+      if (!card) return;
+      var rect = card.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        zekromSeen = true;
+        triggerAchievement("visited_zekrom");
+      }
+    });
+  });
   </script>
 
   <span class="text" style="font-size:11px">
@@ -795,6 +867,8 @@
         if (patCount >= 5)   triggerAchievement("headpat5");
         if (patCount >= 25)  triggerAchievement("headpat25");
         if (patCount >= 100) triggerAchievement("headpat100");
+        var h2 = new Date().getHours();
+        if (h2 >= 0 && h2 < 5) triggerAchievement("headpat_night");
       });
     })();
     </script>
@@ -1022,13 +1096,112 @@
       </div>
     </div>
 
-
-
     <!-- ═══════════════════════════════════
-         SHARED MUSIC ENGINE
-         Controls both the bar widget and the
-         floating player window in sync.
+         ACHIEVEMENT HINTS WINDOW
+         Draggable photocard below media player
+         Peach color scheme, soulslike wording
     ═══════════════════════════════════ -->
+    <div class="photocard" id="hints-window" style="top:2700px;left:20px;width:240px;z-index:102;background-color:#FFF8F3;border-color:#D9A898;box-shadow:3px 4px 0px #E8C4B4;">
+      <div class="drag-handle" id="dragHandleHints" style="background:linear-gradient(90deg,#EDBBAA 0%,#F5E6D8 100%);border-bottom:1px solid #D4A090;cursor:pointer;" onclick="hintsToggle()">
+        <span style="font-size:10px;color:#7A4A3A;font-weight:bold;letter-spacing:0.05em;">✦ achievement hints</span>
+        <span id="hints-chevron" style="font-size:10px;color:#C4896E;">▾</span>
+      </div>
+      <div id="hints-body" style="max-height:420px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#D9A898 #FFF8F3;">
+        <div style="padding:8px;display:flex;flex-direction:column;gap:6px;">
+        </div>
+      </div>
+    </div>
+    <style>
+      #hints-window .drag-handle { cursor:pointer; }
+      .hint-entry {
+        background:#FDF0E8;
+        border:1px dashed #D9A898;
+        border-radius:10px;
+        padding:7px 9px;
+        display:flex;
+        flex-direction:column;
+        gap:3px;
+      }
+      .hint-entry-emoji { font-size:16px; text-align:center; }
+      .hint-entry-text  { font-size:9px; color:#8A5A4A; line-height:1.5; text-align:center; font-style:italic; }
+      .hint-entry.done  { opacity:0.45; }
+      .hint-entry.done .hint-entry-text { text-decoration:line-through; }
+    </style>
+    <script>
+    (function() {
+      var HINTS = [
+        { id:"welcome",         emoji:"🐇", hint:"you opened a door that was never truly locked. the rabbit was already watching." },
+        { id:"headpat1",        emoji:"🤍", hint:"somewhere in the left column, someone waits to be touched. gently." },
+        { id:"headpat5",        emoji:"💙", hint:"five times. not once, not twice. patience is a kind of devotion." },
+        { id:"headpat25",       emoji:"💜", hint:"twenty-five. the avatar has started to remember your hand." },
+        { id:"headpat100",      emoji:"⭐", hint:"one hundred. you have gone beyond kindness into something stranger." },
+        { id:"headpat_night",   emoji:"🌛", hint:"wait until the world is asleep — past midnight — then pat. the dark notices." },
+        { id:"chatted",         emoji:"💬", hint:"find where words can be sent. say hello. it costs nothing." },
+        { id:"night_visitor",   emoji:"🌙", hint:"arrive after midnight, before the birds wake. the site remembers when you came." },
+        { id:"newjeans_fan",    emoji:"🐰", hint:"ever tried scrolling down? all the way. don't stop until the bottom finds you." },
+        { id:"dragged_card",    emoji:"🃏", hint:"these cards are not nailed to the floor. drag one. see what happens." },
+        { id:"played_music",    emoji:"🎵", hint:"there is a music box somewhere on the left. press the button shaped like a triangle." },
+        { id:"patted_fern",     emoji:"🌿", hint:"a mage lingers on the right side. she is a little annoyed by attention. give it anyway." },
+        { id:"patted_frieren",  emoji:"🧝", hint:"an elf floats nearby. she has lived a thousand years. she will not mind one pat." },
+        { id:"patted_mimikyu",  emoji:"🎃", hint:"something small and shadowed sits below, waiting. it only wants to be touched." },
+        { id:"patted_mimikyu5", emoji:"💛", hint:"five pats. the disguise trembles. it is warming to you." },
+        { id:"patted_mimikyu25",emoji:"🌟", hint:"twenty-five. you are its favorite now. it has decided." },
+        { id:"patted_stark",    emoji:"⚡", hint:"a warrior rests on the right. he pretends not to care. pat him anyway." },
+        { id:"patted_stark5",   emoji:"🗡️", hint:"five times. he is embarrassed but he has not left. that means something." },
+        { id:"patted_stark25",  emoji:"🔥", hint:"twenty-five. the warrior trusts you now. few have earned this." },
+        { id:"spell_alohomora", emoji:"🔑", hint:"in the middle column, a door of spells waits. alohomora opens what is locked." },
+        { id:"spell_zoltraak",  emoji:"🔮", hint:"cycle through the spell cards. zoltraak tears the air apart. fern would approve." },
+        { id:"spell_accio",     emoji:"💫", hint:"keep browsing the spell book. accio calls things toward you. trust it." },
+        { id:"spell_judradjim", emoji:"🌿", hint:"an older spell, from an older age. roots spiral. keep flipping." },
+        { id:"spell_expelliarmus", emoji:"⚔️", hint:"the last spell is the simplest. expelliarmus. harry's. the one that ended everything." },
+        { id:"all_spells",      emoji:"📖", hint:"cast all five. every single one. the grimoire closes only when it is complete." },
+        { id:"tarot_reading",   emoji:"🃏", hint:"frieren keeps cards in the right column. click the card. she has been waiting." },
+        { id:"drew_tarot5",     emoji:"🔮", hint:"five draws. the deck is starting to recognize your silhouette." },
+        { id:"tarot_all",       emoji:"✨", hint:"draw every card in the deck. all of them. the journey does not end — it repeats." },
+        { id:"visited_zekrom",  emoji:"⚫", hint:"scroll deep. past everything. a black dragon waits in a card near the center. it has been there the whole time." },
+        { id:"saw_anne",        emoji:"🌹", hint:"a card drifts between the columns. timeless. always. find her." },
+        { id:"konami",          emoji:"🕹️", hint:"↑↑↓↓←→←→ — the old code. type it on your keyboard. the site remembers." },
+        { id:"konami_twice",    emoji:"🕹️", hint:"enter the code a second time. a true believer does not do it just once." },
+        { id:"idle_watcher",    emoji:"🌙", hint:"stay. do not click. do not leave. wait one full minute. the page will notice." },
+      ];
+
+      var open = true;
+
+      window.hintsToggle = function() {
+        open = !open;
+        document.getElementById("hints-body").style.display = open ? "" : "none";
+        document.getElementById("hints-chevron").textContent = open ? "▾" : "▸";
+      };
+
+      function buildHints() {
+        var container = document.querySelector("#hints-body > div");
+        if (!container) return;
+        container.innerHTML = "";
+        HINTS.forEach(function(h) {
+          var done = false;
+          try { done = !!localStorage.getItem("seol_ach_" + h.id); } catch(e) {}
+          var entry = document.createElement("div");
+          entry.className = "hint-entry" + (done ? " done" : "");
+          entry.innerHTML =
+            '<div class="hint-entry-emoji">' + h.emoji + '</div>' +
+            '<div class="hint-entry-text">' + h.hint + '</div>';
+          container.appendChild(entry);
+        });
+      }
+
+      window.addEventListener("load", buildHints);
+
+      // re-render whenever an achievement fires
+      var _oh = window.triggerAchievement;
+      window.triggerAchievement = function(id) {
+        _oh(id);
+        buildHints();
+      };
+    })();
+    </script>
+
+
+
     <audio id="music" preload="metadata"></audio>
     <script>
     (function() {
@@ -1123,8 +1296,8 @@
 
       // ── public API ────────────────────────────
       window.seolPlayerToggle = function() {
-        if (!started) { started=true; loadTrack(0, true); return; }
-        if (audio.paused) { audio.play().catch(function(){}); }
+        if (!started) { started=true; loadTrack(0, true); if (typeof triggerAchievement === "function") triggerAchievement("played_music"); return; }
+        if (audio.paused) { audio.play().catch(function(){}); if (typeof triggerAchievement === "function") triggerAchievement("played_music"); }
         else              { audio.pause(); }
         syncUI();
       };
@@ -2319,7 +2492,8 @@
                 "patted_fern","patted_frieren","patted_mimikyu","patted_mimikyu5","patted_mimikyu25",
                 "patted_stark","patted_stark5","patted_stark25",
                 "spell_alohomora","spell_zoltraak","spell_accio","spell_judradjim","spell_expelliarmus","all_spells",
-                "tarot_reading","tarot_all","konami","idle_watcher"];
+                "tarot_reading","drew_tarot5","tarot_all","konami","konami_twice","idle_watcher",
+                "dragged_card","visited_zekrom","played_music","saw_anne","headpat_night"];
               var grid = document.getElementById("ach-grid");
               var bar  = document.getElementById("ach-progress-bar");
               var lbl  = document.getElementById("ach-progress-label");
@@ -2362,6 +2536,8 @@
               <!-- scrollable text area -->
               <div class="container" style="flex:1;overflow-y:scroll;padding:6px 8px;background-color:white;">
                 <div style="background-color:#f9fcff;border:1px dashed #b8c8d8;border-radius:8px;padding:4px 6px;font-size:10px;line-height:1.9;">
+                  <b>❖ 2026년.4월.9일:</b> added a music player and achievement hint system<br>
+                  <b>❖ 2026년.4월.9일:</b> added a bunch of interactable stuff.<br>
                   <b>❖ 2026년.4월.8일:</b> added an achievement system (still buggy af)<br>
                   <b>❖ 2026년.4월.8일:</b> fixed the color scheme a bit for the photocards and the boxes<br>
                   <b>❖ 2026년.4월.8일:</b> put a bunch of widgets<br>
@@ -3152,6 +3328,7 @@
                 document.getElementById("tarot-seen-label").textContent = n + " drawn";
                 if (typeof triggerAchievement === "function") {
                   if (n >= 1) triggerAchievement("tarot_reading");
+                  if (n >= 5) triggerAchievement("drew_tarot5");
                   if (n >= TAROT.length) triggerAchievement("tarot_all");
                 }
               }
@@ -3253,6 +3430,7 @@
           sl = card.offsetLeft;
           st = card.offsetTop;
           card.style.cursor = "grabbing";
+          if (typeof triggerAchievement === "function") triggerAchievement("dragged_card");
         });
 
         document.addEventListener("mousemove", function(e) {
@@ -3289,6 +3467,7 @@
       makeCard("photocard9", "dragHandle9", 35, 1790);
       makeCard("photocard13", "dragHandle13", 985, 2410);
       makeCard("photocard14", "dragHandle14", 50, 2780);
+      makeCard("hints-window", "dragHandleHints", 20, 2700);
       // Right-side photocards: use offsetLeft on load since right: is used
       (function() {
         function makeRightCard(cardId, handleId, homeTop) {
