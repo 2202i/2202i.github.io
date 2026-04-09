@@ -661,8 +661,8 @@
     },
     "konami_twice": {
       emoji: "🕹️",
-      title: "You Know the Old Ways",
-      desc: "The code, entered twice. A true believer.",
+      title: "Against the Current",
+      desc: "←→←→↓↓↑↑. You found the other way.",
     },
   };
 
@@ -731,19 +731,35 @@
   });
 
   // Konami code easter egg ↑↑↓↓←→←→
+  // Reverse code easter egg  ←→←→↓↓↑↑
   (function() {
-    var seq = [38,38,40,40,37,39,37,39];
-    var pos = 0;
-    var konamiCount = 0;
-    try { konamiCount = parseInt(localStorage.getItem("seol_konamicount") || "0", 10) || 0; } catch(e) {}
+    var forward = [38,38,40,40,37,39,37,39]; // ↑↑↓↓←→←→
+    var reverse = [37,39,37,39,40,40,38,38]; // ←→←→↓↓↑↑
+    var fPos = 0, rPos = 0;
+
     document.addEventListener("keydown", function(e) {
-      if (e.keyCode === seq[pos]) { pos++; } else { pos = 0; }
-      if (pos === seq.length) {
-        pos = 0;
-        triggerAchievement("konami");
-        konamiCount++;
-        try { localStorage.setItem("seol_konamicount", konamiCount); } catch(e) {}
-        if (konamiCount >= 2) triggerAchievement("konami_twice");
+      var k = e.keyCode;
+
+      // --- forward sequence ---
+      if (k === forward[fPos]) {
+        fPos++;
+        if (fPos === forward.length) {
+          fPos = 0;
+          triggerAchievement("konami");
+        }
+      } else {
+        fPos = (k === forward[0]) ? 1 : 0;
+      }
+
+      // --- reverse sequence (fully independent) ---
+      if (k === reverse[rPos]) {
+        rPos++;
+        if (rPos === reverse.length) {
+          rPos = 0;
+          triggerAchievement("konami_twice");
+        }
+      } else {
+        rPos = (k === reverse[0]) ? 1 : 0;
       }
     });
   })();
@@ -906,7 +922,7 @@
     <!-- ═══════════════════════════════════
          Meowl png float
     ═══════════════════════════════════ -->
-    <div id="meowl-floater6" style="position:absolute;top:2350px;left:300px;z-index:99;pointer-events:none;">
+    <div id="meowl-floater6" style="position:absolute;top:2370px;left:300px;z-index:99;pointer-events:none;">
       <img src="./seol/meowl.png" draggable="false" style="width:300px;height:auto;display:block;">
     </div>
 
@@ -1161,7 +1177,7 @@
         { id:"visited_zekrom",  emoji:"⚫", hint:"scroll deep. past everything. a black dragon waits in a card near the center. it has been there the whole time." },
         { id:"saw_anne",        emoji:"🌹", hint:"a card drifts between the columns. timeless. always. find her." },
         { id:"konami",          emoji:"🕹️", hint:"↑↑↓↓←→←→ — the old code. type it on your keyboard. the site remembers." },
-        { id:"konami_twice",    emoji:"🕹️", hint:"enter the code a second time. a true believer does not do it just once." },
+        { id:"konami_twice",    emoji:"🕹️", hint:"the code has a mirror. what happens if you walk it backwards? ←→←→↓↓↑↑" },
         { id:"idle_watcher",    emoji:"🌙", hint:"stay. do not click. do not leave. wait one full minute. the page will notice." },
       ];
 
@@ -2483,7 +2499,9 @@
                 <div style="background:#FDF0E8;border-radius:20px;height:6px;overflow:hidden;margin-bottom:8px;border:1px solid #F5E6D8;">
                   <div id="ach-progress-bar" style="height:100%;background:linear-gradient(90deg,#D9A898,#C4896E);border-radius:20px;transition:width 0.4s;width:0%;"></div>
                 </div>
-                <div id="ach-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;"></div>
+                <div style="height:275px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#D9A898 #FFF8F3;">
+                  <div id="ach-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;"></div>
+                </div>
               </div>
             </div>
             <script>
@@ -2560,7 +2578,15 @@
                 <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ come vote!</span>
               </div>
               <div style="padding:10px 8px;background-color:white;text-align:center;">
-                <form method="post" action="https://poll.pollcode.com/39261585"><div style="background-color:#BAD4EE;padding:2px;width:175px;font-family:Comic Sans MS;font-size:small;color:#000000;box-shadow: 0px 0px 5px #888;"><div style="padding:2px 0px 4px 2px;"><strong>which theme for my subdomain should i create next?</strong></div><input type="checkbox" name="answer" value="1" id="answer392615851" style="float:left;" /><label for="answer392615851" style="float:left;width:150px;">cottagecore</label><div style="clear:both;height:2px;"></div><input type="checkbox" name="answer" value="2" id="answer392615852" style="float:left;" /><label for="answer392615852" style="float:left;width:150px;">soulsborne</label><div style="clear:both;height:2px;"></div><input type="checkbox" name="answer" value="3" id="answer392615853" style="float:left;" /><label for="answer392615853" style="float:left;width:150px;">lord of the rings</label><div style="clear:both;height:2px;"></div><div align="center" style="padding:3px;"><input type="submit" value=" Vote ">&nbsp;<input type="submit" name="view" value=" View "></div><div align="right" style="font-size:10px"></a></div></div></form>
+                <form method="post" action="https://poll.pollcode.com/39261585">
+                  <div style="background-color:#BAD4EE;padding:8px;width:100%;box-sizing:border-box;font-family:Comic Sans MS;font-size:small;color:#000000;box-shadow:0px 0px 5px #888;border-radius:4px;">
+                    <div style="padding:2px 0px 6px 2px;font-weight:bold;text-align:left;">which theme for my subdomain should i create next?</div>
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;text-align:left;"><input type="checkbox" name="answer" value="1" id="answer392615851"><label for="answer392615851">cottagecore</label></div>
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;text-align:left;"><input type="checkbox" name="answer" value="2" id="answer392615852"><label for="answer392615852">soulsborne</label></div>
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;text-align:left;"><input type="checkbox" name="answer" value="3" id="answer392615853"><label for="answer392615853">lord of the rings</label></div>
+                    <div style="text-align:center;"><input type="submit" value=" Vote ">&nbsp;<input type="submit" name="view" value=" View "></div>
+                  </div>
+                </form>
               </div>
             </div>
  
