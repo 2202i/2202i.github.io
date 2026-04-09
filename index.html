@@ -821,6 +821,21 @@
       <img src="./seol/eun2.png" draggable="false" style="width:300px;height:auto;display:block;">
     </div>
 
+
+        <!-- ═══════════════════════════════════
+         Eunhyeok png float
+    ═══════════════════════════════════ -->
+    <div id="eunhyeok-floater4" style="position:absolute;top:1800px;right:70px;z-index:100;pointer-events:none;">
+      <img src="./seol/formal2.png" draggable="false" style="width:300px;height:auto;display:block;">
+    </div>
+    
+    <!-- ═══════════════════════════════════
+         Meowl png float
+    ═══════════════════════════════════ -->
+    <div id="meowl-floater6" style="position:absolute;top:2350px;left:300px;z-index:99;pointer-events:none;">
+      <img src="./seol/meowl.png" draggable="false" style="width:300px;height:auto;display:block;">
+    </div>
+
     <!-- ═══════════════════════════════════
          PHOTOCARD 8 — left side, below photocard 7
     ═══════════════════════════════════ -->
@@ -967,10 +982,7 @@
         <!-- album art -->
         <div style="position:relative;width:100%;aspect-ratio:1;border-radius:10px;overflow:hidden;border:1.5px solid #c4b8e0;box-shadow:2px 3px 0 #d4c8f0;">
           <img id="mp-album-art" src="./seol/rightnow.webp" style="width:100%;height:100%;object-fit:cover;display:block;transition:opacity 0.3s;">
-          <!-- spinning vinyl overlay -->
-          <div id="mp-vinyl" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
-            <div id="mp-vinyl-disc" style="width:60px;height:60px;border-radius:50%;background:radial-gradient(circle at 50%,#1a1a2e 18%,transparent 18%),conic-gradient(#1a1a2e,#2a2a3e,#1a1a2e,#2a2a3e,#1a1a2e);opacity:0.55;border:1.5px solid #3a3a5e;animation:vinyl-spin 4s linear infinite;animation-play-state:paused;"></div>
-          </div>
+
         </div>
 
         <!-- track info -->
@@ -1010,12 +1022,7 @@
       </div>
     </div>
 
-    <style>
-      @keyframes vinyl-spin {
-        from { transform: rotate(0deg); }
-        to   { transform: rotate(360deg); }
-      }
-    </style>
+
 
     <!-- ═══════════════════════════════════
          SHARED MUSIC ENGINE
@@ -1039,10 +1046,16 @@
           art:    "./seol/typhoon.jpg"   // add album art or it falls back gracefully
         },
         {
-          title:  "Journey To The Past",
-          artist: "Anastasia Broadway Musical OST",
-          src:    "./seol/JourneyToThePast.mp3",
-          art:    "./seol/anastasiaalbum.jpg"  // add album art or fallback
+          title:  "Unposted Letters",
+          artist: "Liang Lawrence",
+          src:    "./seol/unposted letters.mp3",
+          art:    "./seol/unpostedlettersalbum.png"  // add album art or fallback
+        },
+        {
+          title:  "Everyone Adores You.mp3",
+          artist: "Matt Maltese",
+          src:    "./seol/Everyone Adores You.mp3",
+          art:    "./seol/everyoneadoresualbum.jpg"  // add album art or fallback
         },
         {
           title:  "Soldier, Poet, King",
@@ -1086,12 +1099,10 @@
         var mpTitle = document.getElementById("mp-track-name");
         var mpArtist= document.getElementById("mp-artist-name");
         var mpBtn   = document.getElementById("mp-playpause-btn");
-        var vinyl   = document.getElementById("mp-vinyl-disc");
         if (mpArt)    { mpArt.style.opacity="0"; setTimeout(function(){ mpArt.src=t.art; mpArt.onerror=function(){mpArt.src="./seol/bun.png";}; mpArt.style.opacity="1"; },300); }
         if (mpTitle)  mpTitle.textContent  = t.title;
         if (mpArtist) mpArtist.textContent = t.artist;
         if (mpBtn)    mpBtn.textContent    = audio.paused ? "▶" : "⏸";
-        if (vinyl)    vinyl.style.animationPlayState = audio.paused ? "paused" : "running";
 
         // playlist highlight
         var rows = document.querySelectorAll(".mp-pl-row");
@@ -1151,7 +1162,7 @@
           row.className = "mp-pl-row";
           row.style.cssText = "display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:7px;cursor:pointer;font-size:10px;color:#8a9eab;transition:background 0.15s;";
           row.innerHTML =
-            '<span style="font-size:14px;flex-shrink:0;">' + ["🎵","💔","🌙","✨","🎸"][i] + '</span>' +
+            '<span style="font-size:14px;flex-shrink:0;">' + ["🎵","💔","💌","🌙","✨","🎸"][i] + '</span>' +
             '<div style="flex:1;overflow:hidden;">' +
               '<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + t.title + '</div>' +
               '<div style="font-size:9px;opacity:0.7;">' + t.artist + '</div>' +
@@ -1212,14 +1223,14 @@
     <!-- ═══════════════════════════════════
          PHOTOCARD 15 — right side, photo + text
     ═══════════════════════════════════ -->
-    <div class="photocard" id="photocard15" style="top:2050px;right:50px;left:auto;width:210px;">
+    <div class="photocard" id="photocard15" style="top:1720px;right:35px;left:auto;width:210px;">
       <div class="drag-handle" id="dragHandle15"></div>
       <div class="photocard-body" style="padding:8px;align-items:center;">
         <div style="width:180px;height:180px;border-radius:10px;overflow:hidden;border:1px dashed #c4b8d4;flex-shrink:0;background:#f4f0fa;display:flex;align-items:center;justify-content:center;">
-          <p style="font-size:10px;color:#b8c8d8;text-align:center;">add image here ♡</p>
+          <p style="font-size:10px;color:#b8c8d8;text-align:center;"><img src="./seol/suae.png" alt="" style="width:100%;height:100%;object-fit:contain;display:block;"></p>
         </div>
-        <p style="font-size:11px;font-weight:bold;color:#4a3a6a;margin:6px 0 1px;text-align:center;">title here</p>
-        <p style="font-size:9px;color:#9888b0;margin:0;text-align:center;">caption here ♡</p>
+        <p style="font-size:11px;font-weight:bold;color:#4a3a6a;margin:6px 0 1px;text-align:center;">suae!</p>
+        <p style="font-size:9px;color:#9888b0;margin:0;text-align:center;">corporate attire ♡</p>
       </div>
     </div>
 
@@ -1578,7 +1589,7 @@
     <!-- ═══════════════════════════════════
          PHOTOCARD 12 — right side, below photocard 11
     ═══════════════════════════════════ -->
-    <div class="photocard" id="photocard12" style="top:1720px;right:98px;left:auto;">
+    <div class="photocard" id="photocard12" style="top:2080px;right:78px;left:auto;z-index: 103;">
       <div class="drag-handle" id="dragHandle12"></div>
       <div class="photocard-body">
         <img id="frieren-avatar" src="./seol/frieren.gif" style="border-radius:10px;width:180px;cursor:pointer;transition:transform 0.1s;user-select:none;" title="click to pat ♡">
@@ -1931,7 +1942,7 @@
         width: 150px;
         height: 150px;
         cursor: grab;
-        z-index: 50;
+        z-index: 102;
         user-select: none;
       }
       .ppg-floater:active { cursor: grabbing; }
@@ -2474,19 +2485,17 @@
               </div>
             </div>
 
-            <div style="height:400px;"></div> <!-- spacer -->
+            <div style="height:300px;"></div> <!-- spacer -->
 
-          <!-- UNDER CONSTRUCTION BOX — left column, below sylveon -->
-            <div style="box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
-              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
-                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ · · ·</span>
-              </div>
-              <div style="padding:16px 8px;background-color:white;text-align:center;">
-                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - - - - - - - - - - - -</p>
-                <p style="font-size:10px;color:#8a9eab;margin:6px 0;">⚙ under construction ⚙</p>
-                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - - - - - - - - - - - -</p>
-              </div>
+          <!-- SUAE ID -->
+           <div style="width:100%;box-sizing:border-box;margin:0;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
+            <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
+              <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ suae</span>
+             </div>
+            <div style="background-color:white;overflow:hidden;">
+              <img src="./seol/suaeprofile.jpg" style="width:100%;display:block;object-fit:cover;">
             </div>
+          </div>
 
           </div>
           <!-- end left column -->
@@ -2920,10 +2929,10 @@
             <div>&nbsp;</div>
 
 
-            <!-- PHOTO BOX -->
+            <!-- EUNHYEOK ID -->
             <div style="width:100%;box-sizing:border-box;margin:0;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
               <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
-                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ photos</span>
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ eunhyeok</span>
               </div>
               <div style="background-color:white;overflow:hidden;">
                 <img src="./seol/IDbro.jpg" style="width:100%;display:block;object-fit:cover;">
@@ -3298,8 +3307,8 @@
         makeRightCard("photocard6",  "dragHandle6",  710);
         makeRightCard("photocard10", "dragHandle10", 1040);
         makeRightCard("photocard11", "dragHandle11", 1370);
-        makeRightCard("photocard12", "dragHandle12", 1700);
-        makeRightCard("photocard15", "dragHandle15", 2050);
+        makeRightCard("photocard12", "dragHandle12", 2080);
+        makeRightCard("photocard15", "dragHandle15", 1720);
         makeRightCard("photocard16", "dragHandle16", 2380);
       })();
     </script>
