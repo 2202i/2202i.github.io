@@ -644,6 +644,11 @@
       title: "The Music Box Opens",
       desc: "Something plays. Something always plays.",
     },
+    "music_paused": {
+      emoji: "🔇",
+      title: "Silence Enjoyer",
+      desc: "you sure don't like music, huh.",
+    },
     "saw_anne": {
       emoji: "🌹",
       title: "Timeless",
@@ -723,6 +728,11 @@
       emoji: "🌸",
       title: "NewJeans Forever",
       desc: "All ten powerpuffs moved. The whole group goes together.",
+    },
+    "ctf_flag": {
+      emoji: "🚩",
+      title: "Flag Captured",
+      desc: "You found the flag. Well done, hacker.",
     },
   };
 
@@ -927,6 +937,11 @@
       }
       updateCounter();
 
+      window.resetHeadpat = function() {
+        patCount = 0;
+        updateCounter();
+      };
+
       document.getElementById("headpat-avatar").addEventListener("click", function() {
         patCount++;
         try { localStorage.setItem("seol_patcount", patCount); } catch(e) {}
@@ -1093,6 +1108,11 @@
       function updateCounter() { counter.textContent = "pats: " + mimikyuPatCount; }
       updateCounter();
 
+      window.resetMimikyu = function() {
+        mimikyuPatCount = 0;
+        updateCounter();
+      };
+
       avatar.addEventListener("click", function() {
         mimikyuPatCount++;
         try { localStorage.setItem("seol_mimikyupats", mimikyuPatCount); } catch(e) {}
@@ -1166,7 +1186,7 @@
         <!-- playlist -->
         <div style="border-top:1px dashed #c4b8e0;padding-top:6px;">
           <div style="font-size:9px;color:#9888c0;font-weight:bold;letter-spacing:0.05em;margin-bottom:4px;">✦ playlist</div>
-          <div id="mp-playlist" style="display:flex;flex-direction:column;gap:3px;"></div>
+          <div id="mp-playlist" style="display:flex;flex-direction:column;gap:3px;max-height:130px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#c4b8e0 #f0eef8;"></div>
         </div>
 
       </div>
@@ -1184,6 +1204,14 @@
       </div>
       <div id="hints-body" style="max-height:420px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#D9A898 #FFF8F3;">
         <div style="padding:8px;display:flex;flex-direction:column;gap:6px;">
+        </div>
+        <!-- ─── RESET BOX — appears after scrolling through all hints ─── -->
+        <div id="hints-reset-box" style="margin:0 8px 10px 8px;background:#FFF0EE;border:1.5px dashed #C47A6A;border-radius:12px;padding:10px 10px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <div style="font-size:14px;">⚠️</div>
+          <div style="font-size:9px;color:#7A3A2A;font-weight:bold;letter-spacing:0.04em;text-align:center;text-transform:uppercase;">danger zone</div>
+          <div style="font-size:9px;color:#9A5A4A;text-align:center;line-height:1.5;font-style:italic;">this will erase <em>all</em> your unlocked achievements.<br>they cannot be recovered.</div>
+          <div id="hints-reset-confirm" style="display:none;font-size:9px;color:#C02020;text-align:center;font-weight:bold;line-height:1.5;margin-top:2px;">are you sure? this is permanent.</div>
+          <button id="hints-reset-btn" onclick="hintsResetStep()" style="margin-top:2px;background:#F5D0C8;border:1px solid #C47A6A;border-radius:20px;color:#7A3A2A;font-size:10px;cursor:pointer;padding:4px 14px;font-weight:bold;transition:background 0.15s;">reset achievements</button>
         </div>
       </div>
     </div>
@@ -1217,6 +1245,7 @@
         { id:"newjeans_fan",    emoji:"🐰", hint:"ever tried scrolling down? all the way. don't stop until the bottom finds you." },
         { id:"dragged_card",    emoji:"🃏", hint:"these cards are not nailed to the floor. drag one. see what happens." },
         { id:"played_music",    emoji:"🎵", hint:"there is a music box somewhere on the left. press the button shaped like a triangle." },
+        { id:"music_paused",    emoji:"🔇", hint:"you found the music box. now make it stop." },
         { id:"patted_fern",     emoji:"🌿", hint:"a mage lingers on the right side. she is a little annoyed by attention. give it anyway." },
         { id:"patted_frieren",  emoji:"🧝", hint:"an elf floats nearby. she has lived a thousand years. she will not mind one pat." },
         { id:"patted_mimikyu",  emoji:"🎃", hint:"something small and shadowed sits below, waiting. it only wants to be touched." },
@@ -1251,6 +1280,7 @@
         { id:"moved_ppg10", emoji:"💜", hint:"top-center. hyein with the ponytail. calm, composed. drag her somewhere new." },
         { id:"found_hidden_minji", emoji:"🌟", hint:"one of the minji ppgs isn't where you'd expect. look at mid-left. really look." },
         { id:"moved_all_ppg", emoji:"🌸", hint:"ten powerpuffs. all of them. don't leave a single one behind." },
+        { id:"ctf_flag",      emoji:"🚩", hint:"somewhere in the right column, a flag waits to be captured. the answer is encoded. decode it first — then submit." },
       ];
 
       var open = true;
@@ -1284,6 +1314,87 @@
       window.triggerAchievement = function(id) {
         _oh(id);
         buildHints();
+      };
+
+      // ── ACHIEVEMENT RESET — two-step confirmation ──────────────────
+      var _resetStage = 0;
+      var _resetTimer = null;
+
+      window.hintsResetStep = function() {
+        var btn  = document.getElementById("hints-reset-btn");
+        var warn = document.getElementById("hints-reset-confirm");
+
+        if (_resetStage === 0) {
+          // first click: show warning and arm the second click
+          _resetStage = 1;
+          warn.style.display = "block";
+          btn.textContent = "yes, reset everything";
+          btn.style.background = "#F0A898";
+          btn.style.borderColor = "#A03020";
+          btn.style.color = "#6A1010";
+          // auto-cancel after 5 s so accidental clicks don't linger
+          clearTimeout(_resetTimer);
+          _resetTimer = setTimeout(function() {
+            _resetStage = 0;
+            warn.style.display = "none";
+            btn.textContent = "reset achievements";
+            btn.style.background = "#F5D0C8";
+            btn.style.borderColor = "#C47A6A";
+            btn.style.color = "#7A3A2A";
+          }, 5000);
+
+        } else {
+          // second click: actually wipe everything
+          clearTimeout(_resetTimer);
+          try {
+            var keys = [];
+            for (var i = 0; i < localStorage.length; i++) {
+              var k = localStorage.key(i);
+              if (k && k.indexOf("seol_ach_") === 0) keys.push(k);
+            }
+            keys.forEach(function(k) { localStorage.removeItem(k); });
+            // also wipe all pat counters so avatars reset cleanly
+            localStorage.removeItem("seol_patcount");
+            localStorage.removeItem("seol_mimikyupats");
+            localStorage.removeItem("seol_fernpats");
+            localStorage.removeItem("seol_frierenpats");
+            localStorage.removeItem("seol_starkpats");
+          } catch(e) {}
+
+          // Reset tarot in-memory state + localStorage
+          if (typeof window.resetTarot === "function") window.resetTarot();
+
+          // Reset all pat closure variables + their displays
+          if (typeof window.resetHeadpat    === "function") window.resetHeadpat();
+          if (typeof window.resetSidebarPat === "function") window.resetSidebarPat();
+          if (typeof window.resetMimikyu    === "function") window.resetMimikyu();
+          if (typeof window.resetFern       === "function") window.resetFern();
+          if (typeof window.resetFrieren    === "function") window.resetFrieren();
+          if (typeof window.resetStark      === "function") window.resetStark();
+
+          _resetStage = 0;
+          warn.style.display = "none";
+          btn.textContent = "reset achievements";
+          btn.style.background = "#F5D0C8";
+          btn.style.borderColor = "#C47A6A";
+          btn.style.color = "#7A3A2A";
+
+          buildHints();
+
+          // little confirmation flash
+          var box = document.getElementById("hints-reset-box");
+          box.style.borderColor = "#6AAA6A";
+          box.style.background = "#EEFAEA";
+          var flash = document.createElement("div");
+          flash.style.cssText = "font-size:9px;color:#3A7A3A;text-align:center;font-weight:bold;";
+          flash.textContent = "✓ all achievements cleared. please refresh the page.";
+          box.appendChild(flash);
+          setTimeout(function() {
+            box.style.borderColor = "#C47A6A";
+            box.style.background = "#FFF0EE";
+            if (flash.parentNode) flash.parentNode.removeChild(flash);
+          }, 2500);
+        }
       };
     })();
     </script>
@@ -1405,7 +1516,7 @@
       window.seolPlayerToggle = function() {
         if (!started) { started=true; loadTrack(0, true); if (typeof triggerAchievement === "function") triggerAchievement("played_music"); return; }
         if (audio.paused) { audio.play().catch(function(){}); if (typeof triggerAchievement === "function") triggerAchievement("played_music"); }
-        else              { audio.pause(); }
+        else              { audio.pause(); if (typeof triggerAchievement === "function") triggerAchievement("music_paused"); }
         syncUI();
       };
       window.seolPlayerNext = function() { loadTrack(curIdx+1, !audio.paused); };
@@ -1452,9 +1563,9 @@
         });
         syncUI();
 
-        // First-click-to-start (browser autoplay policy)
+        // First-click-to-start (browser autoplay policy workaround).
         document.addEventListener("click", function() {
-          if (!started) { started=true; loadTrack(0, true); }
+          if (!started) { started = true; loadTrack(0, true); }
         }, { once: true });
       });
 
@@ -1710,6 +1821,11 @@
       function updateCounter() { counter.textContent = "pats: " + starkPatCount; }
       updateCounter();
 
+      window.resetStark = function() {
+        starkPatCount = 0;
+        updateCounter();
+      };
+
       avatar.addEventListener("click", function() {
         starkPatCount++;
         try { localStorage.setItem("seol_starkpats", starkPatCount); } catch(e) {}
@@ -1839,6 +1955,11 @@
 
       function updateCounter() { counter.textContent = "pats: " + fernPatCount; }
       updateCounter();
+
+      window.resetFern = function() {
+        fernPatCount = 0;
+        updateCounter();
+      };
 
       avatar.addEventListener("click", function() {
         fernPatCount++;
@@ -1973,6 +2094,11 @@
 
       function updateCounter() { counter.textContent = "pats: " + frierenPatCount; }
       updateCounter();
+
+      window.resetFrieren = function() {
+        frierenPatCount = 0;
+        updateCounter();
+      };
 
       avatar.addEventListener("click", function() {
         frierenPatCount++;
@@ -2568,6 +2694,12 @@
               var timer;
               function syncCount() { countEl.textContent = patCount + " pats"; }
               syncCount();
+              window.resetSidebarPat = function() {
+                patCount = 0;
+                syncCount();
+                var pc = document.getElementById("headpat-counter");
+                if (pc) pc.textContent = "pats: 0";
+              };
               avatar.addEventListener("click", function() {
                 patCount++;
                 try { localStorage.setItem("seol_patcount", patCount); } catch(e) {}
@@ -2614,10 +2746,10 @@
                 "patted_stark","patted_stark5","patted_stark25",
                 "spell_alohomora","spell_zoltraak","spell_accio","spell_judradjim","spell_expelliarmus","all_spells",
                 "tarot_reading","drew_tarot5","tarot_all","konami","konami_twice","idle_watcher",
-                "dragged_card","visited_zekrom","played_music","saw_anne","headpat_night",
+                "dragged_card","visited_zekrom","played_music","music_paused","saw_anne","headpat_night",
                 "moved_ppg1","moved_ppg2","moved_ppg3","moved_ppg4","moved_ppg5",
                 "moved_ppg6","moved_ppg7","moved_ppg8","moved_ppg9","moved_ppg10",
-                "found_hidden_minji","moved_all_ppg"];
+                "found_hidden_minji","moved_all_ppg","ctf_flag"];
               var grid = document.getElementById("ach-grid");
               var bar  = document.getElementById("ach-progress-bar");
               var lbl  = document.getElementById("ach-progress-label");
@@ -2660,6 +2792,8 @@
               <!-- scrollable text area -->
               <div class="container" style="flex:1;overflow-y:scroll;padding:6px 8px;background-color:white;">
                 <div style="background-color:#f9fcff;border:1px dashed #b8c8d8;border-radius:8px;padding:4px 6px;font-size:10px;line-height:1.9;">
+                  <b>❖ 2026년.4월.9일:</b> added a reset achievements button<br>
+                  <b>❖ 2026년.4월.9일:</b> tons of bug fixes Claude Code is my best friend<br>
                   <b>❖ 2026년.4월.9일:</b> added a music player and achievement hint system<br>
                   <b>❖ 2026년.4월.9일:</b> added a bunch of interactable stuff.<br>
                   <b>❖ 2026년.4월.8일:</b> added an achievement system (still buggy af)<br>
@@ -2756,6 +2890,7 @@
                 if (decodedInput === decodedFlag) {
                   result.textContent = "correct ♡";
                   result.style.color = "#7aa8a1";
+                  if (typeof triggerAchievement === "function") triggerAchievement("ctf_flag");
                 } else {
                   result.textContent = "nope...";
                   result.style.color = "#c4896e";
@@ -3317,8 +3452,6 @@
               ];
 
               var current = 0;
-              var castCount = {};
-              try { castCount = JSON.parse(localStorage.getItem("seol_castcount") || "{}"); } catch(e) {}
 
               function updateSpellDisplay() {
                 var s = SPELLS[current];
@@ -3455,16 +3588,30 @@
               try { seenIds = JSON.parse(localStorage.getItem("seol_tarots") || "{}"); } catch(e) {}
               var lastIdx = -1;
 
-              function updateSeenLabel() {
+              // expose reset so the achievement reset button can wipe in-memory state too
+              window.resetTarot = function() {
+                seenIds = {};
+                lastIdx = -1;
+                try { localStorage.removeItem("seol_tarots"); } catch(e) {}
+                document.getElementById("tarot-seen-label").textContent = "0 drawn";
+                document.getElementById("tarot-icon").textContent = "🃏";
+                document.getElementById("tarot-name").textContent = "draw a card";
+                document.getElementById("tarot-sub").textContent = "click to receive a reading";
+                document.getElementById("tarot-reading").style.display = "none";
+                document.getElementById("tarot-frieren-note").style.display = "none";
+              };
+
+              function updateSeenLabel(fromDraw) {
                 var n = Object.keys(seenIds).length;
                 document.getElementById("tarot-seen-label").textContent = n + " drawn";
-                if (typeof triggerAchievement === "function") {
+                // only fire achievements when the player actually draws a card
+                if (fromDraw && typeof triggerAchievement === "function") {
                   if (n >= 1) triggerAchievement("tarot_reading");
                   if (n >= 5) triggerAchievement("drew_tarot5");
                   if (n >= TAROT.length) triggerAchievement("tarot_all");
                 }
               }
-              updateSeenLabel();
+              updateSeenLabel(false);
 
               window.drawTarot = function() {
                 // pick a card, prefer unseen ones
@@ -3491,7 +3638,7 @@
                   document.getElementById("tarot-frieren-note").textContent = card.frieren;
                   document.getElementById("tarot-frieren-note").style.display = "block";
                   cardEl.style.transform = "rotateY(0deg)";
-                  updateSeenLabel();
+                  updateSeenLabel(true);
                 }, 180);
               };
             })();
@@ -3534,6 +3681,9 @@
           </div>
           <!-- end right column -->
 
+
+        </div>
+        <!-- end three-column grid -->
 
         </div>
         <!-- end white content area -->
