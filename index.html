@@ -11,6 +11,9 @@
   <link rel="icon" type="image/x-icon" href="./seol/bun.png">
   <link href="./seol/style.css" rel="stylesheet" type="text/css" media="all">
 
+  <!-- cursor-effects library (tholman) -->
+  <script src="https://unpkg.com/cursor-effects@latest/dist/browser.js"></script>
+
   <style>
     
     /* ═══════════════════════════════════
@@ -153,6 +156,8 @@
       cursor: grab;
       z-index: 99;
       overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
     }
     .photocard:active { cursor: grabbing; }
 
@@ -477,7 +482,10 @@
       border-radius: 50%;
     }
 
+
   </style>
+  <!-- Mobile styles — keep mobile.css in the same folder as index.html -->
+  <link rel="stylesheet" href="./mobile.css">
 </head>
 
 <body>
@@ -948,7 +956,7 @@
         updateCounter();
 
         // Show speech bubble
-        bubble.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+        if(window.krSetBubble){window.krSetBubble(bubble,msgs[Math.floor(Math.random()*msgs.length)]);}else{bubble.textContent=msgs[Math.floor(Math.random()*msgs.length)];}
         bubble.style.display = "block";
         clearTimeout(bubbleTimer);
         bubbleTimer = setTimeout(function() { bubble.style.display = "none"; }, 1800);
@@ -1126,7 +1134,7 @@
           avatar.style.transform = "";
         }, 1000);
 
-        bubble.textContent = mimikyuMsgs[Math.floor(Math.random() * mimikyuMsgs.length)];
+        if(window.krSetBubble){window.krSetBubble(bubble,mimikyuMsgs[Math.floor(Math.random()*mimikyuMsgs.length)]);}else{bubble.textContent=mimikyuMsgs[Math.floor(Math.random()*mimikyuMsgs.length)];}
         bubble.style.display = "block";
         clearTimeout(bubbleTimer);
         bubbleTimer = setTimeout(function() { bubble.style.display = "none"; }, 2200);
@@ -1205,16 +1213,702 @@
       <div id="hints-body" style="max-height:420px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#D9A898 #FFF8F3;">
         <div style="padding:8px;display:flex;flex-direction:column;gap:6px;">
         </div>
-        <!-- ─── RESET BOX — appears after scrolling through all hints ─── -->
-        <div id="hints-reset-box" style="margin:0 8px 10px 8px;background:#FFF0EE;border:1.5px dashed #C47A6A;border-radius:12px;padding:10px 10px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-          <div style="font-size:14px;">⚠️</div>
-          <div style="font-size:9px;color:#7A3A2A;font-weight:bold;letter-spacing:0.04em;text-align:center;text-transform:uppercase;">danger zone</div>
-          <div style="font-size:9px;color:#9A5A4A;text-align:center;line-height:1.5;font-style:italic;">this will erase <em>all</em> your unlocked achievements.<br>they cannot be recovered.</div>
-          <div id="hints-reset-confirm" style="display:none;font-size:9px;color:#C02020;text-align:center;font-weight:bold;line-height:1.5;margin-top:2px;">are you sure? this is permanent.</div>
-          <button id="hints-reset-btn" onclick="hintsResetStep()" style="margin-top:2px;background:#F5D0C8;border:1px solid #C47A6A;border-radius:20px;color:#7A3A2A;font-size:10px;cursor:pointer;padding:4px 14px;font-weight:bold;transition:background 0.15s;">reset achievements</button>
-        </div>
       </div>
     </div>
+
+
+    <style>
+      /* ── shared reward entry card ── */
+      .inv-entry {
+        background:#EEEAF8;
+        border:1px dashed #C0B0D8;
+        border-radius:10px;
+        padding:7px 9px;
+        display:flex;
+        align-items:center;
+        gap:8px;
+        opacity:0.38;
+        filter:grayscale(0.55);
+        transition:opacity 0.25s, filter 0.25s, background 0.2s, border-color 0.2s;
+      }
+      .inv-entry.inv-unlocked {
+        opacity:1;
+        filter:none;
+        background:#E8E2F8;
+        border-color:#9880CC;
+      }
+      .inv-entry.inv-equipped {
+        background:#DDD4F5;
+        border-color:#7060AA;
+        box-shadow:0 0 0 2px #C0B0E0;
+      }
+      .inv-entry-icon { font-size:20px; flex-shrink:0; line-height:1; }
+      .inv-entry-info { flex:1; min-width:0; }
+      .inv-entry-name { font-size:10px; font-weight:bold; color:#3A2A5A; line-height:1.3; }
+      .inv-entry-desc { font-size:9px; color:#7868A8; line-height:1.4; margin-top:2px; }
+      .inv-entry-locked { font-size:9px; color:#A898C8; font-style:italic; line-height:1.4; }
+
+      /* ── equip / unequip button ── */
+      .inv-btn {
+        background:#C8B8E8;
+        border:1px solid #9880CC;
+        border-radius:14px;
+        color:#2A1A4A;
+        font-size:9px;
+        font-weight:bold;
+        padding:3px 8px;
+        cursor:pointer;
+        flex-shrink:0;
+        transition:background 0.15s, color 0.15s;
+        white-space:nowrap;
+      }
+      .inv-btn:hover { background:#B0A0D8; }
+      .inv-btn.inv-btn-unequip {
+        background:#8878B8;
+        color:#fff;
+        border-color:#6858A0;
+      }
+      .inv-btn.inv-btn-unequip:hover { background:#7060A8; }
+
+      /* ── reset box adjustments for lilac ── */
+      #inv-reset-box button { transition:background 0.15s; }
+      #inv-reset-box button:hover { background:#CCC0E8; }
+    </style>
+
+    <script>
+    (function() {
+
+      // ══════════════════════════════════════════════════
+      //  CURSOR REWARDS
+      // ══════════════════════════════════════════════════
+      var CURSOR_REWARDS = [
+        {
+          id: "cur_default",
+          name: "Default Cursor",
+          desc: "the original. always here.",
+          icon: "🖱️",
+          always: true,
+          unlockedBy: [],
+          cursor: "url('https://file.garden/adMvuUsLaQ5DhcDC/normal.ani'), url('https://file.garden/adMvuUsLaQ5DhcDC/normal.gif'), auto"
+        },
+        {
+          id: "cur_soft",
+          name: "Soft Paws ♡",
+          desc: "gentle visitor. a warmer hand.",
+          icon: "🐾",
+          unlockedBy: ["headpat1"],
+          // placeholder until custom cursor linked
+          cursor: "url('https://file.garden/adMvuUsLaQ5DhcDC/normal.ani'), url('https://file.garden/adMvuUsLaQ5DhcDC/normal.gif'), auto"
+        },
+        {
+          id: "cur_star",
+          name: "Starlight ✦",
+          desc: "true enjoyer. 100 pats.",
+          icon: "⭐",
+          unlockedBy: ["headpat100"],
+          cursor: "url('https://file.garden/adMvuUsLaQ5DhcDC/normal.ani'), url('https://file.garden/adMvuUsLaQ5DhcDC/normal.gif'), auto"
+        },
+        {
+          id: "cur_moon",
+          name: "Moonlit",
+          desc: "night visitor. came when the world slept.",
+          icon: "🌙",
+          unlockedBy: ["night_visitor", "headpat_night"],
+          cursor: "url('https://file.garden/adMvuUsLaQ5DhcDC/normal.ani'), url('https://file.garden/adMvuUsLaQ5DhcDC/normal.gif'), auto"
+        },
+        {
+          id: "cur_mage",
+          name: "Zoltraak",
+          desc: "offensive magic. fern's favorite.",
+          icon: "🔮",
+          unlockedBy: ["spell_zoltraak"],
+          cursor: "url('https://file.garden/adMvuUsLaQ5DhcDC/normal.ani'), url('https://file.garden/adMvuUsLaQ5DhcDC/normal.gif'), auto"
+        },
+        {
+          id: "cur_grimoire",
+          name: "Grimoire",
+          desc: "all 5 spells cast. frieren would nod.",
+          icon: "📖",
+          unlockedBy: ["all_spells"],
+          cursor: "url('https://file.garden/adMvuUsLaQ5DhcDC/normal.ani'), url('https://file.garden/adMvuUsLaQ5DhcDC/normal.gif'), auto"
+        },
+        {
+          id: "cur_hacker",
+          name: "Flag Captured",
+          desc: "ctf flag found. you looked closer.",
+          icon: "🚩",
+          unlockedBy: ["ctf_flag"],
+          cursor: "url('https://file.garden/adMvuUsLaQ5DhcDC/normal.ani'), url('https://file.garden/adMvuUsLaQ5DhcDC/normal.gif'), auto"
+        },
+        {
+          id: "cur_newjeans",
+          name: "NewJeans Forever ♡",
+          desc: "all ten powerpuffs moved. devoted.",
+          icon: "🌸",
+          unlockedBy: ["moved_all_ppg"],
+          cursor: "url('https://file.garden/adMvuUsLaQ5DhcDC/normal.ani'), url('https://file.garden/adMvuUsLaQ5DhcDC/normal.gif'), auto"
+        },
+        {
+          id: "cur_konami",
+          name: "Old Ways",
+          desc: "↑↑↓↓←→←→ — you know the code.",
+          icon: "🕹️",
+          unlockedBy: ["konami"],
+          cursor: "url('https://file.garden/adMvuUsLaQ5DhcDC/normal.ani'), url('https://file.garden/adMvuUsLaQ5DhcDC/normal.gif'), auto"
+        }
+      ];
+
+      // ══════════════════════════════════════════════════
+      //  TRAIL REWARDS  — canvas particle trail effects
+      // ══════════════════════════════════════════════════
+      var TRAIL_REWARDS = [
+        {
+          id: "trail_none",
+          name: "No Trail",
+          desc: "clean. quiet. nothing follows.",
+          icon: "✖️",
+          always: true,
+          unlockedBy: [],
+          trail: null   // null = disable trail
+        },
+        {
+          id: "trail_sparkle",
+          name: "Sparkle Trail ✦",
+          desc: "gentle visitor. tiny stars follow your steps.",
+          icon: "✨",
+          unlockedBy: ["headpat1"],
+          trail: {
+            type: "sparkle",
+            colors: ["#E8D8FF","#C8B8F0","#F8E8FF","#ffffff"],
+            size: 5, life: 38, count: 2
+          }
+        },
+        {
+          id: "trail_stars",
+          name: "Starfield",
+          desc: "true enjoyer. 100 pats earns you starlight.",
+          icon: "⭐",
+          unlockedBy: ["headpat100"],
+          trail: {
+            type: "star",
+            colors: ["#FFE88A","#FFC840","#FFFA80","#ffffff"],
+            size: 7, life: 45, count: 3
+          }
+        },
+        {
+          id: "trail_moon",
+          name: "Lunar Dust",
+          desc: "night visitor. silver and indigo drift behind.",
+          icon: "🌙",
+          unlockedBy: ["night_visitor", "headpat_night"],
+          trail: {
+            type: "circle",
+            colors: ["#C8D8FF","#9898D8","#B0B8F8","#E8E0FF"],
+            size: 5, life: 50, count: 2
+          }
+        },
+        {
+          id: "trail_magic",
+          name: "Zoltraak Burst",
+          desc: "offensive magic. violet sparks tear the air.",
+          icon: "🔮",
+          unlockedBy: ["spell_zoltraak"],
+          trail: {
+            type: "burst",
+            colors: ["#CC88FF","#9040F0","#E8B0FF","#7020C8"],
+            size: 6, life: 35, count: 3
+          }
+        },
+        {
+          id: "trail_grimoire",
+          name: "Ancient Runes",
+          desc: "all 5 spells. glyphs trail behind the cursor.",
+          icon: "📖",
+          unlockedBy: ["all_spells"],
+          trail: {
+            type: "rune",
+            colors: ["#A8FFD8","#60D0A0","#C8FFF0","#40B080"],
+            size: 8, life: 55, count: 2,
+            chars: ["ᚠ","ᚢ","ᚦ","ᚨ","ᚱ","ᚲ","ᚷ","ᚹ","ᚺ","ᚾ","ᛁ"]
+          }
+        },
+        {
+          id: "trail_newjeans",
+          name: "Petal Drift ♡",
+          desc: "all powerpuffs moved. pink petals in your wake.",
+          icon: "🌸",
+          unlockedBy: ["moved_all_ppg"],
+          trail: {
+            type: "petal",
+            colors: ["#FFB8D8","#FF88B8","#FFC8E0","#FFD8EC"],
+            size: 7, life: 55, count: 2
+          }
+        },
+        {
+          id: "trail_konami",
+          name: "Pixel Trail",
+          desc: "the old code. retro pixels scatter.",
+          icon: "🕹️",
+          unlockedBy: ["konami"],
+          trail: {
+            type: "pixel",
+            colors: ["#88FF88","#40D040","#AAFFAA","#FFFFFF"],
+            size: 5, life: 30, count: 3
+          }
+        },
+        {
+          id: "trail_hacker",
+          name: "Flag Trace",
+          desc: "ctf flag. red fragments fall.",
+          icon: "🚩",
+          unlockedBy: ["ctf_flag"],
+          trail: {
+            type: "burst",
+            colors: ["#FF5050","#CC1010","#FF8888","#FF3030"],
+            size: 5, life: 30, count: 2
+          }
+        }
+      ];
+
+      // ══════════════════════════════════════════════════
+      //  EFFECT REWARDS — cursor-effects library instances
+      // ══════════════════════════════════════════════════
+      var EFFECT_REWARDS = [
+        {
+          id: "eff_none",
+          name: "No Effect",
+          desc: "nothing extra. clean and quiet.",
+          icon: "✖️",
+          always: true,
+          unlockedBy: [],
+          effect: null
+        },
+        {
+          id: "eff_fairy",
+          name: "Fairy Dust ✨",
+          desc: "gentle visitor. golden sparks drift from your cursor.",
+          icon: "🧚",
+          unlockedBy: ["headpat1"],
+          effect: function() {
+            return new cursoreffects.fairyDustCursor({ colors: ["#E8D8FF","#C8B8F0","#FFE8FF","#ffffff"] });
+          }
+        },
+        {
+          id: "eff_rainbow",
+          name: "Rainbow Trail",
+          desc: "100 pats. you've earned some color.",
+          icon: "🌈",
+          unlockedBy: ["headpat100"],
+          effect: function() {
+            return new cursoreffects.rainbowCursor({ length: 6, size: 4 });
+          }
+        },
+        {
+          id: "eff_snowflake",
+          name: "Snowflakes ❄",
+          desc: "night visitor. the cold follows you.",
+          icon: "❄️",
+          unlockedBy: ["night_visitor", "headpat_night"],
+          effect: function() {
+            return new cursoreffects.snowflakeCursor();
+          }
+        },
+        {
+          id: "eff_emoji_magic",
+          name: "Spellcast Rain",
+          desc: "all 5 spells cast. magic rains from above.",
+          icon: "🔮",
+          unlockedBy: ["all_spells"],
+          effect: function() {
+            return new cursoreffects.emojiCursor({ emoji: ["🔑","🔮","💫","🌿","⚔️"] });
+          }
+        },
+        {
+          id: "eff_newjeans",
+          name: "NewJeans Shower ♡",
+          desc: "all powerpuffs moved. bunnies fall from the sky.",
+          icon: "🌸",
+          unlockedBy: ["moved_all_ppg"],
+          effect: function() {
+            return new cursoreffects.emojiCursor({ emoji: ["🐇","🌸","💚","🩷","💜","💛","💙"] });
+          }
+        },
+        {
+          id: "eff_ghost",
+          name: "Ghost Following",
+          desc: "found the hidden minji. something follows you now.",
+          icon: "👻",
+          unlockedBy: ["found_hidden_minji"],
+          effect: function() {
+            return new cursoreffects.ghostCursor();
+          }
+        },
+        {
+          id: "eff_bubbles",
+          name: "Bubble Stream",
+          desc: "said hello in the chat. bubbles everywhere.",
+          icon: "🫧",
+          unlockedBy: ["chatted"],
+          effect: function() {
+            return new cursoreffects.bubbleCursor();
+          }
+        },
+        {
+          id: "eff_konami",
+          name: "Retro Springy",
+          desc: "↑↑↓↓←→←→ — the old ways, bouncy edition.",
+          icon: "🕹️",
+          unlockedBy: ["konami"],
+          effect: function() {
+            return new cursoreffects.springyEmojiCursor({ emoji: "🕹️" });
+          }
+        },
+        {
+          id: "eff_ctf",
+          name: "Hacker Rain",
+          desc: "flag captured. watch your back.",
+          icon: "🚩",
+          unlockedBy: ["ctf_flag"],
+          effect: function() {
+            return new cursoreffects.emojiCursor({ emoji: ["🚩","💻","🔓","⚡","🛡️"] });
+          }
+        },
+        {
+          id: "eff_tarot",
+          name: "Card Reader",
+          desc: "all cards drawn. frieren's deck never lies.",
+          icon: "🃏",
+          unlockedBy: ["tarot_all"],
+          effect: function() {
+            return new cursoreffects.emojiCursor({ emoji: ["🃏","☀️","🌙","⭐","🗼","⚖️","🔥","🌿","🌀","💀","🌊"] });
+          }
+        }
+      ];
+
+      // ── active cursoreffects instance ──────────────────────────────────
+      var _activeEffectInstance = null;
+
+      function setEffect(effDef) {
+        // destroy previous instance
+        if (_activeEffectInstance) {
+          try { _activeEffectInstance.destroy(); } catch(e) {}
+          _activeEffectInstance = null;
+        }
+        if (effDef && effDef.effect && typeof cursoreffects !== "undefined") {
+          try { _activeEffectInstance = effDef.effect(); } catch(e) { console.warn("effect failed:", e); }
+        }
+      }
+
+      // ══════════════════════════════════════════════════
+      //  STATE
+      // ══════════════════════════════════════════════════
+      var activeCursorId = "cur_default";
+      var activeTrailId  = "trail_none";
+      var activeEffectId = "eff_none";
+      try {
+        activeCursorId = localStorage.getItem("seol_active_cursor") || "cur_default";
+        activeTrailId  = localStorage.getItem("seol_active_trail")  || "trail_none";
+        activeEffectId = localStorage.getItem("seol_active_effect") || "eff_none";
+      } catch(e) {}
+
+      // ══════════════════════════════════════════════════
+      //  TRAIL ENGINE — canvas overlay
+      // ══════════════════════════════════════════════════
+      var trailCanvas, trailCtx, trailParticles = [], trailConfig = null, trailAnim = null;
+      var trailMX = 0, trailMY = 0;
+
+      function initTrailCanvas() {
+        if (trailCanvas) return;
+        trailCanvas = document.createElement("canvas");
+        trailCanvas.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:99998;";
+        trailCanvas.width  = window.innerWidth;
+        trailCanvas.height = window.innerHeight;
+        document.body.appendChild(trailCanvas);
+        trailCtx = trailCanvas.getContext("2d");
+        window.addEventListener("resize", function() {
+          trailCanvas.width  = window.innerWidth;
+          trailCanvas.height = window.innerHeight;
+        });
+        document.addEventListener("mousemove", function(e) {
+          trailMX = e.clientX; trailMY = e.clientY;
+          if (!trailConfig) return;
+          for (var i = 0; i < (trailConfig.count || 2); i++) spawnParticle(e.clientX, e.clientY);
+        });
+      }
+
+      function spawnParticle(x, y) {
+        if (!trailConfig) return;
+        var c = trailConfig;
+        var color = c.colors[Math.floor(Math.random() * c.colors.length)];
+        var angle = Math.random() * Math.PI * 2;
+        var speed = 0.4 + Math.random() * 1.2;
+        var p = {
+          x: x, y: y,
+          vx: Math.cos(angle) * speed * (c.type === "burst" ? 1.8 : 0.7),
+          vy: Math.sin(angle) * speed * (c.type === "burst" ? 1.8 : 0.7) + (c.type === "petal" ? 0.6 : 0.2),
+          size: (c.size || 5) * (0.6 + Math.random() * 0.8),
+          color: color,
+          life: c.life || 40,
+          maxLife: c.life || 40,
+          type: c.type,
+          rot: Math.random() * Math.PI * 2,
+          rotV: (Math.random() - 0.5) * 0.12,
+          char: c.chars ? c.chars[Math.floor(Math.random() * c.chars.length)] : null
+        };
+        trailParticles.push(p);
+      }
+
+      function drawParticle(ctx, p) {
+        var alpha = p.life / p.maxLife;
+        ctx.save();
+        ctx.globalAlpha = alpha * 0.85;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+        ctx.strokeStyle = p.color;
+
+        if (p.type === "star") {
+          // 5-pointed star
+          ctx.beginPath();
+          var r = p.size, r2 = r * 0.45, pts = 5;
+          for (var i = 0; i < pts * 2; i++) {
+            var a = (i * Math.PI) / pts - Math.PI / 2;
+            var ri = i % 2 === 0 ? r : r2;
+            if (i === 0) ctx.moveTo(Math.cos(a) * ri, Math.sin(a) * ri);
+            else ctx.lineTo(Math.cos(a) * ri, Math.sin(a) * ri);
+          }
+          ctx.closePath(); ctx.fill();
+        } else if (p.type === "sparkle") {
+          // 4-point cross sparkle
+          var s = p.size;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(-s,0); ctx.lineTo(s,0);
+          ctx.moveTo(0,-s); ctx.lineTo(0,s);
+          ctx.moveTo(-s*0.6,-s*0.6); ctx.lineTo(s*0.6,s*0.6);
+          ctx.moveTo(s*0.6,-s*0.6); ctx.lineTo(-s*0.6,s*0.6);
+          ctx.stroke();
+        } else if (p.type === "rune" && p.char) {
+          ctx.font = "bold " + (p.size * 1.6) + "px serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(p.char, 0, 0);
+        } else if (p.type === "petal") {
+          // oval petal
+          ctx.beginPath();
+          ctx.ellipse(0, 0, p.size * 0.5, p.size, 0, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (p.type === "pixel") {
+          // hard square, no smoothing
+          ctx.imageSmoothingEnabled = false;
+          ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+        } else {
+          // circle (default / burst / moon)
+          ctx.beginPath();
+          ctx.arc(0, 0, p.size * 0.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      function trailLoop() {
+        if (!trailCtx) return;
+        trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+        for (var i = trailParticles.length - 1; i >= 0; i--) {
+          var p = trailParticles[i];
+          p.x += p.vx; p.y += p.vy;
+          p.vy += 0.03; // gentle gravity
+          p.rot += p.rotV;
+          p.life--;
+          if (p.life <= 0) { trailParticles.splice(i, 1); continue; }
+          drawParticle(trailCtx, p);
+        }
+        trailAnim = requestAnimationFrame(trailLoop);
+      }
+
+      function setTrail(trailDef) {
+        trailParticles = [];
+        if (trailDef && trailDef.trail) {
+          trailConfig = trailDef.trail;
+          initTrailCanvas();
+          if (!trailAnim) trailLoop();
+        } else {
+          trailConfig = null;
+          if (trailCtx) trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+          if (trailAnim) { cancelAnimationFrame(trailAnim); trailAnim = null; }
+        }
+      }
+
+      // ══════════════════════════════════════════════════
+      //  CURSOR APPLICATION
+      // ══════════════════════════════════════════════════
+      var DEFAULT_CURSOR = "url('https://file.garden/adMvuUsLaQ5DhcDC/normal.ani'), url('https://file.garden/adMvuUsLaQ5DhcDC/normal.gif'), auto";
+
+      function applyCursor(curDef) {
+        document.body.style.cursor = (curDef && curDef.cursor) ? curDef.cursor : DEFAULT_CURSOR;
+      }
+
+      // ══════════════════════════════════════════════════
+      //  HELPERS
+      // ══════════════════════════════════════════════════
+      function isUnlocked(reward) {
+        if (reward.always) return true;
+        for (var i = 0; i < reward.unlockedBy.length; i++) {
+          try { if (localStorage.getItem("seol_ach_" + reward.unlockedBy[i])) return true; } catch(e) {}
+        }
+        return false;
+      }
+
+
+      // ══════════════════════════════════════════════════
+      //  EQUIP / UNEQUIP
+      // ══════════════════════════════════════════════════
+      window._invEquipCursor = function(id) {
+        var def = CURSOR_REWARDS.find(function(r){ return r.id === id; });
+        if (!def) return;
+        if (activeCursorId === id) {
+          // unequip → restore default
+          activeCursorId = "cur_default";
+          applyCursor(CURSOR_REWARDS.find(function(r){ return r.id === "cur_default"; }));
+          try { localStorage.setItem("seol_active_cursor", "cur_default"); } catch(e) {}
+        } else {
+          activeCursorId = id;
+          applyCursor(def);
+          try { localStorage.setItem("seol_active_cursor", id); } catch(e) {}
+        }
+        buildInventory();
+      };
+
+      window._invEquipTrail = function(id) {
+        var def = TRAIL_REWARDS.find(function(r){ return r.id === id; });
+        if (!def) return;
+        if (activeTrailId === id) {
+          // unequip → no trail
+          activeTrailId = "trail_none";
+          setTrail(null);
+          try { localStorage.setItem("seol_active_trail", "trail_none"); } catch(e) {}
+        } else {
+          activeTrailId = id;
+          setTrail(def);
+          try { localStorage.setItem("seol_active_trail", id); } catch(e) {}
+        }
+        buildInventory();
+      };
+
+      window._invEquipEffect = function(id) {
+        var def = EFFECT_REWARDS.find(function(r){ return r.id === id; });
+        if (!def) return;
+        if (activeEffectId === id) {
+          activeEffectId = "eff_none";
+          setEffect(null);
+          try { localStorage.setItem("seol_active_effect", "eff_none"); } catch(e) {}
+        } else {
+          activeEffectId = id;
+          setEffect(def);
+          try { localStorage.setItem("seol_active_effect", id); } catch(e) {}
+        }
+        buildInventory();
+      };
+
+      // ══════════════════════════════════════════════════
+      //  BUILD UI
+      // ══════════════════════════════════════════════════
+      function makeEntry(reward, isActive, equipFn) {
+        var unlocked = isUnlocked(reward);
+        var entry = document.createElement("div");
+        entry.className = "inv-entry" + (unlocked ? " inv-unlocked" : "") + (isActive ? " inv-equipped" : "");
+
+        var iconEl = '<div class="inv-entry-icon">' + reward.icon + '</div>';
+        var infoEl = '<div class="inv-entry-info"><div class="inv-entry-name">' + reward.name + '</div>';
+
+        if (unlocked) {
+          infoEl += '<div class="inv-entry-desc">' + reward.desc + '</div>';
+        } else {
+          var hint = reward.always ? "always available" :
+            reward.unlockedBy.map(function(id){ return id.replace(/_/g," "); }).join(" / ");
+          infoEl += '<div class="inv-entry-locked">[ locked ] · ' + hint + '</div>';
+        }
+        infoEl += '</div>';
+
+        var btnHtml = "";
+        if (unlocked) {
+          var isDefault = (reward.id === "cur_default" || reward.id === "trail_none");
+          if (isActive && !isDefault) {
+            btnHtml = '<button class="inv-btn inv-btn-unequip" onclick="' + equipFn + '(\'' + reward.id + '\')">✓ remove</button>';
+          } else if (isActive && isDefault) {
+            btnHtml = '<button class="inv-btn inv-btn-unequip" style="opacity:0.5;cursor:default;">✓ on</button>';
+          } else {
+            btnHtml = '<button class="inv-btn" onclick="' + equipFn + '(\'' + reward.id + '\')">equip</button>';
+          }
+        }
+
+        entry.innerHTML = iconEl + infoEl + btnHtml;
+        return entry;
+      }
+
+      function buildInventory() {
+        var curList    = document.getElementById("inv-cursor-list");
+        var trailList  = document.getElementById("inv-trail-list");
+        var effectList = document.getElementById("inv-effect-list");
+        var summary    = document.getElementById("inv-summary");
+        if (!curList || !trailList) return;
+
+        curList.innerHTML   = "";
+        trailList.innerHTML = "";
+        if (effectList) effectList.innerHTML = "";
+
+        var totalUnlocked = 0, totalItems = CURSOR_REWARDS.length + TRAIL_REWARDS.length + EFFECT_REWARDS.length;
+
+        CURSOR_REWARDS.forEach(function(r) {
+          if (isUnlocked(r)) totalUnlocked++;
+          curList.appendChild(makeEntry(r, activeCursorId === r.id, "_invEquipCursor"));
+        });
+        TRAIL_REWARDS.forEach(function(r) {
+          if (isUnlocked(r)) totalUnlocked++;
+          trailList.appendChild(makeEntry(r, activeTrailId === r.id, "_invEquipTrail"));
+        });
+        if (effectList) {
+          EFFECT_REWARDS.forEach(function(r) {
+            if (isUnlocked(r)) totalUnlocked++;
+            effectList.appendChild(makeEntry(r, activeEffectId === r.id, "_invEquipEffect"));
+          });
+        }
+
+        if (summary) summary.textContent = totalUnlocked + " / " + totalItems + " items unlocked";
+      }
+
+      // ══════════════════════════════════════════════════
+      //  INIT
+      // ══════════════════════════════════════════════════
+      window.buildInventory = buildInventory;
+
+      window.addEventListener("load", function() {
+
+        // restore cursor
+        var cDef = CURSOR_REWARDS.find(function(r){ return r.id === activeCursorId; });
+        if (cDef && isUnlocked(cDef)) applyCursor(cDef);
+
+        // restore trail
+        var tDef = TRAIL_REWARDS.find(function(r){ return r.id === activeTrailId; });
+        if (tDef && isUnlocked(tDef) && tDef.trail) setTrail(tDef);
+
+        // restore effect
+        var eDef = EFFECT_REWARDS.find(function(r){ return r.id === activeEffectId; });
+        if (eDef && isUnlocked(eDef) && eDef.effect) setEffect(eDef);
+
+        buildInventory();
+      });
+
+      // re-render when achievements fire
+      var _oh2 = window.triggerAchievement;
+      window.triggerAchievement = function(id) {
+        _oh2(id);
+        buildInventory();
+      };
+
+    })();
+    </script>
+
     <style>
       #hints-window .drag-handle { cursor:pointer; }
       .hint-entry {
@@ -1322,25 +2016,25 @@
 
       window.hintsResetStep = function() {
         var btn  = document.getElementById("hints-reset-btn");
-        var warn = document.getElementById("hints-reset-confirm");
+        var warn = document.getElementById("inv-reset-confirm");
 
         if (_resetStage === 0) {
           // first click: show warning and arm the second click
           _resetStage = 1;
           warn.style.display = "block";
           btn.textContent = "yes, reset everything";
-          btn.style.background = "#F0A898";
-          btn.style.borderColor = "#A03020";
-          btn.style.color = "#6A1010";
+          btn.style.background = "#C098E8";
+          btn.style.borderColor = "#7040A8";
+          btn.style.color = "#3A1A6A";
           // auto-cancel after 5 s so accidental clicks don't linger
           clearTimeout(_resetTimer);
           _resetTimer = setTimeout(function() {
             _resetStage = 0;
             warn.style.display = "none";
             btn.textContent = "reset achievements";
-            btn.style.background = "#F5D0C8";
-            btn.style.borderColor = "#C47A6A";
-            btn.style.color = "#7A3A2A";
+            btn.style.background = "#DDD0F0";
+            btn.style.borderColor = "#9888B8";
+            btn.style.color = "#4A3A6A";
           }, 5000);
 
         } else {
@@ -1372,26 +2066,40 @@
           if (typeof window.resetFrieren    === "function") window.resetFrieren();
           if (typeof window.resetStark      === "function") window.resetStark();
 
+          // Reset active cursor / trail / effect back to defaults
+          activeCursorId = "cur_default";
+          activeTrailId  = "trail_none";
+          activeEffectId = "eff_none";
+          try {
+            localStorage.setItem("seol_active_cursor", "cur_default");
+            localStorage.setItem("seol_active_trail",  "trail_none");
+            localStorage.setItem("seol_active_effect", "eff_none");
+          } catch(e) {}
+          applyCursor(CURSOR_REWARDS.find(function(r){ return r.id === "cur_default"; }));
+          setTrail(null);
+          setEffect(null);
+
           _resetStage = 0;
           warn.style.display = "none";
           btn.textContent = "reset achievements";
-          btn.style.background = "#F5D0C8";
-          btn.style.borderColor = "#C47A6A";
-          btn.style.color = "#7A3A2A";
+          btn.style.background = "#DDD0F0";
+          btn.style.borderColor = "#9888B8";
+          btn.style.color = "#4A3A6A";
 
           buildHints();
+          if (typeof buildInventory === "function") buildInventory();
 
           // little confirmation flash
-          var box = document.getElementById("hints-reset-box");
-          box.style.borderColor = "#6AAA6A";
-          box.style.background = "#EEFAEA";
+          var box = document.getElementById("inv-reset-box");
+          box.style.borderColor = "#7A9A7A";
+          box.style.background = "#EEF8F0";
           var flash = document.createElement("div");
           flash.style.cssText = "font-size:9px;color:#3A7A3A;text-align:center;font-weight:bold;";
           flash.textContent = "✓ all achievements cleared. please refresh the page.";
           box.appendChild(flash);
           setTimeout(function() {
-            box.style.borderColor = "#C47A6A";
-            box.style.background = "#FFF0EE";
+            box.style.borderColor = "#9888B8";
+            box.style.background = "#F0EEF8";
             if (flash.parentNode) flash.parentNode.removeChild(flash);
           }, 2500);
         }
@@ -1409,11 +2117,20 @@
         <span style="font-size:10px;color:#3a5a3a;font-weight:bold;letter-spacing:0.05em;">✦ credits</span>
       </div>
       <div style="padding:10px 10px;background-color:#e8f0e8;">
-        <p style="font-size:10px;color:#4a6a4a;line-height:1.7;margin:0;text-align:center;">
+        <p style="font-size:10px;color:#4a6a4a;line-height:1.7;margin:0 0 6px 0;text-align:center;">
           this little corner of the web was lovingly shaped by the wonderful work of
           <a href="https://rottenware.neocities.org/" target="_blank" style="color:#3a6a3a;font-weight:bold;text-decoration:underline dotted;">rottenware</a>
           — whose site is a gem worth visiting. thank you for the inspiration. ♡
         </p>
+        <hr style="border:none;border-top:1px dashed #a8c4a8;margin:8px 0;">
+        <p style="font-size:10px;color:#4a6a4a;margin:0 0 5px 0;text-align:center;">✦ special thanks ✦</p>
+        <ul style="list-style:none;padding:0;margin:0;">
+          <li style="border-bottom:1px dashed #a8c4a8;width:100%;padding:4px 0;text-align:center;">
+            <a href="https://ichomancer.neocities.org" target="_blank" style="color:#3a6a3a;font-weight:bold;font-size:10px;text-decoration:underline dotted;">infineks</a>
+            <span style="font-size:9px;color:#6a8a6a;display:block;">feature suggestions &amp; support</span>
+          </li>
+          <!-- add more credits below, copy the <li> block above -->
+        </ul>
       </div>
     </div>
     <style>
@@ -1449,10 +2166,34 @@
           art:    "./seol/everyoneadoresualbum.jpg"  // add album art or fallback
         },
         {
+          title:  "사랑이 시작될 때",
+          artist: "Kassy",
+          src:    "https://file.garden/adMvuUsLaQ5DhcDC/%EC%82%AC%EB%9E%91%EC%9D%B4%20%EC%8B%9C%EC%9E%91%EB%90%A0%20%EB%95%8C.mp3",
+          art:    "./seol/사랑이 시작될 때.jpg"  // add album art or fallback
+        },
+        {
+          title:  "At The Beach, In Every Life",
+          artist: "Gigi Perez",
+          src:    "https://file.garden/adMvuUsLaQ5DhcDC/Gigi%20Perez%20-%20At%20The%20Beach%2C%20In%20Every%20Life%20(Lyric%20Video).mp3",
+          art:    "./seol/atthebeachineverylife.jpg"  // add album art or fallback
+        },
+        {
           title:  "Soldier, Poet, King",
           artist: "The Oh Hellos",
           src:    "https://file.garden/adMvuUsLaQ5DhcDC/SPK.mp3",
           art:    "./seol/SPKalbum.jpg"  // add album art or fallback
+        },
+        {
+          title:  "Linger",
+          artist: "The Cranberries",
+          src:    "https://file.garden/adMvuUsLaQ5DhcDC/The%20Cranberries%20-%20Linger%20(Official%20Music%20Video).mp3",
+          art:    "./seol/linger.jpg"  // add album art or fallback
+        },
+        {
+          title:  "Heaven's On Fire",
+          artist: "The Radio Dept.",
+          src:    "https://file.garden/adMvuUsLaQ5DhcDC/The%20Radio%20Dept.%20-%20Heaven's%20On%20Fire.mp3",
+          art:    "./seol/heaven.jpg"  // add album art or fallback
         },
         {
           title:  "Legendary Theme",
@@ -1553,7 +2294,7 @@
           row.className = "mp-pl-row";
           row.style.cssText = "display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:7px;cursor:pointer;font-size:10px;color:#8a9eab;transition:background 0.15s;";
           row.innerHTML =
-            '<span style="font-size:14px;flex-shrink:0;">' + ["🎵","💔","💌","🌙","✨","🎸"][i] + '</span>' +
+            '<span style="font-size:14px;flex-shrink:0;">' + ["🎵","💔","💌","🌙","🌸","🌊","👑","💭","🔥","🎸"][i] + '</span>' +
             '<div style="flex:1;overflow:hidden;">' +
               '<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + t.title + '</div>' +
               '<div style="font-size:9px;opacity:0.7;">' + t.artist + '</div>' +
@@ -1839,7 +2580,7 @@
           avatar.style.transform = "";
         }, 1000);
 
-        bubble.textContent = starkMsgs[Math.floor(Math.random() * starkMsgs.length)];
+        if(window.krSetBubble){window.krSetBubble(bubble,starkMsgs[Math.floor(Math.random()*starkMsgs.length)]);}else{bubble.textContent=starkMsgs[Math.floor(Math.random()*starkMsgs.length)];}
         bubble.style.display = "block";
         clearTimeout(bubbleTimer);
         bubbleTimer = setTimeout(function() { bubble.style.display = "none"; }, 2200);
@@ -1976,7 +2717,7 @@
         }, 1000);
 
         // speech bubble
-        bubble.textContent = fernMsgs[Math.floor(Math.random() * fernMsgs.length)];
+        if(window.krSetBubble){window.krSetBubble(bubble,fernMsgs[Math.floor(Math.random()*fernMsgs.length)]);}else{bubble.textContent=fernMsgs[Math.floor(Math.random()*fernMsgs.length)];}
         bubble.style.display = "block";
         clearTimeout(bubbleTimer);
         bubbleTimer = setTimeout(function() { bubble.style.display = "none"; }, 2200);
@@ -2113,7 +2854,7 @@
           avatar.style.transform = "";
         }, 1000);
 
-        bubble.textContent = frierenMsgs[Math.floor(Math.random() * frierenMsgs.length)];
+        if(window.krSetBubble){window.krSetBubble(bubble,frierenMsgs[Math.floor(Math.random()*frierenMsgs.length)]);}else{bubble.textContent=frierenMsgs[Math.floor(Math.random()*frierenMsgs.length)];}
         bubble.style.display = "block";
         clearTimeout(bubbleTimer);
         bubbleTimer = setTimeout(function() { bubble.style.display = "none"; }, 2200);
@@ -2376,6 +3117,18 @@
           return { top: top, left: left };
         }
 
+        // ─── MID PPG POSITION CONFIG ──────────────────────────────
+        // Adjust these to move the four middle PPGs (ppg7, ppg8, ppg4, ppg3).
+        // xOffset: pixels relative to the lace edge (negative = more to the outside)
+        // yFrac:   0.0 = top of lace, 1.0 = bottom of lace
+        var MID_CONFIG = {
+          "mid-left-top":  { xOffset: 0, yFrac: 0.20 },  // ppg7 — hidden Minji
+          "mid-left-bot":  { xOffset: 0, yFrac: 0.66 },  // ppg8 — Hanni
+          "mid-right-top": { xOffset: 0, yFrac: 0.23 },  // ppg4 — Danielle
+          "mid-right-bot": { xOffset: 0, yFrac: 0.57 },  // ppg3 — Danielle
+        };
+        // ──────────────────────────────────────────────────────────
+
         function setPositions() {
           var laceEl = document.querySelector('[style*="lace.png"]');
           if (!laceEl) return;
@@ -2390,16 +3143,16 @@
           var cx = ll + lw / 2;
 
           var positions = {
-            "top-left":      { x: ll - half,               y: lt - half },
-            "top-center":    { x: cx - half,               y: lt - half },
-            "top-right":     { x: lr - half,               y: lt - half },
-            "mid-left-top":  { x: ll - half,               y: lt + lh * 0.23 - half },
-            "mid-left-bot":  { x: ll - half,               y: lt + lh * 0.66 - half },
-            "mid-right-top": { x: lr - half,               y: lt + lh * 0.23 - half },
-            "mid-right-bot": { x: lr - half,               y: lt + lh * 0.66 - half },
-            "bot-left":      { x: ll - half,               y: lb - half },
-            "bot-center":    { x: cx - half,               y: lb - half },
-            "bot-right":     { x: lr - half,               y: lb - half },
+            "top-left":      { x: ll - half,                                                         y: lt - half },
+            "top-center":    { x: cx - half,                                                         y: lt - half },
+            "top-right":     { x: lr - half,                                                         y: lt - half },
+            "mid-left-top":  { x: ll - half + MID_CONFIG["mid-left-top"].xOffset,                   y: lt + lh * MID_CONFIG["mid-left-top"].yFrac  - half },
+            "mid-left-bot":  { x: ll - half + MID_CONFIG["mid-left-bot"].xOffset,                   y: lt + lh * MID_CONFIG["mid-left-bot"].yFrac  - half },
+            "mid-right-top": { x: lr - half + MID_CONFIG["mid-right-top"].xOffset,                  y: lt + lh * MID_CONFIG["mid-right-top"].yFrac - half },
+            "mid-right-bot": { x: lr - half + MID_CONFIG["mid-right-bot"].xOffset,                  y: lt + lh * MID_CONFIG["mid-right-bot"].yFrac - half },
+            "bot-left":      { x: ll - half,                                                         y: lb - half },
+            "bot-center":    { x: cx - half,                                                         y: lb - half },
+            "bot-right":     { x: lr - half,                                                         y: lb - half },
           };
 
           document.querySelectorAll('.ppg-floater').forEach(function(el) {
@@ -2612,13 +3365,13 @@
          uses lace.png as border-image
          change "20px" and "20" together to resize
     ═══════════════════════════════════ -->
-    <div style="border:20px solid transparent;border-image:url('./seol/lace.png') 20 fill round;width:823px;height:auto;margin:0 auto;display:block;" class="center">
+    <div id="lace-wrapper" style="border:20px solid transparent;border-image:url('./seol/lace.png') 20 fill round;width:823px;height:auto;margin:0 auto;display:block;" class="center">
 
       <!-- BLUE DOTS TEXTURE LAYER -->
-      <div style="width:822px;height:auto;background-image:url('./seol/pureblue.jpg');background-repeat:repeat;background-size:24px 24px;padding:10px;border:1px dashed #81a9ff;border-radius:20px;box-sizing:border-box;">
+      <div id="blue-dots-layer" style="width:822px;height:auto;background-image:url('./seol/pureblue.jpg');background-repeat:repeat;background-size:24px 24px;padding:10px;border:1px dashed #81a9ff;border-radius:20px;box-sizing:border-box;">
 
         <!-- WHITE CONTENT AREA -->
-        <div style="width:800px;height:auto;padding:10px;padding-bottom:24px;border:1px dashed #81a9ff;border-radius:20px;background-color:white;box-sizing:border-box;">
+        <div id="white-content-area" style="width:800px;height:auto;padding:10px;padding-bottom:24px;border:1px dashed #81a9ff;border-radius:20px;background-color:white;box-sizing:border-box;">
 
           <!-- BANNER — half height (100px) -->
           <div style="width:100%;height:162px;margin-bottom:8px;">
@@ -2626,7 +3379,7 @@
           </div>
 
           <!-- THREE-COLUMN GRID -->
-          <div style="display:grid;grid-template-columns:160px 1fr 160px;gap:8px;align-items:start;">
+          <div id="three-col-grid" style="display:grid;grid-template-columns:160px 1fr 160px;gap:8px;align-items:start;">
 
 
           <!-- LEFT COLUMN -->
@@ -2707,7 +3460,7 @@
                 // Also sync the photocard counter if visible
                 var pc = document.getElementById("headpat-counter");
                 if (pc) pc.textContent = "pats: " + patCount;
-                bubble.textContent = msgs[Math.floor(Math.random()*msgs.length)];
+                if(window.krSetBubble){window.krSetBubble(bubble,msgs[Math.floor(Math.random()*msgs.length)]);}else{bubble.textContent=msgs[Math.floor(Math.random()*msgs.length)];}
                 bubble.style.display = "block";
                 avatar.style.transform = "scale(0.95)";
                 setTimeout(function() { avatar.style.transform = ""; }, 120);
@@ -2792,6 +3545,10 @@
               <!-- scrollable text area -->
               <div class="container" style="flex:1;overflow-y:scroll;padding:6px 8px;background-color:white;">
                 <div style="background-color:#f9fcff;border:1px dashed #b8c8d8;border-radius:8px;padding:4px 6px;font-size:10px;line-height:1.9;">
+                  <b>❖ 2026년.4월.10일:</b> *reminder to add more rewards and interactables later* // currenty working on the cursors!<br>
+                  <b>❖ 2026년.4월.10일:</b> added inventory system and rewards!<br>
+                  <b>❖ 2026년.4월.10일:</b> created a auto translate plus dictionary for english members<br>
+                  <b>❖ 2026년.4월.10일:</b> made a mobile auto res css<br>
                   <b>❖ 2026년.4월.9일:</b> added a reset achievements button<br>
                   <b>❖ 2026년.4월.9일:</b> tons of bug fixes Claude Code is my best friend<br>
                   <b>❖ 2026년.4월.9일:</b> added a music player and achievement hint system<br>
@@ -2940,9 +3697,37 @@
             </div>
           </div>
 
+          <!-- SPACER after SUAE ID -->
+          <div style="height:500px;"></div>
+
+          <!-- UNDER CONSTRUCTION — left column, below suae ID -->
+          <div style="width:100%;box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;margin:0;">
+            <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
+              <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ · · ·</span>
+            </div>
+            <div style="padding:16px 8px;background-color:white;text-align:center;">
+              <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - - - - - - - - - - - -</p>
+              <p style="font-size:10px;color:#8a9eab;margin:6px 0;">⚙ under construction ⚙</p>
+              <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - - - - - - - - - - - -</p>
+            </div>
+          </div>
+
+          <!-- UNDER CONSTRUCTION — left column, second box below suae ID -->
+          <div style="width:100%;box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;margin:0;">
+            <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
+              <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ · · ·</span>
+            </div>
+            <div style="padding:16px 8px;background-color:white;text-align:center;">
+              <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - - - - - - - - - - - -</p>
+              <p style="font-size:10px;color:#8a9eab;margin:6px 0;">⚙ under construction ⚙</p>
+              <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - - - - - - - - - - - -</p>
+            </div>
+          </div>
+
           </div>
           <!-- end left column -->
 
+          
 
           <!-- MIDDLE COLUMN -->
           <div style="display:flex;flex-direction:column;gap:8px;">
@@ -3010,11 +3795,11 @@
               <!-- POEM BOX (scrollable) -->
               <div style="flex:1;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;display:flex;flex-direction:column;">
                 <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;flex-shrink:0;">
-                  <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ a poem i found</span>
+                  <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ a poem i like</span>
                 </div>
                 <div class="container" style="flex:1;overflow-y:scroll;background-color:white;padding:6px 8px;">
                   <img src="./seol/buni.png" class="center" style="width:50%;margin:4px auto 6px;">
-                  <p style="text-align:center;color:#7d9acf;margin:0;font-size:10px;">2026년 3월 14일</p>
+                  <p style="text-align:center;color:#7d9acf;margin:0;font-size:10px;">1950년</p>
                   <p style="text-align:center;font-size:10px;margin:2px 0 0;color:#333940;">The Snow Path · Chung Ho-seung</p>
                   <p style="text-align:center;font-size:10px;color:#8a9eab;margin:0 0 4px;">눈길 · 정호승</p>
                   <p style="font-size:10px;margin:0;line-height:1.8;color:#333940;">
@@ -3179,15 +3964,48 @@
 
             </div>
 
-            <!-- UNDER CONSTRUCTION BOX C (middle) -->
-            <div style="box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;">
-              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
-                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ · · ·</span>
+            <!-- INVENTORY BOX (moved from draggable window) -->
+            <div style="box-sizing:border-box;background-color:#F5F3FA;border:1.5px solid #B8A8D4;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #CEC0E4;">
+              <div style="background:linear-gradient(90deg,#C8B8E0 0%,#E8E0F4 100%);border-bottom:1px solid #B0A0CC;padding:5px 10px;display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:10px;color:#3A2A5A;font-weight:bold;letter-spacing:0.05em;">✦ inventory</span>
               </div>
-              <div style="padding:16px 8px;background-color:white;text-align:center;">
-                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - - - - - - - - - - - -</p>
-                <p style="font-size:10px;color:#8a9eab;margin:6px 0;">⚙ under construction ⚙</p>
-                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - - - - - - - - - - - -</p>
+              <div style="max-height:560px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#B8A8D4 #F5F3FA;">
+
+                <!-- ── intro blurb ── -->
+                <div style="padding:8px 10px 5px;font-size:9px;color:#6A5A8A;font-style:italic;text-align:center;line-height:1.6;border-bottom:1px dashed #CEC0E4;margin-bottom:2px;">
+                  unlock achievements to earn cosmetic rewards ✦<br>cursor swaps &amp; trails — equip or unequip freely.
+                </div>
+
+                <!-- ── section: cursors ── -->
+                <div style="padding:6px 10px 2px;">
+                  <div style="font-size:9px;color:#8878B0;font-weight:bold;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;">✦ cursors</div>
+                  <div id="inv-cursor-list" style="display:flex;flex-direction:column;gap:5px;"></div>
+                </div>
+
+                <!-- ── section: trails ── -->
+                <div style="padding:8px 10px 2px;">
+                  <div style="font-size:9px;color:#8878B0;font-weight:bold;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;">✦ cursor trails</div>
+                  <div id="inv-trail-list" style="display:flex;flex-direction:column;gap:5px;"></div>
+                </div>
+
+                <!-- ── section: cursor effects ── -->
+                <div style="padding:8px 10px 2px;">
+                  <div style="font-size:9px;color:#8878B0;font-weight:bold;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;">✦ cursor effects</div>
+                  <div id="inv-effect-list" style="display:flex;flex-direction:column;gap:5px;"></div>
+                </div>
+
+                <!-- ── progress summary ── -->
+                <div id="inv-summary" style="font-size:9px;color:#9888B0;text-align:center;padding:8px 10px 4px;"></div>
+
+                <!-- ── reset / danger zone ── -->
+                <div id="inv-reset-box" style="margin:4px 8px 10px 8px;background:#F0EEF8;border:1.5px dashed #9888B8;border-radius:12px;padding:10px 10px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                  <div style="font-size:13px;">⚠️</div>
+                  <div style="font-size:9px;color:#4A3A6A;font-weight:bold;letter-spacing:0.04em;text-align:center;text-transform:uppercase;">danger zone</div>
+                  <div style="font-size:9px;color:#7A6A9A;text-align:center;line-height:1.5;font-style:italic;">this will erase <em>all</em> unlocked achievements.<br>they cannot be recovered.</div>
+                  <div id="inv-reset-confirm" style="display:none;font-size:9px;color:#8030C0;text-align:center;font-weight:bold;line-height:1.5;margin-top:2px;">are you sure? this is permanent.</div>
+                  <button id="hints-reset-btn" onclick="hintsResetStep()" style="margin-top:2px;background:#DDD0F0;border:1px solid #9888B8;border-radius:20px;color:#4A3A6A;font-size:10px;cursor:pointer;padding:4px 14px;font-weight:bold;transition:background 0.15s;">reset achievements</button>
+                </div>
+
               </div>
             </div>
 
@@ -3277,6 +4095,14 @@
                 var total    = new Date(pcYear, pcMonth + 1, 0).getDate();
                 var months   = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
                 document.getElementById("pcMonthYear").textContent = pcYear + "년 " + months[pcMonth];
+                // Re-walk so the Korean tooltip system wraps the new text
+                // Small defer in case tooltip system hasn't run yet on first call
+                setTimeout(function() {
+                  if (window.krWalkNode) {
+                    var el = document.getElementById("pcMonthYear");
+                    if (el) window.krWalkNode(el);
+                  }
+                }, 0);
                 var grid = document.getElementById("pcDays");
                 grid.innerHTML = "";
                 for (var i = 0; i < firstDay; i++) {
@@ -3680,6 +4506,30 @@
               </div>
             </div>
 
+            <!-- UNDER CONSTRUCTION BOX — right column, 2nd -->
+            <div style="width:100%;box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;margin:0;">
+              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ · · ·</span>
+              </div>
+              <div style="padding:16px 8px;background-color:white;text-align:center;">
+                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - - - - - - - - - - - -</p>
+                <p style="font-size:10px;color:#8a9eab;margin:6px 0;">⚙ under construction ⚙</p>
+                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - - - - - - - - - - - -</p>
+              </div>
+            </div>
+
+            <!-- UNDER CONSTRUCTION BOX — right column, 3rd -->
+            <div style="width:100%;box-sizing:border-box;background-color:#f4f7fb;border:1.5px solid #b8c8d8;border-radius:14px;overflow:hidden;box-shadow:2px 3px 0px #c8d8e8;margin:0;">
+              <div style="background:linear-gradient(90deg,#c5d8e8 0%,#dce8f4 100%);border-bottom:1px solid #b0c8d8;padding:5px 8px;">
+                <span style="font-size:10px;color:#4a6880;font-weight:bold;letter-spacing:0.05em;">✦ · · ·</span>
+              </div>
+              <div style="padding:16px 8px;background-color:white;text-align:center;">
+                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - - - - - - - - - - - -</p>
+                <p style="font-size:10px;color:#8a9eab;margin:6px 0;">⚙ under construction ⚙</p>
+                <p style="font-size:10px;color:#b8c8d8;margin:0;letter-spacing:0.1em;">- - - - - - - - - - - - - - - - - - - -</p>
+              </div>
+            </div>
+
           </div>
           <!-- end right column -->
 
@@ -3718,50 +4568,62 @@
          snaps back to home position after 10s
     ═══════════════════════════════════ -->
     <script>
-      function makeCard(cardId, handleId, homeLeft, homeTop) {
-        var card   = document.getElementById(cardId);
-        var handle = document.getElementById(handleId);
-        var drag = false, sx, sy, sl, st, timer;
+      // ── DRAG SYSTEM ─────────────────────────────────────────────────────────
+      // Single shared state + one pair of document listeners.
+      // Previously each makeCard() added its own mousemove/mouseup to document,
+      // so stale listeners from earlier cards fought each other on every drag
+      // after the first, breaking both dragging and the sparkle trail.
+      // Also removed e.preventDefault() from mousedown — it was suppressing
+      // mousemove events during drag (killing sparkles). Text selection is
+      // blocked via CSS user-select:none on .photocard instead.
+      var _drag = null;
 
+      document.addEventListener("mousemove", function(e) {
+        if (!_drag) return;
+        _drag.card.style.left = (_drag.sl + e.clientX - _drag.sx) + "px";
+        _drag.card.style.top  = (_drag.st + e.clientY - _drag.sy) + "px";
+      });
+
+      document.addEventListener("mouseup", function() {
+        if (!_drag) return;
+        var d = _drag;
+        _drag = null;
+        d.card.style.cursor = "grab";
+        d.snapTimer = setTimeout(function() {
+          var openContent = d.card.querySelector(".content");
+          if (openContent && openContent.style.display === "block") {
+            openContent.style.display = "none";
+            var btn = d.card.querySelector(".collapsible");
+            if (btn) btn.classList.remove("active");
+          }
+          d.card.style.transition = "left 1s ease, top 1s ease";
+          d.card.style.left = d.homeLeft + "px";
+          d.card.style.top  = d.homeTop  + "px";
+          setTimeout(function() { d.card.style.transition = ""; }, 1100);
+        }, 10000);
+      });
+
+      function makeCard(cardId, handleId, homeLeft, homeTop) {
+        var card = document.getElementById(cardId);
+        if (!card) return;
         card.addEventListener("mousedown", function(e) {
           if (e.target.tagName === "BUTTON") return;
           if (e.target.tagName === "INPUT")  return;
           if (e.target.tagName === "A")      return;
-          e.preventDefault();
-          drag = true;
-          clearTimeout(timer);
+          // No e.preventDefault() — suppressed mousemove (broke sparkles)
           card.style.transition = "";
-          sx = e.clientX;
-          sy = e.clientY;
-          sl = card.offsetLeft;
-          st = card.offsetTop;
           card.style.cursor = "grabbing";
+          _drag = {
+            card:      card,
+            sx:        e.clientX,
+            sy:        e.clientY,
+            sl:        card.offsetLeft,
+            st:        card.offsetTop,
+            homeLeft:  homeLeft,
+            homeTop:   homeTop,
+            snapTimer: null
+          };
           if (typeof triggerAchievement === "function") triggerAchievement("dragged_card");
-        });
-
-        document.addEventListener("mousemove", function(e) {
-          if (!drag) return;
-          card.style.left = (sl + e.clientX - sx) + "px";
-          card.style.top  = (st + e.clientY - sy) + "px";
-        });
-
-        document.addEventListener("mouseup", function() {
-          if (!drag) return;
-          drag = false;
-          card.style.cursor = "grab";
-          timer = setTimeout(function() {
-            // close any open collapsible inside this card before snapping back
-            var openContent = card.querySelector(".content");
-            if (openContent && openContent.style.display === "block") {
-              openContent.style.display = "none";
-              var btn = card.querySelector(".collapsible");
-              if (btn) btn.classList.remove("active");
-            }
-            card.style.transition = "left 1s ease, top 1s ease";
-            card.style.left = homeLeft + "px";
-            card.style.top  = homeTop  + "px";
-            setTimeout(function() { card.style.transition = ""; }, 1100);
-          }, 10000);
         });
       }
 
@@ -3773,7 +4635,7 @@
       makeCard("photocard9", "dragHandle9", 35, 1790);
       makeCard("photocard13", "dragHandle13", 985, 2410);
       makeCard("photocard14", "dragHandle14", 50, 2780);
-      makeCard("hints-window", "dragHandleHints", 20, 2700);
+      makeCard("hints-window",   "dragHandleHints",   20,  2700);
       // Right-side photocards: use offsetLeft on load since right: is used
       (function() {
         function makeRightCard(cardId, handleId, homeTop) {
@@ -3939,7 +4801,9 @@
         else tiny[i].style.visibility="hidden";
       }
 
-      document.onmousemove=mouse;
+      // Use addEventListener instead of onmousemove assignment so the
+      // drag system's listener and the sparkle listener coexist peacefully.
+      document.addEventListener("mousemove", mouse);
       function mouse(e) {
         if (e) {
           y=e.pageY;
@@ -4025,6 +4889,310 @@
     <h1 id=nl><script src="https://webneko.net/n20171213.js"></script><a 
     href="https://webneko.net">Neko</a></h1>
 
+    <!-- ═══════════════════════════════════
+         MOBILE JS — only runs on small screens
+         1. Inserts a horizontal photocard strip
+            with key images after the banner
+         2. Disables the snap-back drag system
+            on touch devices (makeCard uses mouse
+            events that don't fire on mobile)
+    ═══════════════════════════════════ -->
+    <script>
+    (function() {
+      if (window.innerWidth > 768) return; // desktop: do nothing
+
+      // ── 1. Mobile photocard strip ──────────────────────────
+      // Insert a horizontal scroll strip of key photocards
+      // right before the three-column grid inside the white area
+      var grid = document.getElementById("three-col-grid");
+      if (grid) {
+        var strip = document.createElement("div");
+        strip.id = "mobile-photocard-strip";
+
+        // Key photocards to show: image src + label
+        var cards = [
+          { src: "./seol/hancard.jpg",  label: "✦ hanni" },
+          { src: "./seol/mincard.jpg",  label: "✦ minji" },
+          { src: "./seol/hyecard.jpg",  label: "✦ hyein" },
+          { src: "./seol/haerinnie.jpg",label: "✦ haerin" },
+          { src: "./seol/danicard.jpg", label: "✦ danielle" },
+          { src: "./seol/tokicard.jpg", label: "✦ toki" },
+        ];
+
+        cards.forEach(function(c) {
+          var card = document.createElement("div");
+          card.className = "mob-card";
+
+          var handle = document.createElement("div");
+          handle.className = "mob-card-handle";
+          handle.textContent = c.label;
+
+          var img = document.createElement("img");
+          img.src = c.src;
+          img.alt = c.label;
+
+          card.appendChild(handle);
+          card.appendChild(img);
+          strip.appendChild(card);
+        });
+
+        grid.parentNode.insertBefore(strip, grid);
+      }
+
+      // ── 2. Disable snap-back drag on touch devices ─────────
+      // makeCard() uses mousedown/mousemove/mouseup which don't
+      // fire on mobile — override it to a no-op so no errors fire
+      window.makeCard = function() {};
+
+    })();
+    </script>
+
   </span>
+
+  <!-- ═══════════════════════════════════
+       KOREAN HOVER TRANSLATION
+       Auto-detects Korean text on the page
+       and shows an English translation tooltip
+       on hover. Friendly for English-only readers!
+  ═══════════════════════════════════ -->
+  <style>
+    .kr-tooltip-wrap {
+      display: inline;
+      cursor: help;
+      border-bottom: 1px dotted #95a8a9;
+    }
+    #kr-global-tooltip {
+      display: none;
+      position: fixed;
+      background: linear-gradient(135deg, #f4f7fb, #dce8f4);
+      border: 1.5px solid #b8c8d8;
+      border-radius: 10px;
+      padding: 4px 10px;
+      font-size: 10px;
+      color: #4a6880;
+      white-space: nowrap;
+      box-shadow: 2px 2px 0 #c8d8e8;
+      pointer-events: none;
+      z-index: 99999;
+      font-style: italic;
+    }
+    #kr-global-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: #b8c8d8;
+    }
+  </style>
+  <script>
+  (function() {
+    // ── Static translation dictionary ──────────────────────────
+    // Maps exact Korean strings to English translations.
+    var KR_DICT = {
+      // Title / achievement
+      "잠자는 토끼":        "Sleeping Rabbit",
+      // Headpat bubble messages
+      "꺄!":                "Kyaa!",
+      "꼭 안아줄게":        "I'll hug you tight",
+      // Poem
+      "눈길 · 정호승":      "Snow Path · Chung Ho-seung (poet)",
+      "눈길 · 정호승":     "Snow Path · Chung Ho-seung (poet)",
+      "눈길":               "Snow Path",
+      "정호승":             "Chung Ho-seung (poet)",
+      "희디흰 눈길 위로":   "On the all-white snow path",
+      "누가 걸어간":        "Someone has walked",
+      "발자국이 보인다":    "I can see their footsteps",
+      "새의 발자욱이다":    "They belong to a bird",
+      "다행이다":           "What a relief",
+      // Navigation / UI labels
+      "디렉터리":           "Directory",
+      // Greetings
+      "안녕!":              "Hello!",
+      "안녕":               "Hello",
+      // Status card
+      "stan 해린♥":         "stan haerin♥",
+      "뭐 해?":             "whatcha doing?",
+      // Calendar weekdays
+      "화":                 "Tue",
+      "수":                 "Wed",
+      "목":                 "Thu",
+      "금":                 "Fri",
+      "토":                 "Sat",
+      // Calendar months (these match before bare 월/일/년)
+      "1월":  "January",   "2월":  "February",  "3월":  "March",
+      "4월":  "April",     "5월":  "May",       "6월":  "June",
+      "7월":  "July",      "8월":  "August",    "9월":  "September",
+      "10월": "October",   "11월": "November",  "12월": "December",
+      // Bare date unit suffixes (fallback for standalone characters)
+      "년":                 "year",
+      "월":                 "Mon / month",
+      "일":                 "Sun / day",
+      // haerin
+      "강해린":              "haerin",
+      "사랑이 시작될 때":                "When love begins",
+    };
+
+    // Longer phrases must be checked first (longest-match).
+    var KR_PHRASES = Object.keys(KR_DICT).sort(function(a,b){ return b.length - a.length; });
+
+    // Regex: Korean Unicode block U+AC00-D7A3 + Hangul jamo U+1100-11FF + compat U+3130-318F
+    var KR_RE = /[\uAC00-\uD7A3\u1100-\u11FF\u3130-\u318F]/;
+
+    // Date pattern: e.g. "2026년.4월.9일" or "2026년 3월 14일"
+    var DATE_RE = /(\d{4})년[\s.](\d{1,2})월[\s.](\d{1,2})일/g;
+    // Year+month pattern: e.g. "2026년 4월" (calendar header)
+    var YEAR_MONTH_RE = /(\d{4})년\s*(\d{1,2})월/g;
+
+    function translateDate(y, m, d) {
+      var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      return months[parseInt(m,10)-1] + " " + d + ", " + y;
+    }
+
+    function translateYearMonth(y, m) {
+      var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+      return months[parseInt(m,10)-1] + " " + y;
+    }
+
+    // ── Wrap a text node that contains Korean ─────────────────
+    function wrapTextNode(textNode) {
+      var text = textNode.nodeValue;
+      if (!KR_RE.test(text)) return;
+
+      var frag = document.createDocumentFragment();
+      var remaining = text;
+
+      while (remaining.length > 0) {
+        // Try full-date pattern first
+        DATE_RE.lastIndex = 0;
+        var dateMatch = DATE_RE.exec(remaining);
+        if (dateMatch && dateMatch.index === 0) {
+          var eng = translateDate(dateMatch[1], dateMatch[2], dateMatch[3]);
+          frag.appendChild(makeTooltipSpan(dateMatch[0], eng));
+          remaining = remaining.slice(dateMatch[0].length);
+          continue;
+        }
+
+        // Try year+month pattern (e.g. calendar header "2026년 4월")
+        YEAR_MONTH_RE.lastIndex = 0;
+        var ymMatch = YEAR_MONTH_RE.exec(remaining);
+        if (ymMatch && ymMatch.index === 0) {
+          var engYM = translateYearMonth(ymMatch[1], ymMatch[2]);
+          frag.appendChild(makeTooltipSpan(ymMatch[0], engYM));
+          remaining = remaining.slice(ymMatch[0].length);
+          continue;
+        }
+
+        // Try phrase dictionary (longest match)
+        var matched = false;
+        for (var pi = 0; pi < KR_PHRASES.length; pi++) {
+          var phrase = KR_PHRASES[pi];
+          if (remaining.indexOf(phrase) === 0) {
+            frag.appendChild(makeTooltipSpan(phrase, KR_DICT[phrase]));
+            remaining = remaining.slice(phrase.length);
+            matched = true;
+            break;
+          }
+        }
+        if (matched) continue;
+
+        // Consume one non-Korean character as plain text
+        if (!KR_RE.test(remaining[0])) {
+          // Accumulate a run of non-Korean chars
+          var runEnd = 1;
+          while (runEnd < remaining.length && !KR_RE.test(remaining[runEnd])) runEnd++;
+          // But also check if a known phrase starts partway in
+          frag.appendChild(document.createTextNode(remaining.slice(0, runEnd)));
+          remaining = remaining.slice(runEnd);
+          continue;
+        }
+
+        // Single unknown Korean character — wrap with a generic note
+        frag.appendChild(makeTooltipSpan(remaining[0], "(Korean)"));
+        remaining = remaining.slice(1);
+      }
+
+      textNode.parentNode.replaceChild(frag, textNode);
+    }
+
+    // ── Global single tooltip element (fixed-position, never clipped) ──
+    var krTooltipEl = null;
+    function ensureGlobalTooltip() {
+      if (krTooltipEl) return;
+      krTooltipEl = document.createElement("div");
+      krTooltipEl.id = "kr-global-tooltip";
+      document.body.appendChild(krTooltipEl);
+    }
+
+    function makeTooltipSpan(korean, english) {
+      var wrap = document.createElement("span");
+      wrap.className = "kr-tooltip-wrap";
+      wrap.setAttribute("data-kr-en", english);
+      wrap.appendChild(document.createTextNode(korean));
+
+      wrap.addEventListener("mouseenter", function(e) {
+        ensureGlobalTooltip();
+        krTooltipEl.textContent = english;
+        krTooltipEl.style.display = "block";
+        positionTooltip(e);
+      });
+      wrap.addEventListener("mousemove", positionTooltip);
+      wrap.addEventListener("mouseleave", function() {
+        if (krTooltipEl) krTooltipEl.style.display = "none";
+      });
+
+      return wrap;
+    }
+
+    function positionTooltip(e) {
+      if (!krTooltipEl) return;
+      var ttW = krTooltipEl.offsetWidth;
+      var ttH = krTooltipEl.offsetHeight;
+      var vw  = window.innerWidth;
+      var x   = e.clientX - ttW / 2;
+      var y   = e.clientY - ttH - 10;
+      // Keep inside viewport
+      if (x < 4) x = 4;
+      if (x + ttW > vw - 4) x = vw - ttW - 4;
+      if (y < 4) y = e.clientY + 18; // flip below if too close to top
+      krTooltipEl.style.left = x + "px";
+      krTooltipEl.style.top  = y + "px";
+    }
+
+    // ── Walk the DOM, skip scripts/styles/iframes ──────────────
+    var SKIP_TAGS = { SCRIPT:1, STYLE:1, IFRAME:1, NOSCRIPT:1, TEXTAREA:1, INPUT:1 };
+
+    function walk(node) {
+      if (node.nodeType === 3) { // text node
+        if (KR_RE.test(node.nodeValue)) wrapTextNode(node);
+        return;
+      }
+      if (node.nodeType === 1 && SKIP_TAGS[node.tagName]) return;
+      // Skip nodes that are already our tooltip wrappers
+      if (node.classList && node.classList.contains("kr-tooltip-wrap")) return;
+      if (node.classList && node.classList.contains("kr-tooltip")) return;
+
+      var children = Array.prototype.slice.call(node.childNodes);
+      for (var i = 0; i < children.length; i++) {
+        walk(children[i]);
+      }
+    }
+
+    window.addEventListener("load", function() {
+      walk(document.body);
+    });
+
+    // Expose so dynamic content (headpat bubbles, etc.) can be re-processed
+    window.krWalkNode = walk;
+
+    // Helper: set an element's text and re-walk it for Korean tooltips
+    window.krSetBubble = function(el, text) {
+      el.textContent = text;
+      walk(el);
+    };
+  })();
+  </script>
+
 </body>
 </html>

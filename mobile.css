@@ -1,0 +1,188 @@
+/* ═══════════════════════════════════════════════════════════════
+   mobile.css — 잠자는 토끼
+   Mobile overrides for index.html (max-width: 768px)
+   Link this in your index.html <head> AFTER style.css:
+     <link rel="stylesheet" href="./mobile.css">
+   Desktop layout is completely untouched.
+═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+
+  /* --- Body: prevent horizontal scroll, tighten padding --- */
+  body {
+    padding: 8px !important;
+    background-size: 600px !important;
+    overflow-x: hidden !important;
+  }
+
+  /* --- Outer span wrapper --- */
+  span.text {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* --- Lace wrapper: drop fixed width, kill the lace border on mobile (too thick) --- */
+  #lace-wrapper {
+    width: 100% !important;
+    border: none !important;
+    border-image: none !important;
+    margin: 0 !important;
+  }
+
+  /* --- Blue dots layer: full width --- */
+  #blue-dots-layer {
+    width: 100% !important;
+    padding: 6px !important;
+  }
+
+  /* --- White content area: full width --- */
+  #white-content-area {
+    width: 100% !important;
+    padding: 8px !important;
+  }
+
+  /* --- 3-column grid → single column --- */
+  #three-col-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* --- Hide all absolute-positioned photocards (left/right side columns) ---
+     They use position:absolute with large pixel values that break on mobile */
+  .photocard[id^="photocard"],
+  #photocard,
+  #photocard2,
+  #photocard3,
+  #photocard4,
+  #photocard5,
+  #photocard6,
+  #photocard7,
+  #photocard8,
+  #photocard9,
+  #photocard10,
+  #photocard11,
+  #photocard12,
+  #photocard13,
+  #photocard14,
+  #photocard15,
+  #photocard16 {
+    display: none !important;
+  }
+
+  /* --- Hide decorative absolute floaters --- */
+  #eunhyeok-floater,
+  #jellyfish-floater,
+  #png-logo,
+  #png-buni,
+  #anime-haerin,
+  #anime-hanni,
+  #anime-hyein,
+  #anime-minji,
+  #anime-danielle,
+  #celeb-card,
+  .ppg-floater {
+    display: none !important;
+  }
+
+  /* --- Media player & hints: convert from absolute to normal flow --- */
+  #media-player-window,
+  #hints-window {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin-bottom: 10px !important;
+    z-index: 10 !important;
+  }
+
+  /* --- Credits card: also inline on mobile --- */
+  #credits-card {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin-bottom: 10px !important;
+  }
+
+  /* --- Achievement toast: clamp width so it doesn't overflow --- */
+  .achievement-toast {
+    min-width: unset !important;
+    max-width: calc(100vw - 32px) !important;
+    width: calc(100vw - 32px) !important;
+  }
+
+  /* --- Make images responsive --- */
+  .photocard-body img,
+  #white-content-area img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* --- Nav list items: comfortable tap size --- */
+  li a {
+    padding: 8px !important;
+    font-size: 14px !important;
+  }
+
+  /* --- Iframe: cap height on mobile --- */
+  #white-content-area iframe {
+    height: 400px !important;
+  }
+
+  /* --- Banner image: natural height on mobile --- */
+  #white-content-area > div:first-child {
+    height: auto !important;
+  }
+
+  /* --- Web Neko: hide on mobile (mouse-only) --- */
+  #nl {
+    display: none !important;
+  }
+
+  /* --- Mobile photocard strip (injected by mobile JS) --- */
+  #mobile-photocard-strip {
+    display: flex !important;
+    overflow-x: auto !important;
+    gap: 10px !important;
+    padding: 8px 0 !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #95a8a9 white !important;
+    margin-bottom: 10px !important;
+  }
+
+  #mobile-photocard-strip .mob-card {
+    flex-shrink: 0 !important;
+    width: 140px !important;
+    background-color: #FAF6FA !important;
+    border: 1.5px solid #C4B0D4 !important;
+    border-radius: 16px !important;
+    box-shadow: 3px 4px 0px #D8C4E8 !important;
+    overflow: hidden !important;
+  }
+
+  #mobile-photocard-strip .mob-card-handle {
+    width: 100% !important;
+    height: 22px !important;
+    background: linear-gradient(90deg, #CBBDCC 0%, #EAE4F0 100%) !important;
+    border-bottom: 1px solid #C4A4CC !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 8px !important;
+    box-sizing: border-box !important;
+    font-size: 9px !important;
+    color: #5A4A7A !important;
+    font-weight: bold !important;
+  }
+
+  #mobile-photocard-strip .mob-card img {
+    width: 100% !important;
+    display: block !important;
+    border-radius: 0 0 14px 14px !important;
+  }
+
+}
+/* ═══ end mobile.css ═══ */
