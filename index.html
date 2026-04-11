@@ -2,7 +2,18 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <meta name="viewport" content="width=1536, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    (function () {
+      // CSS zoom scales layout content but position:fixed elements
+      // (CRT, haunted overlay, hands, spotlight) still cover the
+      // real full viewport — no counter-scaling needed.
+      var scale = window.screen.width / 1536;
+      if (scale !== 1) {
+        document.write('<style>body { zoom: ' + scale + '; }</style>');
+      }
+    })();
+  </script>
   <title>잠자는 토끼. . ˖Ი𐑼⋆</title>
 
   <!-- ═══════════════════════════════════
