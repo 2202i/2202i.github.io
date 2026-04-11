@@ -6,8 +6,9 @@
   <script>
     (function () {
       var scale = window.innerWidth / 1536;
+      window._pageScale = scale;
       if (scale !== 1) {
-        document.write('<style>body { zoom: ' + scale + '; }</style>');
+        document.write('<style>body { zoom: ' + scale + '; } html { overflow-x: hidden; height: ' + (100 / scale) + 'vh; } </style>');
       }
     })();
   </script>
@@ -6672,14 +6673,16 @@
     function flCreateCanvas() {
       if (flCanvas) return;
       flCanvas = document.createElement("canvas");
-      flCanvas.style.cssText = "position:fixed;top:0;left:0;pointer-events:none;z-index:99999;display:none;";
-      flCanvas.width  = window.innerWidth;
-      flCanvas.height = window.innerHeight;
+      flCanvas.style.cssText = "position:fixed;top:0;left:0;pointer-events:none;z-index:99999;display:none;width:100vw;height:100vh;";
+      var s = window._pageScale || 1;
+      flCanvas.width  = window.innerWidth  / s;
+      flCanvas.height = window.innerHeight / s;
       document.body.appendChild(flCanvas);
       flCtx = flCanvas.getContext("2d");
       window.addEventListener("resize", function() {
-        flCanvas.width  = window.innerWidth;
-        flCanvas.height = window.innerHeight;
+        var s2 = window._pageScale || 1;
+        flCanvas.width  = window.innerWidth  / s2;
+        flCanvas.height = window.innerHeight / s2;
         if (flActive) flDraw();
       });
     }
@@ -6745,8 +6748,9 @@
     }
 
     document.addEventListener("mousemove", function(e) {
-      flMouse.x = e.clientX;
-      flMouse.y = e.clientY;
+      var s = window._pageScale || 1;
+      flMouse.x = e.clientX / s;
+      flMouse.y = e.clientY / s;
       if (flActive) flDraw();
     }, true);
 
@@ -7074,10 +7078,11 @@
     //  MOUSE TRACKING — unified for both phases
     // ════════════════════════════════════════════════════════════
     document.addEventListener("mousemove", function(e) {
+      var _s = window._pageScale || 1;
       // ── Chapter 1 (haunted / lights on) ─────────────────────
       if (haunted && !soulLost) {
-        var mx = e.clientX, my = e.clientY;
-        var W  = window.innerWidth;
+        var mx = e.clientX / _s, my = e.clientY / _s;
+        var W  = window.innerWidth / _s;
         var distLeft  = mx;
         var distRight = W - mx;
 
@@ -7107,8 +7112,8 @@
 
       // ── Dark phase: left/right edge detection — same as chapter 1 ──
       if (darkPhase && !soulLost) {
-        var dx = e.clientX, dy = e.clientY;
-        var DW = window.innerWidth;
+        var dx = e.clientX / _s, dy = e.clientY / _s;
+        var DW = window.innerWidth / _s;
         var distLeft  = dx;
         var distRight = DW - dx;
 
@@ -8068,7 +8073,8 @@
     var EYE_DIST = 180;
     var _lastClose = false;
     document.addEventListener("mousemove", function(e) {
-      window._catMouseX = e.clientX; window._catMouseY = e.clientY;
+      var s = window._pageScale || 1;
+      window._catMouseX = e.clientX / s; window._catMouseY = e.clientY / s;
     }, true);
 
     (function poll() {
