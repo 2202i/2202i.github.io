@@ -6673,16 +6673,14 @@
     function flCreateCanvas() {
       if (flCanvas) return;
       flCanvas = document.createElement("canvas");
-      flCanvas.style.cssText = "position:fixed;top:0;left:0;pointer-events:none;z-index:99999;display:none;width:100vw;height:100vh;";
-      var s = window._pageScale || 1;
-      flCanvas.width  = window.innerWidth  / s;
-      flCanvas.height = window.innerHeight / s;
-      document.body.appendChild(flCanvas);
+      flCanvas.style.cssText = "position:fixed;top:0;left:0;pointer-events:none;z-index:99999;display:none;";
+      flCanvas.width  = window.innerWidth;
+      flCanvas.height = window.innerHeight;
+      document.documentElement.appendChild(flCanvas);
       flCtx = flCanvas.getContext("2d");
       window.addEventListener("resize", function() {
-        var s2 = window._pageScale || 1;
-        flCanvas.width  = window.innerWidth  / s2;
-        flCanvas.height = window.innerHeight / s2;
+        flCanvas.width  = window.innerWidth;
+        flCanvas.height = window.innerHeight;
         if (flActive) flDraw();
       });
     }
@@ -6748,9 +6746,8 @@
     }
 
     document.addEventListener("mousemove", function(e) {
-      var s = window._pageScale || 1;
-      flMouse.x = e.clientX / s;
-      flMouse.y = e.clientY / s;
+      flMouse.x = e.clientX;
+      flMouse.y = e.clientY;
       if (flActive) flDraw();
     }, true);
 
