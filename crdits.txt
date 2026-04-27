@@ -1,0 +1,32 @@
+credits:
+
+Custom mouse click
+
+Custom scroll bar (In some places you seem too, but not the main scrollbar)
+
+Custom middle click (auto scroll)
+
+Custom right click
+
+Rewards for the achievements- maybe different mouse colors.. maybe, a mouse pet??
+
+
+
+I love that you can drag some stuff around. It would be cool if it had some inertia physics and could bounce off the side of the website or even other draggable objects.
+
+
+
+the cool dragging effect only seems to happen the first time you drag something.
+unfixed
+
+
+
+Would be kind of a neat feature, for the basic English users, if when you hover your mouse over, or maybe click on Korean text it shows a translation.
+fixed
+
+
+Everything in your directory 404s- guessing just not implemented yet? Anyways, the next idea is a custom 404 page!
+home
+
+infineks
+ichomancer.neocities.org

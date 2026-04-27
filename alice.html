@@ -1,0 +1,1800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alice · Wonderland's End</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --gold:    #c8a84b;
+  --gold2:   #f0d080;
+  --cream:   #ece3d0;
+  --pale:    #d4c9b0;
+  --dark:    #04030a;
+  --deep:    #080514;
+  --mid:     #0e0a1c;
+  --queen:   #8b0000;
+  --jabber:  #1a0a2e;
+  --teal:    #2a5c6a;
+  --rose:    rgba(180,40,60,0.18);
+  --mist:    rgba(100,80,180,0.12);
+}
+
+html, body {
+  width:100%; height:100%;
+  overflow:hidden;
+  background: var(--dark);
+  font-family: 'IM Fell English', serif;
+  color: var(--cream);
+  cursor: none;
+}
+
+/* ══════════════════════════════════
+   CUSTOM CURSOR — golden key
+══════════════════════════════════ */
+#cursor-key {
+  position: fixed; pointer-events: none; z-index: 99999;
+  transform: translate(-4px, -4px);
+  transition: transform 0.05s ease; opacity: 0;
+}
+#cursor-key svg { width:32px; height:32px; filter: drop-shadow(0 0 6px rgba(200,168,75,0.8)); }
+#cursor-key.glow svg { filter: drop-shadow(0 0 14px rgba(240,208,120,1)); }
+
+/* ══════════════════════════════════
+   SCREENS
+══════════════════════════════════ */
+.screen {
+  position: fixed; inset:0;
+  opacity:0; pointer-events:none;
+  transition: opacity 1.2s ease;
+}
+.screen.active { opacity:1; pointer-events:all; }
+
+/* ══════════════════════════════════
+   TITLE SCREEN
+══════════════════════════════════ */
+#title-screen {
+  background: var(--dark);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:20px; overflow:hidden;
+}
+#title-particles { position:absolute; inset:0; pointer-events:none; }
+.title-card { text-align:center; z-index:2; animation: fadeup 2.5s ease 0.5s both; }
+#title-main {
+  font-family: 'UnifrakturMaguntia', cursive;
+  font-size: clamp(56px,9vw,110px); color: var(--cream);
+  letter-spacing: 6px; line-height:1;
+  text-shadow: 0 0 60px rgba(200,168,75,0.4), 0 0 120px rgba(200,168,75,0.15), 2px 4px 0 rgba(0,0,0,0.8);
+}
+#title-sub {
+  font-style:italic; font-size: clamp(11px,1.3vw,15px);
+  color: rgba(200,185,160,0.55); letter-spacing:6px; margin-top:10px;
+}
+.title-divider {
+  width:260px; height:1px;
+  background: linear-gradient(to right, transparent, rgba(200,168,75,0.5), transparent);
+  margin:16px auto;
+}
+#title-instructions {
+  font-style:italic; font-size:clamp(10px,1.1vw,13px);
+  color: rgba(180,165,140,0.4); line-height:2.2; letter-spacing:2px;
+  text-align:center; max-width:420px;
+  border: 1px solid rgba(200,168,75,0.1); padding:18px 28px;
+}
+#title-instructions span { color: rgba(200,168,75,0.7); }
+#begin-btn {
+  background:transparent; border:none;
+  border-bottom:1px solid rgba(200,168,75,0.25); color:rgba(200,168,75,0.4);
+  font-family:'IM Fell English',serif; font-style:italic;
+  font-size:1rem; letter-spacing:5px;
+  cursor:none; padding:12px 40px; transition: all 0.4s;
+  animation: fadeup 2.5s ease 1.8s both;
+}
+#begin-btn:hover { color: var(--gold2); border-color: rgba(200,168,75,0.6); text-shadow: 0 0 20px rgba(200,168,75,0.5); }
+
+/* ══════════════════════════════════
+   PROLOGUE SCREEN — narrative intro
+══════════════════════════════════ */
+#prologue-screen {
+  background: #020108;
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+}
+#prologue-wrap {
+  max-width:560px; text-align:center; z-index:2; padding:40px;
+}
+#prologue-eyebrow {
+  font-style:italic; font-size:10px; letter-spacing:5px;
+  color:rgba(200,168,75,0.4); margin-bottom:24px;
+}
+#prologue-text {
+  font-style:italic; font-size:clamp(14px,1.8vw,18px);
+  color:rgba(200,185,160,0.7); line-height:2.1; letter-spacing:0.5px;
+  margin-bottom:32px; min-height:80px;
+}
+#prologue-cursor-blink {
+  display:inline-block; width:2px; height:1em;
+  background:rgba(200,168,75,0.6); animation:blink 1s step-end infinite;
+  vertical-align:text-bottom;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+#prologue-continue {
+  font-style:italic; font-size:11px; letter-spacing:4px;
+  color:rgba(200,168,75,0.3); cursor:none;
+  animation: fadeup 1s ease 1s both;
+  border:none; background:none; transition:color 0.3s;
+}
+#prologue-continue:hover { color:rgba(200,168,75,0.7); }
+#prologue-bg {
+  position:absolute; inset:0;
+  background: radial-gradient(ellipse 60% 60% at 50% 50%, #0a051a 0%, #020108 100%);
+}
+
+/* ══════════════════════════════════
+   HALL SCREEN
+══════════════════════════════════ */
+#hall-screen { background: var(--deep); overflow:hidden; }
+#hall-particles { position:absolute; inset:0; pointer-events:none; z-index:1; }
+#hall-bg {
+  position:absolute; inset:0;
+  background: radial-gradient(ellipse 80% 60% at 50% 100%, #12091e 0%, #06030f 60%, #030208 100%);
+}
+#hall-floor {
+  position:absolute; bottom:0; left:0; right:0; height:42vh;
+  background:
+    repeating-linear-gradient(90deg, transparent, transparent 80px, rgba(200,168,75,0.04) 80px, rgba(200,168,75,0.04) 81px),
+    repeating-linear-gradient(0deg, transparent, transparent 80px, rgba(200,168,75,0.03) 80px, rgba(200,168,75,0.03) 81px),
+    linear-gradient(to top, #06040e 0%, #0a0718 40%, transparent 100%);
+  transform: perspective(600px) rotateX(45deg); transform-origin: bottom center;
+}
+#hall-ceiling {
+  position:absolute; top:0; left:0; right:0; height:18vh;
+  background: linear-gradient(to bottom, #020106 0%, transparent 100%);
+}
+.wall-candle { position:absolute; bottom:42vh; width:3px; background:#c8a84b; transform-origin: bottom center; }
+.candle-flame {
+  position:absolute; top:-12px; left:-4px; width:11px; height:16px;
+  background: radial-gradient(ellipse at 50% 80%, #fff8c0 0%, #f0c040 35%, #c86020 70%, transparent 100%);
+  border-radius:50% 50% 30% 30%; animation: flicker 1.8s ease-in-out infinite;
+  box-shadow: 0 0 12px 4px rgba(200,140,30,0.4), 0 0 30px 10px rgba(200,100,20,0.15);
+}
+@keyframes flicker {
+  0%,100% { transform:scaleX(1) scaleY(1); opacity:1; }
+  25% { transform:scaleX(0.85) scaleY(1.1); opacity:0.9; }
+  50% { transform:scaleX(1.1) scaleY(0.9); opacity:1; }
+  75% { transform:scaleX(0.9) scaleY(1.05); opacity:0.95; }
+}
+#hall-shrink-overlay {
+  position:absolute; inset:0; pointer-events:none; z-index:5;
+  border: 0px solid rgba(60,20,80,0.0); transition: border-width 3s ease, border-color 3s ease;
+  box-shadow: inset 0 0 0px 0px rgba(60,20,80,0);
+}
+#hall-shrink-overlay.shrinking {
+  border-width: 40px; border-color: rgba(10,5,20,0.9);
+  box-shadow: inset 0 0 120px 60px rgba(10,5,20,0.8);
+}
+
+/* Threat meters */
+#threat-bar {
+  position:fixed; top:24px; left:50%; transform:translateX(-50%);
+  z-index:20; display:flex; gap:36px; align-items:center;
+  background: rgba(4,3,10,0.75); border: 1px solid rgba(200,168,75,0.1);
+  padding:10px 24px; backdrop-filter: blur(4px); animation: fadeup 1.2s ease both;
+}
+.meter-wrap { text-align:center; }
+.meter-label { font-style:italic; font-size:9px; letter-spacing:3px; color: rgba(180,165,140,0.45); display:block; margin-bottom:5px; }
+.meter-bar { width:110px; height:5px; background: rgba(255,255,255,0.06); border-radius:2px; overflow:hidden; }
+.meter-fill { height:100%; width:0%; border-radius:2px; transition: width 0.8s ease, background-color 0.5s; }
+#jabber-fill { background: linear-gradient(to right, #2a1060, #7030c0); }
+#queen-fill  { background: linear-gradient(to right, #600010, #c01030); }
+
+/* Door row */
+#door-row {
+  position:absolute; bottom:38vh; left:50%; transform:translateX(-50%);
+  display:flex; gap:0; align-items:flex-end;
+  transition: gap 4s ease, transform 4s ease; z-index:4;
+}
+
+/* Individual door */
+.door {
+  position:relative; width:88px; height:160px; margin:0 10px;
+  cursor:none; transition: transform 0.3s ease, filter 0.3s ease; flex-shrink:0;
+}
+.door:hover { transform:translateY(-8px) scale(1.04); }
+.door:hover .door-frame { box-shadow: 0 0 30px 6px rgba(200,168,75,0.15), inset 0 0 20px rgba(200,168,75,0.05); }
+
+.door-frame {
+  position:absolute; inset:0; border:2px solid #3a2d18; border-radius:3px 3px 0 0;
+  background: linear-gradient(to bottom, #1c1408 0%, #140e06 50%, #0e0904 100%);
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 2px 0 8px rgba(0,0,0,0.5);
+  overflow:hidden; transition: box-shadow 0.3s ease;
+}
+.door-top { position:absolute; top:0; left:0; right:0; height:44%; border-bottom:2px solid #3a2d18; }
+.door-top::before { content:''; position:absolute; inset:6px; border:1px solid rgba(200,168,75,0.08); border-radius:2px 2px 0 0; }
+.door-bottom { position:absolute; bottom:0; left:0; right:0; height:53%; }
+.door-bottom::before { content:''; position:absolute; inset:6px; border:1px solid rgba(200,168,75,0.06); }
+.door-arch {
+  position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+  width:94px; height:28px; border-radius:50px 50px 0 0;
+  background: #12100a; border:2px solid #3a2d18; border-bottom:none;
+}
+.door-knob {
+  position:absolute; right:12px; top:50%;
+  width:9px; height:9px; border-radius:50%;
+  background: radial-gradient(circle at 35% 35%, #f0d080 0%, #c8a84b 50%, #8a6820 100%);
+  box-shadow: 0 0 4px rgba(200,168,75,0.2); transform: translateY(-50%);
+}
+/* whisper tooltip — no color hints */
+.door-whisper {
+  position:absolute; bottom:calc(100% + 18px); left:50%;
+  transform:translateX(-50%) translateY(4px);
+  background: rgba(4,3,10,0.92); border:1px solid rgba(200,168,75,0.12);
+  padding:7px 12px; white-space:nowrap;
+  font-style:italic; font-size:11px; letter-spacing:1.5px;
+  color:rgba(200,185,160,0.7); opacity:0; pointer-events:none;
+  transition: opacity 0.4s ease, transform 0.4s ease; backdrop-filter:blur(4px);
+}
+.door:hover .door-whisper { opacity:1; transform:translateX(-50%) translateY(0); }
+/* REMOVED: .door.wrong .door-whisper and .door.right .door-whisper color hints */
+.door-num {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  font-family:'UnifrakturMaguntia',cursive; font-size:22px;
+  color:rgba(200,168,75,0.15); pointer-events:none;
+}
+
+/* Wrong door flash */
+#wrong-flash {
+  position:fixed; inset:0; z-index:90;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition: opacity 0.15s;
+}
+#wrong-flash.show { opacity:1; pointer-events:all; }
+#wrong-flash-bg { position:absolute; inset:0; background:rgba(4,3,10,0.97); }
+#wrong-flash-content { position:relative; z-index:2; text-align:center; max-width:520px; padding:40px; }
+#wrong-flash-title {
+  font-family:'UnifrakturMaguntia',cursive; font-size:clamp(36px,6vw,64px); color:#ece3d0;
+  text-shadow: 0 0 40px rgba(180,40,60,0.6); animation: wrongtitleflash 0.5s ease both;
+}
+#wrong-flash-desc { font-style:italic; font-size:13px; letter-spacing:2px; color:rgba(180,165,140,0.55); margin-top:16px; line-height:2; }
+#wrong-flash-warning { margin-top:24px; font-style:italic; font-size:11px; letter-spacing:3px; color:rgba(200,80,80,0.6); }
+/* Death flash */
+#death-screen {
+  position:fixed; inset:0; z-index:95;
+  display:flex; align-items:center; justify-content:center; flex-direction:column;
+  opacity:0; pointer-events:none; transition:opacity 0.4s;
+  background: rgba(4,3,10,0.98);
+}
+#death-screen.show { opacity:1; pointer-events:all; }
+#death-title {
+  font-family:'UnifrakturMaguntia',cursive; font-size:clamp(48px,8vw,90px);
+  color:#8b0000; text-shadow: 0 0 60px rgba(139,0,0,0.7); text-align:center;
+  animation: deathpulse 2s ease-in-out infinite;
+}
+@keyframes deathpulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
+#death-subtitle { font-style:italic; font-size:13px; letter-spacing:4px; color:rgba(180,40,40,0.5); margin-top:16px; text-align:center; max-width:440px; line-height:2; }
+#death-continue { background:none; border:none; border-bottom:1px solid rgba(200,168,75,0.2); color:rgba(200,168,75,0.35); font-family:'IM Fell English',serif; font-style:italic; font-size:0.9rem; letter-spacing:5px; cursor:none; padding:10px 32px; margin-top:28px; transition:all 0.3s; }
+#death-continue:hover { color:rgba(200,168,75,0.7); }
+
+@keyframes wrongtitleflash { 0% { transform:scale(1.3); opacity:0; } 100% { transform:scale(1); opacity:1; } }
+
+/* ══════════════════════════════════
+   EVENT SCREEN
+══════════════════════════════════ */
+#event-screen {
+  background: var(--dark); display:flex; flex-direction:column;
+  align-items:center; justify-content:center; overflow:hidden;
+}
+#event-bg { position:absolute; inset:0; pointer-events:none; transition: background 1.5s ease; }
+#event-wrap { position:relative; z-index:4; width:min(700px,90vw); padding:36px; }
+#event-title {
+  font-family:'UnifrakturMaguntia',cursive; font-size:clamp(28px,4.5vw,52px); color:var(--cream);
+  text-align:center; text-shadow: 0 0 40px rgba(200,168,75,0.3); margin-bottom:6px;
+}
+#event-subtitle { text-align:center; font-style:italic; font-size:11px; letter-spacing:4px; color:rgba(180,165,140,0.35); margin-bottom:22px; }
+#event-scene { width:100%; height:170px; margin-bottom:22px; border-radius:2px; overflow:hidden; position:relative; border:1px solid rgba(200,168,75,0.08); }
+#event-speaker { font-family:'UnifrakturMaguntia',cursive; font-size:20px; color:var(--gold); margin-bottom:4px; text-shadow: 0 0 20px rgba(200,168,75,0.3); }
+#event-dialogue {
+  font-style:italic; font-size:clamp(13px,1.5vw,15px); color:rgba(200,185,160,0.82); line-height:1.85;
+  min-height:68px; letter-spacing:0.5px; border-left:2px solid rgba(200,168,75,0.15);
+  padding-left:14px; margin-bottom:20px;
+}
+#madness-wrap { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+#madness-label { font-style:italic; font-size:9px; letter-spacing:3px; color:rgba(180,165,140,0.35); white-space:nowrap; }
+#madness-bar { flex:1; height:3px; background:rgba(255,255,255,0.05); border-radius:2px; overflow:hidden; }
+#madness-fill { height:100%; width:0%; background: linear-gradient(to right, #c8a84b, #c03060); transition: width 0.6s ease; border-radius:2px; }
+#choice-area { display:flex; flex-direction:column; gap:8px; }
+.choice-btn {
+  background:transparent; border:1px solid rgba(200,168,75,0.12);
+  color:rgba(200,185,160,0.6); font-family:'IM Fell English',serif; font-style:italic;
+  font-size:13px; letter-spacing:1.5px; padding:12px 18px; text-align:left;
+  cursor:none; transition: all 0.3s; line-height:1.6;
+}
+.choice-btn:hover { background:rgba(200,168,75,0.06); border-color:rgba(200,168,75,0.35); color:var(--cream); text-shadow: 0 0 20px rgba(200,168,75,0.2); }
+/* REMOVED: .choice-btn.bad / .choice-btn.good hints — player must guess */
+
+/* Narrative box for visual novel feel */
+#narrative-box {
+  position:fixed; bottom:0; left:0; right:0; z-index:50;
+  background: rgba(4,3,10,0.92); border-top:1px solid rgba(200,168,75,0.08);
+  padding:20px 40px; backdrop-filter:blur(6px);
+  display:flex; flex-direction:column; gap:8px;
+  opacity:0; pointer-events:none; transition:opacity 0.4s;
+}
+#narrative-box.show { opacity:1; }
+#narrative-speaker-name { font-family:'UnifrakturMaguntia',cursive; font-size:18px; color:var(--gold); }
+#narrative-line { font-style:italic; font-size:14px; color:rgba(200,185,160,0.8); line-height:1.8; letter-spacing:0.5px; }
+#narrative-next { font-size:10px; letter-spacing:3px; color:rgba(200,168,75,0.3); align-self:flex-end; animation:blink 1.5s step-end infinite; }
+
+#rule-notice {
+  position:fixed; top:70px; left:50%; transform:translateX(-50%);
+  background:rgba(4,3,10,0.9); border:1px solid rgba(200,168,75,0.2);
+  padding:8px 20px; font-style:italic; font-size:11px; letter-spacing:2px;
+  color:rgba(200,168,75,0.7); z-index:30; opacity:0; pointer-events:none;
+  transition: opacity 0.4s; backdrop-filter:blur(4px);
+}
+#rule-notice.show { opacity:1; }
+#event-result {
+  position:fixed; inset:0; z-index:80;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition: opacity 0.3s;
+}
+#event-result.show { opacity:1; }
+#event-result-bg { position:absolute; inset:0; background:rgba(4,3,10,0.95); }
+#event-result-text { position:relative; z-index:2; text-align:center; }
+#event-result-title { font-family:'UnifrakturMaguntia',cursive; font-size:clamp(40px,7vw,80px); color:var(--cream); text-shadow: 0 0 60px rgba(200,168,75,0.4); }
+#event-result-sub { font-style:italic; font-size:13px; letter-spacing:3px; color:rgba(180,165,140,0.5); margin-top:12px; }
+
+/* ══════════════════════════════════
+   GAME OVER / WIN SCREENS
+══════════════════════════════════ */
+#gameover-screen, #win-screen { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; }
+#gameover-screen { background:#000; }
+#win-screen { background: #020408; }
+.end-title { font-family:'UnifrakturMaguntia',cursive; font-size:clamp(50px,9vw,100px); color:var(--cream); text-align:center; animation: fadeup 2s ease 0.5s both; }
+.end-sub { font-style:italic; font-size:13px; letter-spacing:4px; color:rgba(180,165,140,0.45); text-align:center; line-height:2.2; animation: fadeup 2s ease 1s both; }
+.end-btn {
+  background:transparent; border:none; border-bottom:1px solid rgba(200,168,75,0.25);
+  color:rgba(200,168,75,0.45); font-family:'IM Fell English',serif; font-style:italic;
+  font-size:0.95rem; letter-spacing:4px; cursor:none; padding:10px 36px;
+  transition: all 0.4s; margin-top:12px; animation: fadeup 2s ease 1.5s both;
+}
+.end-btn:hover { color:var(--gold2); border-color:rgba(200,168,75,0.6); }
+
+/* ══════════════════════════════════
+   JABBERWOCK CREEP OVERLAY
+══════════════════════════════════ */
+#jabber-creep { position:fixed; inset:0; z-index:6; pointer-events:none; opacity:0; transition: opacity 2s ease; }
+#jabber-creep.show { opacity:1; }
+#jabber-creep svg { position:absolute; }
+
+/* ══════════════════════════════════
+   SHARED ANIMATIONS
+══════════════════════════════════ */
+@keyframes fadeup { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+@keyframes shimmer { 0%,100% { opacity:0.4; } 50% { opacity:0.8; } }
+#transition-fade { position:fixed; inset:0; z-index:200; background:#000; opacity:0; pointer-events:none; transition: opacity 0.8s ease; }
+#transition-fade.fading { opacity:1; }
+#hall-progress { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); font-style:italic; font-size:10px; letter-spacing:4px; color:rgba(180,165,140,0.3); z-index:10; transition: opacity 0.5s; }
+#hall-intro { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; z-index:15; pointer-events:none; opacity:0; }
+#hall-intro-title { font-family:'UnifrakturMaguntia',cursive; font-size:clamp(28px,4vw,48px); color:var(--cream); opacity:0.7; letter-spacing:4px; }
+#hall-intro-sub { font-style:italic; font-size:11px; letter-spacing:3px; color:rgba(180,165,140,0.4); margin-top:10px; }
+
+/* Queen's warning banner */
+#queen-warning {
+  position:fixed; top:80px; left:50%; transform:translateX(-50%);
+  background:rgba(80,0,0,0.85); border:1px solid rgba(180,0,0,0.3);
+  padding:8px 24px; font-style:italic; font-size:11px; letter-spacing:3px;
+  color:rgba(220,100,100,0.8); z-index:25; opacity:0; pointer-events:none;
+  transition:opacity 0.5s; backdrop-filter:blur(4px); text-align:center;
+}
+#queen-warning.show { opacity:1; }
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="cursor-key">
+  <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="10" cy="10" rx="7" ry="7" stroke="#c8a84b" stroke-width="2.5" fill="none"/>
+    <ellipse cx="10" cy="10" rx="3.5" ry="3.5" fill="#c8a84b" opacity="0.5"/>
+    <line x1="16" y1="14" x2="28" y2="26" stroke="#c8a84b" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="22" y1="20" x2="22" y2="24" stroke="#c8a84b" stroke-width="2" stroke-linecap="round"/>
+    <line x1="25" y1="23" x2="25" y2="26" stroke="#c8a84b" stroke-width="2" stroke-linecap="round"/>
+  </svg>
+</div>
+
+<div id="transition-fade"></div>
+
+<!-- TITLE SCREEN -->
+<div id="title-screen" class="screen active">
+  <canvas id="title-particles"></canvas>
+  <div class="title-card">
+    <div id="title-main">Alice</div>
+    <div id="title-sub">wonderland's end · · ·</div>
+    <div class="title-divider"></div>
+    <div id="title-instructions">
+      the queen of hearts is <span>hunting you</span><br>
+      alice has vanished · only she knows the way out<br>
+      find her before the queen finds you<br><br>
+      choose a door · any door<br>
+      <span>no door glows · no door is safe</span><br>
+      one wrong step · and it ends<br><br>
+      the jabberwock is already here
+    </div>
+    <div class="title-divider"></div>
+    <button id="begin-btn" onclick="beginGame()">· · · fall deeper · · ·</button>
+  </div>
+</div>
+
+<!-- PROLOGUE SCREEN -->
+<div id="prologue-screen" class="screen">
+  <div id="prologue-bg"></div>
+  <div id="prologue-wrap">
+    <div id="prologue-eyebrow">· · · before the hall · · ·</div>
+    <div id="prologue-text"></div>
+    <button id="prologue-continue" onclick="endPrologue()">· · · continue · · ·</button>
+  </div>
+</div>
+
+<!-- HALL SCREEN -->
+<div id="hall-screen" class="screen">
+  <div id="hall-bg"></div>
+  <div id="hall-ceiling"></div>
+  <canvas id="hall-particles"></canvas>
+  <div id="hall-floor"></div>
+  <div id="candle-left"  class="wall-candle" style="left:8%; height:24px;"><div class="candle-flame"></div></div>
+  <div id="candle-left2" class="wall-candle" style="left:22%; height:20px;"><div class="candle-flame"></div></div>
+  <div id="candle-right" class="wall-candle" style="right:8%; height:24px;"><div class="candle-flame"></div></div>
+  <div id="candle-right2"class="wall-candle" style="right:22%; height:20px;"><div class="candle-flame"></div></div>
+  <div id="threat-bar">
+    <div class="meter-wrap">
+      <span class="meter-label">jabberwock approaches</span>
+      <div class="meter-bar"><div class="meter-fill" id="jabber-fill"></div></div>
+    </div>
+    <div style="width:1px;height:24px;background:rgba(200,168,75,0.12)"></div>
+    <div class="meter-wrap">
+      <span class="meter-label">the queen hunts</span>
+      <div class="meter-bar"><div class="meter-fill" id="queen-fill"></div></div>
+    </div>
+    <div style="width:1px;height:24px;background:rgba(200,168,75,0.12)"></div>
+    <div class="meter-wrap" id="lives-wrap">
+      <span class="meter-label">chances remain</span>
+      <div id="lives-pips" style="display:flex;gap:6px;justify-content:center;margin-top:3px;"></div>
+    </div>
+  </div>
+  <div id="hall-shrink-overlay"></div>
+  <div id="door-row"></div>
+  <div id="jabber-creep">
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" width="100%" height="100%">
+      <defs>
+        <radialGradient id="jabGrad" cx="15%" cy="50%" r="55%">
+          <stop offset="0%" stop-color="#1a0a2e" stop-opacity="0.7"/>
+          <stop offset="100%" stop-color="transparent" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="queenGrad" cx="85%" cy="50%" r="55%">
+          <stop offset="0%" stop-color="#2a0010" stop-opacity="0.6"/>
+          <stop offset="100%" stop-color="transparent" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="100" height="100" fill="url(#jabGrad)"/>
+      <rect width="100" height="100" fill="url(#queenGrad)"/>
+    </svg>
+  </div>
+  <div id="hall-progress">find the door · alice is waiting</div>
+  <div id="hall-intro"><div id="hall-intro-title"></div><div id="hall-intro-sub"></div></div>
+  <div id="queen-warning">the queen's guards were seen · · · moving closer</div>
+</div>
+
+<!-- EVENT SCREEN -->
+<div id="event-screen" class="screen">
+  <div id="event-bg"></div>
+  <div id="event-wrap">
+    <div id="event-title">The Mad Tea Party</div>
+    <div id="event-subtitle">· · · ·</div>
+    <div id="event-scene"></div>
+    <div id="event-speaker">The Hatter</div>
+    <div id="event-dialogue">No room! No room!</div>
+    <div id="madness-wrap">
+      <span id="madness-label">madness</span>
+      <div id="madness-bar"><div id="madness-fill"></div></div>
+    </div>
+    <div id="choice-area"></div>
+  </div>
+  <div id="rule-notice"></div>
+</div>
+
+<!-- EVENT RESULT -->
+<div id="event-result">
+  <div id="event-result-bg"></div>
+  <div id="event-result-text">
+    <div id="event-result-title">survived</div>
+    <div id="event-result-sub"></div>
+  </div>
+</div>
+
+<!-- WRONG DOOR FLASH -->
+<div id="wrong-flash">
+  <div id="wrong-flash-bg"></div>
+  <div id="wrong-flash-content">
+    <div id="wrong-flash-title">The Queen's Court</div>
+    <div id="wrong-flash-desc"></div>
+    <div id="wrong-flash-warning">the jabberwock heard · · · the queen stirs</div>
+  </div>
+</div>
+
+<!-- DEATH SCREEN -->
+<div id="death-screen">
+  <div id="death-title">Off With Her Head.</div>
+  <div id="death-subtitle" id="death-sub"></div>
+  <button id="death-continue" onclick="deathContinue()">· · · try again · · ·</button>
+</div>
+
+<!-- GAME OVER -->
+<div id="gameover-screen" class="screen">
+  <div class="end-title" style="color:#8b0000; text-shadow:0 0 60px rgba(139,0,0,0.6);">Off with her head.</div>
+  <div class="end-sub" id="gameover-sub">the queen found you · you never found alice · · ·</div>
+  <button class="end-btn" onclick="restartGame()">↩ &nbsp;fall again · · ·</button>
+</div>
+
+<!-- WIN SCREEN -->
+<div id="win-screen" class="screen">
+  <div class="end-title" style="color:#ece3d0; text-shadow:0 0 60px rgba(100,200,120,0.3);">The Garden</div>
+  <div class="end-sub">
+    you found alice · · ·<br>
+    she knew the way all along<br>
+    the queen's voice fades behind the roses
+  </div>
+  <button class="end-btn" onclick="restartGame()">↩ &nbsp;wake up, alice · · ·</button>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════
+   ALICE — WONDERLAND'S END
+   The queen is hunting you. Alice is the only way out.
+   Choose your doors. Every wrong one brings her closer.
+════════════════════════════════════════════════════════ */
+
+const cursorEl = document.getElementById('cursor-key');
+document.addEventListener('mousemove', e => {
+  cursorEl.style.left = e.clientX + 'px';
+  cursorEl.style.top  = e.clientY + 'px';
+  cursorEl.style.opacity = '1';
+});
+document.addEventListener('mouseleave', () => cursorEl.style.opacity = '0');
+
+/* ── game state ── */
+const gs = {
+  jabber: 0, queen: 0, round: 0,
+  wrongsThisHall: 0, totalEvents: 10,
+  eventsCleared: 0, hallActive: false,
+  lives: 3, // wrong door deaths
+  usedEventIds: [],
+  reset() {
+    this.jabber = 0; this.queen = 0; this.round = 0;
+    this.wrongsThisHall = 0; this.eventsCleared = 0;
+    this.hallActive = false; this.lives = 3; this.usedEventIds = [];
+    this.totalEvents = EVENTS.filter(e => e.id !== 'alice-room').length;
+    updateLivesDisplay();
+  }
+};
+
+/* ── title particles ── */
+function initTitleParticles() {
+  const c = document.getElementById('title-particles');
+  const ctx = c.getContext('2d');
+  c.width = window.innerWidth; c.height = window.innerHeight;
+  const pts = Array.from({length:80}, () => ({
+    x: Math.random()*c.width, y: Math.random()*c.height,
+    r: Math.random()*1.4+0.2, o: Math.random()*0.3+0.05,
+    dx: (Math.random()-0.5)*0.12, dy: (Math.random()-0.5)*0.1,
+  }));
+  function draw() {
+    ctx.clearRect(0,0,c.width,c.height);
+    pts.forEach(p => {
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle = `rgba(200,168,75,${p.o})`; ctx.fill();
+      p.x += p.dx; p.y += p.dy;
+      if(p.x<0)p.x=c.width; if(p.x>c.width)p.x=0;
+      if(p.y<0)p.y=c.height; if(p.y>c.height)p.y=0;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+initTitleParticles();
+
+/* ════════════════════════════════════════
+   PROLOGUE
+════════════════════════════════════════ */
+const PROLOGUE_LINES = [
+  { text: "alice has disappeared.", delay: 0 },
+  { text: "the queen of hearts declared her a traitor three days ago. the cards are searching every corridor.", delay: 0 },
+  { text: "you came through the looking glass by accident. now the door behind you is sealed.", delay: 0 },
+  { text: "the only one who knows how to leave this place — how to find the one true door among thousands — is alice.", delay: 0 },
+  { text: "find her. survive the wonderland. do not let the queen catch you first.", delay: 0 },
+  { text: "the hall of doors stretches ahead. one door is real. the others are traps.", delay: 0 },
+];
+let prologueIdx = 0;
+
+function typewriterEffect(el, text, done) {
+  el.textContent = '';
+  const cursor = document.getElementById('prologue-cursor-blink');
+  let i = 0;
+  function type() {
+    if(i < text.length) {
+      el.textContent += text[i]; i++;
+      setTimeout(type, 28 + Math.random()*18);
+    } else if(done) {
+      setTimeout(done, 400);
+    }
+  }
+  type();
+}
+
+function showPrologueLine() {
+  if(prologueIdx >= PROLOGUE_LINES.length) {
+    document.getElementById('prologue-continue').style.display = 'inline-block';
+    return;
+  }
+  const line = PROLOGUE_LINES[prologueIdx];
+  const el = document.getElementById('prologue-text');
+  typewriterEffect(el, line.text, () => {
+    document.getElementById('prologue-continue').style.display = 'inline-block';
+  });
+}
+
+function endPrologue() {
+  prologueIdx++;
+  document.getElementById('prologue-continue').style.display = 'none';
+  if(prologueIdx >= PROLOGUE_LINES.length) {
+    showScreen('hall-screen', () => {
+      updateMeters();
+      buildHall();
+      showHallIntro('the hall of doors', 'alice is missing · find the one true door');
+    });
+  } else {
+    showPrologueLine();
+  }
+}
+
+/* ════════════════════════════════════════
+   WRONG DOOR WHISPERS — all neutral, no hints
+════════════════════════════════════════ */
+// All whispers are ambiguous — can't tell which is right or wrong
+const ALL_WHISPERS = [
+  "something stirs beyond this wood · · ·",
+  "you were expected · · ·",
+  "the air smells of old clocks · · ·",
+  "a voice · just out of reach · · ·",
+  "it grows quieter on the other side · · ·",
+  "roses · or the smell of blood · hard to say · · ·",
+  "something is counting down · · ·",
+  "the light here is wrong · · ·",
+  "echoes of a tea party · · ·",
+  "warmth · and something watching · · ·",
+  "the door breathes · · ·",
+  "you have been here before · · ·",
+  "do not open this one · or do · it is hard to tell · · ·",
+  "water sounds · very far · very real · · ·",
+  "someone left in a hurry · · ·",
+  "the looking glass reflects nothing here · · ·",
+  "a cheshire grin hangs in the dark · · ·",
+  "it whispers your name · almost · · ·",
+  "the queen's roses grew here once · · ·",
+  "alice came this way · perhaps · · ·",
+];
+
+const WRONG_DOORS = [
+  { title:"The Queen's Rage",       desc:"the queen's roses drip red · guards march in rows without end · you feel her eyes find you",       lethal: false },
+  { title:"The Jabberwock's Maw",   desc:"the darkness breathes · claws too large for any corridor · it has been waiting since you arrived", lethal: true  },
+  { title:"The Pool of Tears",      desc:"alice's tears became an ocean · you are pulled under · the creatures swim in circles above you",    lethal: true  },
+  { title:"The Looking Glass",      desc:"your reflection does not follow · it mouths words you cannot hear · then it walks away",            lethal: false },
+  { title:"The Forgotten Room",     desc:"a room where alice never arrived · dust on every chair · a tea set laid for no one · forever",      lethal: false },
+  { title:"The Tulgey Wood",        desc:"the bandersnatches move between trees · the jubjub bird screams once · then silence · then claws",  lethal: true  },
+  { title:"The Card Guards",        desc:"five of hearts · seven of hearts · they don't speak · they only point their spears",                lethal: false },
+  { title:"The White Queen's Trap", desc:"she smiles too wide · her crown tilts · 'jam yesterday and jam tomorrow' she says · never today",  lethal: false },
+  { title:"The Borogoves",          desc:"mimsy were the borogoves · all mimsy · their eyes are large and wet and wrong",                    lethal: true  },
+  { title:"The Walrus",             desc:"the walrus is weeping · 'i deeply sympathise' he says · eating · always eating",                   lethal: false },
+  { title:"The Red Knight",         desc:"he falls from his horse again and again · each time closer to you · 'i will rescue you' he says",  lethal: false },
+  { title:"Tweedledum & Tweedledee",desc:"they block the path · arguing · 'contrariwise' · 'nohow' · you will not get past today",           lethal: false },
+];
+
+const LETHAL_DEATHS = [
+  "the jabberwock found you first · · ·\nyou never found alice · the hall went dark",
+  "the pool of tears swallowed you · · ·\nyou forgot your name · and then the rest",
+  "the tulgey wood kept you · · ·\nthe trees grew around you like a room",
+  "the borogoves circled · · ·\nyou outgrabe · and it was over",
+];
+
+/* ════════════════════════════════════════
+   EVENTS — all 8 (Alice in Wonderland + Through the Looking Glass)
+════════════════════════════════════════ */
+const EVENTS = [
+  /* 0 — Mad Tea Party */
+  {
+    id: 'tea-party', title: 'The Mad Tea Party', subtitle: 'no room · no room · no room',
+    bgStyle: 'radial-gradient(ellipse 80% 60% at 50% 50%, #1a1204 0%, #0c0802 60%, #030201 100%)',
+    sceneRender: drawTeaScene,
+    steps: [
+      { speaker:'The Hatter', text:'"No room! No room!" he cried, though there was room everywhere. His eyes moved like clocks that had forgotten to stop. He poured tea into a full cup without looking.',
+        choices:[
+          {text:'Take a seat without being asked.',          good:true,  result:'The Hatter looks delighted. "Manners! How delightfully improper!" He pours the tea.', madness:0},
+          {text:'"There seems to be plenty of room."',       good:true,  result:'The Hatter blinks. "She speaks correctly. Sit, sit — before the tea cools."', madness:5},
+          {text:'Ask politely if you may sit.',              good:false, result:'"Asking! How terribly rude." The March Hare shoves your cup off the table.', madness:25},
+        ]},
+      { speaker:'The March Hare', ruleIntro:'New rule: you must answer every question with a question.',
+        text:'The March Hare leaned forward. "Have some wine," he said. There was no wine anywhere on the table. There had never been any wine.',
+        choices:[
+          {text:'"Is there not wine enough in wondering?"',  good:true,  result:'The March Hare claps his paws. "Exactly! Exactly right!"', madness:0},
+          {text:'"But there is no wine."',                   good:false, result:'The March Hare gasps. "She stated a FACT. That is very bad manners."', madness:30},
+          {text:'"Why would you say so?"',                   good:true,  result:'"Why would I?" says the Hare. "Precisely." He refills a cup that was never empty.', madness:0},
+        ]},
+      { speaker:'The Hatter', ruleIntro:'New rule: you must not say the word "time."',
+        text:'"Why is a raven like a writing desk?" the Hatter asked, his eyes very wide and his smile wider still. The question had no answer. That was the point.',
+        choices:[
+          {text:'"Because both can produce flat notes."',    good:true,  result:'Silence. Then the Hatter stands and bows. "She has won the riddle."', madness:0},
+          {text:'"I haven\'t the slightest idea."',          good:true,  result:'"Neither do I!" The Hatter seems enormously relieved.', madness:0},
+          {text:'"I have no time for riddles."',             good:false, result:'"TIME!" screams the Hatter. The cups smash. The March Hare bursts into tears.', madness:40},
+        ]},
+    ]
+  },
+
+  /* 1 — The Caterpillar */
+  {
+    id: 'caterpillar', title: "Who Are You?", subtitle: 'the caterpillar asks · and asks · and asks',
+    bgStyle: 'radial-gradient(ellipse 80% 70% at 50% 40%, #0a1a06 0%, #060d04 60%, #020401 100%)',
+    sceneRender: drawMushroomScene,
+    steps: [
+      { speaker:'The Caterpillar', text:'"Who are you?" said the Caterpillar. The hookah smoke curled into letters that made no sense in any language. He did not blink.',
+        choices:[
+          {text:'"I — I hardly know, sir."',                 good:true,  result:'"At least you are honest about your uncertainty. Sit."', madness:0},
+          {text:'"I am Alice."',                             good:false, result:'"Are you?" The Caterpillar does not seem convinced. "Are you QUITE sure?"', madness:20},
+          {text:'"I am not who I was this morning."',        good:true,  result:'"Hmph. That is actually correct." He blows a smoke ring shaped like a question mark.', madness:0},
+        ]},
+      { speaker:'The Caterpillar', ruleIntro:'New rule: respond to every command with action, not words.',
+        text:'"Keep your temper," said the Caterpillar. "One side will make you grow taller. The other side will make you grow shorter." He said nothing more.',
+        choices:[
+          {text:'[Reach for the mushroom without speaking.]', good:true,  result:'The Caterpillar nods slowly. "Good. You are learning."', madness:0},
+          {text:'"Which side? Which side of what?"',          good:false, result:'"Words. Always words." He turns away. "She is not ready."', madness:30},
+          {text:'[Wait, silently, watching him.]',            good:true,  result:'"Patience too." The Caterpillar crawls toward a leaf. "Take the mushroom."', madness:0},
+        ]},
+      { speaker:'The Caterpillar', text:'He said one final thing before vanishing entirely into the green: "You will find her. She has already been found. These are both true."',
+        choices:[
+          {text:'"How can both be true?"',                    good:false, result:'The Caterpillar is gone. The question hangs in the smoke. Unanswered.', madness:20},
+          {text:'[Say nothing. Accept the contradiction.]',   good:true,  result:'The smoke clears. The path forward opens. You understand something small.', madness:0},
+          {text:'"Which way did alice go?"',                  good:true,  result:'"Every way," the smoke says. "And none." A door appears in the mushroom\'s shadow.', madness:0},
+        ]},
+    ]
+  },
+
+  /* 2 — Queen's Croquet */
+  {
+    id: 'croquet', title: "The Croquet Ground", subtitle: 'the queen watches everything',
+    bgStyle: 'radial-gradient(ellipse 90% 70% at 50% 40%, #1a0404 0%, #0d0202 60%, #040101 100%)',
+    sceneRender: drawCroquetScene,
+    steps: [
+      { speaker:'The Queen of Hearts', ruleIntro:'New rule: never look directly at the Queen.',
+        text:'"Begin!" cried the Queen, and the hedgehog unrolled at your feet. The flamingo in your arms twisted to look at you. The Queen\'s eyes swept the ground.',
+        choices:[
+          {text:'[Swing the flamingo, eyes on the ground.]',      good:true,  result:'The ball rolls through the arch. The Queen looks almost disappointed.', madness:0},
+          {text:'[Turn to check if the Queen is watching.]',       good:false, result:'"She LOOKED at me!" The Queen screams. The cards draw their spades.', madness:35},
+          {text:'[Ask the flamingo quietly which way to swing.]',  good:true,  result:'The flamingo whispers. You swing left. Perfect shot.', madness:5},
+        ]},
+      { speaker:'The Cheshire Cat',
+        text:'The Cheshire Cat\'s head appeared above the croquet ground. "How are you getting on?" it said. Only the grin remained. "Have you found alice yet? No one has."',
+        choices:[
+          {text:'"Not at all well. Would you ask the Queen something for me?"', good:true,  result:'"Delightful." The Cat spoke to the Queen, who went red, then purple, then was distracted.', madness:0},
+          {text:'"Where is alice? You must know."',                             good:false, result:'"Must I?" The Cat faded faster than usual. The Queen noticed your distraction.', madness:25},
+          {text:'[Simply nod, and wait for it to fade.]',                      good:true,  result:'The Cat faded, grin last. The distraction gave you a free turn.', madness:0},
+        ]},
+      { speaker:'The Queen of Hearts', ruleIntro:'New rule: you must agree with the last thing said.',
+        text:'"OFF WITH HER—" began the Queen. She was looking at a hedgehog, but her eyes kept drifting to you.',
+        choices:[
+          {text:'"Quite right, Your Majesty — unacceptable uncurling."',  good:true,  result:'The Queen blinks. "Yes. Yes, it is." She lets you play on.', madness:0},
+          {text:'"But it only uncurled a little—"',                        good:false, result:'"A LITTLE!" shrieks the Queen. "Off with HERS as well!"', madness:40},
+          {text:'[Bow deeply and say nothing at all.]',                    good:true,  result:'The Queen takes your silence as agreement. The round continues.', madness:5},
+        ]},
+    ]
+  },
+
+  /* 3 — The Cheshire Cat's Tree */
+  {
+    id: 'cheshire', title: "The Disappearing Path", subtitle: 'it all depends on where you want to get to',
+    bgStyle: 'radial-gradient(ellipse 80% 60% at 50% 30%, #0d1018 0%, #060810 60%, #020306 100%)',
+    sceneRender: drawCheshireScene,
+    steps: [
+      { speaker:'The Cheshire Cat',
+        text:'"Cheshire Puss," you said, "which way ought I go from here?" The grin widened. The rest of the cat was already somewhere else entirely.',
+        choices:[
+          {text:'"I don\'t much care where—"',               good:true,  result:'"Then it doesn\'t matter which way you go," said the Cat approvingly.', madness:0},
+          {text:'"I want to find alice."',                    good:true,  result:'"Ah. Her." The grin tilted. "She\'s looking for you too, you know."', madness:0},
+          {text:'"Just tell me which way! Please."',          good:false, result:'The grin faded. "Desperation. Poor answer." The path behind you vanished.', madness:30},
+        ]},
+      { speaker:'The Cheshire Cat', ruleIntro:'New rule: begin your answer with the last word spoken.',
+        text:'"We\'re all mad here," said the Cat. Its body flickered in and out, leaving only the eyes, then only the grin, then a sound like laughter.',
+        choices:[
+          {text:'"Mad · · · I suppose that includes me now."',  good:true,  result:'"Now." The Cat reappears fully. "You\'re learning the grammar."', madness:0},
+          {text:'"That isn\'t very reassuring."',               good:false, result:'The Cat\'s eyes narrow. "You started with \'That.\' The last word was \'grin.\'"', madness:25},
+          {text:'"Grin · · · is all I can trust in you."',      good:true,  result:'"Trust — that\'s almost philosophical." The Cat curls, pleased.', madness:0},
+        ]},
+      { speaker:'The Cheshire Cat',
+        text:'"Alice keeps a lantern lit," said the Cat, "for whoever finds her first. I hope it\'s you. I hope it\'s not the cards." It began to vanish from its tail forward.',
+        choices:[
+          {text:'"Where is the lantern?"',                     good:true,  result:'"Behind the next real door," says the voice from nowhere. "You\'ll know it."', madness:0},
+          {text:'"How will I know the right door?"',           good:false, result:'"You won\'t. That\'s the point." The Cat is gone. The question sits unanswered.', madness:20},
+          {text:'[Listen. Wait. Let the silence answer.]',     good:true,  result:'The grin fades last. In the space after, something like understanding.', madness:0},
+        ]},
+    ]
+  },
+
+  /* 4 — Trial of the Tarts */
+  {
+    id: 'trial', title: "The Trial", subtitle: 'sentence first · verdict afterwards',
+    bgStyle: 'radial-gradient(ellipse 90% 70% at 50% 50%, #1a0808 0%, #0e0404 60%, #040101 100%)',
+    sceneRender: drawTrialScene,
+    steps: [
+      { speaker:'The King of Hearts', ruleIntro:'New rule: all answers must be exactly one sentence.',
+        text:'"Herald, read the accusation!" The White Rabbit unrolled a scroll. It was blank. Everyone in the courtroom looked at you.',
+        choices:[
+          {text:'"I am certain I stole nothing."',                       good:true,  result:'The King nods. "One sentence. Admissible." He writes something down.', madness:0},
+          {text:'"I didn\'t — I would never — the tarts — how—"',        good:false, result:'"Several sentences!" shrieks the Queen. "Add thirty to the madness card!"', madness:35},
+          {text:'"The accusation is as blank as the scroll."',           good:true,  result:'"Hmm." The King squints at the scroll. "She has a point. Proceed."', madness:0},
+        ]},
+      { speaker:'The Queen of Hearts',
+        text:'"Sentence first — verdict afterwards!" the Queen cried. The courtroom burst into uproar. The Dormouse was used as a gavel. You looked for alice in the crowd.',
+        choices:[
+          {text:'"Stuff and nonsense! The sentence cannot come first."', good:true,  result:'"She speaks sense," the King whispered. Even the Queen paused.', madness:5},
+          {text:'[Say nothing. Watch. Wait.]',                           good:true,  result:'Your silence unnerved the court more than any argument could.', madness:0},
+          {text:'"Yes, yes, whatever Your Majesty says."',               good:false, result:'"Coward!" screamed the Queen. "Off with the head of someone compliant!"', madness:25},
+        ]},
+      { speaker:'The King of Hearts', ruleIntro:'New rule: you are exactly a mile high.',
+        text:'"All persons more than a mile high to leave the court!" Everyone looked around. Nobody moved. Then they all looked at you.',
+        choices:[
+          {text:'[Stand and begin to leave, with dignity.]',             good:true,  result:'"She remembered," whispered the White Rabbit. The court parted for you.', madness:0},
+          {text:'"I am not a mile high."',                               good:false, result:'"Contempt of court!" The Queen\'s guards advance.', madness:35},
+          {text:'[Grow, deliberately, until the courtroom trembles.]',   good:true,  result:'"Nobody of any consequence," said Alice — was it alice? — "Goodbye."', madness:0},
+        ]},
+    ]
+  },
+
+  /* 5 — The Looking Glass (Through the Looking Glass) */
+  {
+    id: 'looking-glass', title: "Through the Glass", subtitle: 'the other side · always backwards',
+    bgStyle: 'radial-gradient(ellipse 70% 70% at 50% 50%, #080d1a 0%, #040810 60%, #020308 100%)',
+    sceneRender: drawLookingGlassScene,
+    steps: [
+      { speaker:'Your Reflection',
+        text:'The mirror did not show what was behind you. It showed what was behind itself — a room almost like this one, but reversed. Your reflection mouthed: "she is here. do not look away."',
+        choices:[
+          {text:'[Hold the reflection\'s gaze. Don\'t blink.]',          good:true,  result:'The reflection nods once. A door appears in the glass.', madness:0},
+          {text:'[Look behind you to see what it\'s pointing at.]',      good:false, result:'The reflection shakes its head. When you look back, it is gone.', madness:30},
+          {text:'"Who is here? Where?"',                                  good:true,  result:'The reflection points down. Through the floor, a faint lantern light.', madness:5},
+        ]},
+      { speaker:'The Red Queen', ruleIntro:'New rule: you must run to stay in the same place.',
+        text:'The Red Queen appeared beside you, already moving. "Faster! FASTER!" She ran without seeming to get anywhere. The landscape ran backwards around you both.',
+        choices:[
+          {text:'[Run. Don\'t stop. Don\'t ask why.]',                   good:true,  result:'You run. The Red Queen nods, slightly less impatient. "Better."', madness:0},
+          {text:'"But we aren\'t going anywhere."',                       good:false, result:'"Of course not!" snaps the Queen. "That takes twice the effort. Move!"', madness:25},
+          {text:'[Run faster than the Queen.]',                          good:true,  result:'The Queen blinks. "She is improving." You see alice\'s lantern, briefly, far ahead.', madness:0},
+        ]},
+      { speaker:'The White Knight',
+        text:'The White Knight fell off his horse again. He stood up, beaming. "I\'ll see you safe to the end of the wood," he said. "Then you find her yourself, I\'m afraid."',
+        choices:[
+          {text:'"Thank you. Lead on."',                                  good:true,  result:'He led, falling and rising, through the wood. At the edge, a door of real wood.', madness:0},
+          {text:'"I don\'t need protecting."',                            good:false, result:'"No," he agreed sadly. "Perhaps I do." He fell and didn\'t rise. You were alone.', madness:20},
+          {text:'[Walk beside him quietly.]',                             good:true,  result:'He sang as he fell. The song made no sense and was very comforting.', madness:0},
+        ]},
+    ]
+  },
+
+  /* 6 — Tweedledee & Tweedledum */
+  {
+    id: 'tweedles', title: "Nohow · Contrariwise", subtitle: 'the battle that never ends · quite',
+    bgStyle: 'radial-gradient(ellipse 80% 60% at 50% 60%, #0a0d08 0%, #060806 60%, #020402 100%)',
+    sceneRender: drawTweedleScene,
+    steps: [
+      { speaker:'Tweedledee & Tweedledum',
+        text:'"If you think we\'re wax-works," said Tweedledee, "you ought to pay." "Contrariwise," said Tweedledum, "if you think we\'re alive, you ought to speak." They both looked at you.',
+        choices:[
+          {text:'[Remain perfectly still and say nothing.]',              good:true,  result:'Both looked confused. The confusion created a gap. You walked through it.', madness:0},
+          {text:'"You are both alive and wax-works."',                    good:true,  result:'"Contrariwise!" "Nohow!" They began arguing again. You slipped past.', madness:5},
+          {text:'"Which of you should I speak to first?"',               good:false, result:'"Me!" "Me!" They blocked your path more completely than before.', madness:20},
+        ]},
+      { speaker:'The Crow', ruleIntro:'New rule: everything that happens is a dream.',
+        text:'A monstrous crow descended, scattering both Tweedles in every direction. In the chaos, you heard a small voice say: "the lantern is north. or east. it depends."',
+        choices:[
+          {text:'"If this is a dream, I can fly."',                       good:false, result:'You cannot fly. The crow is very real. You run instead.', madness:30},
+          {text:'[Accept the dream. Walk calmly through the crow.]',     good:true,  result:'The crow passes through you like fog. You are north now. East. Both.', madness:0},
+          {text:'"Was that alice\'s voice?"',                             good:true,  result:'The crow takes the sound with it. But north is warmer now. Something knows you.', madness:0},
+        ]},
+      { speaker:'Tweedledee',
+        text:'"She\'s here, you know," said Tweedledee, suddenly alone and very small. "She\'s been waiting for someone to find her without getting lost first." He adjusted his bolster.',
+        choices:[
+          {text:'"Tell me where."',                                        good:false, result:'"Contrariwise," he said, though Tweedledum wasn\'t there anymore. He waddled away.', madness:20},
+          {text:'[Say nothing. Remember: north is warmer.]',              good:true,  result:'Tweedledee nodded as if you\'d said something wise. "The door is close now."', madness:0},
+          {text:'"Thank you. Truly."',                                    good:true,  result:'"Nohow," he said, but he was smiling. The wood lightened ahead of you.', madness:0},
+        ]},
+    ]
+  },
+
+  /* 7 — Humpty Dumpty */
+  {
+    id: 'humpty', title: "Humpty Dumpty", subtitle: 'glory · the question is · which is to be master',
+    bgStyle: 'radial-gradient(ellipse 80% 60% at 50% 35%, #0d0c18 0%, #080610 60%, #030208 100%)',
+    sceneRender: drawHumptyScene,
+    steps: [
+      { speaker:'Humpty Dumpty', ruleIntro:'New rule: all words mean exactly what Humpty chooses.',
+        text:'"When I use a word," Humpty Dumpty said, in a rather scornful tone, "it means just what I choose it to mean — neither more nor less." He balanced improbably on the wall above you.',
+        choices:[
+          {text:'"The question is whether you can make words mean different things."', good:true,  result:'"The question is which is to be master." He seemed mollified. "Sit."', madness:0},
+          {text:'"But that\'s not how words work—"',                                   good:false, result:'"Impenetrability! That\'s what I say." He sniffed enormously. Wrong.', madness:30},
+          {text:'[Say nothing. Wait for him to continue.]',                            good:true,  result:'He seemed pleased to have an audience. He adjusted his cravat.', madness:0},
+        ]},
+      { speaker:'Humpty Dumpty',
+        text:'"Slithy," he said, "means lithe and slimy. You see it\'s like a portmanteau — there are two meanings packed into one word." He pointed at you. "Now: where were you born?"',
+        choices:[
+          {text:'"I\'d rather not say — I\'m looking for alice."',          good:true,  result:'"Hmm. Reasonable impenetrability." He wrote something in the air.', madness:0},
+          {text:'"Seven years and six months."',                              good:true,  result:'"Wrong birthday," he said, delighted, "but the right format. Proceed."', madness:5},
+          {text:'"How did you know to ask that?"',                           good:false, result:'"Questions! Questions! She is very aggravating." He wobbled dangerously.', madness:25},
+        ]},
+      { speaker:'Humpty Dumpty',
+        text:'"I can explain all the poems that ever were invented," said Humpty Dumpty. "And a good many that haven\'t been invented just yet." He paused. "Goodbye."',
+        choices:[
+          {text:'[Leave immediately. He said goodbye.]',                      good:true,  result:'He blinked. "Manners." A crack appeared in the wall beside him. A door.', madness:0},
+          {text:'"But I have more questions—"',                               good:false, result:'He fell. The sound was decisive. Nobody came to put him together again.', madness:35},
+          {text:'"Will you remember my name?"',                               good:true,  result:'"No," he said cheerfully. "But someone else will. Move along."', madness:0},
+        ]},
+    ]
+  },
+
+  /* 8 — The Duchess's Kitchen */
+  {
+    id: 'duchess', title: "The Duchess", subtitle: 'everything has a moral · if only you can find it',
+    bgStyle: 'radial-gradient(ellipse 80% 70% at 50% 50%, #1a0a04 0%, #0e0602 60%, #040201 100%)',
+    sceneRender: drawDuchessScene,
+    steps: [
+      { speaker:'The Duchess', ruleIntro:'New rule: agree with every moral the Duchess states.',
+        text:'The kitchen was full of smoke. The cook stirred a cauldron of soup with too much pepper. The baby in the Duchess\'s arms sneezed rhythmically. "There\'s a moral in that, my child," said the Duchess.',
+        choices:[
+          {text:'"So there is," you agreed quickly.',                        good:true,  result:'The Duchess smiled, which was not an improvement. "She learns."', madness:0},
+          {text:'"What is the moral, exactly?"',                             good:false, result:'"Don\'t bother asking what I can\'t explain," snapped the Duchess. More pepper.',madness:30},
+          {text:'[Nod vigorously while covering your nose.]',                good:true,  result:'She nodded back. "Conduct yourself as you would like others to perceive you."', madness:5},
+        ]},
+      { speaker:'The Cook',
+        text:'The cook began throwing things — saucepans, ladles, the fire-irons — at the Duchess without any apparent malice. The Duchess ignored this. "You\'re thinking about something," she told you, "and that makes you sign."',
+        choices:[
+          {text:'"I\'m thinking about alice."',                              good:true,  result:'The cook lowered the ladle. The Duchess went very still. "She knows that name."', madness:0},
+          {text:'[Duck. Dodge. Survive the kitchen.]',                       good:true,  result:'You emerged on the other side of a frying pan. A door appeared in the wall.', madness:0},
+          {text:'"Please make the cook stop throwing things."',              good:false, result:'"If everybody minded their own business," said the Duchess, "the world would go round faster."', madness:25},
+        ]},
+      { speaker:'The Duchess',
+        text:'"Take care of the sense," said the Duchess, "and the sounds will take care of themselves." She handed you something that might have been the baby, but was now a small pig. It looked resigned.',
+        choices:[
+          {text:'[Set the pig down gently. Let it go.]',                     good:true,  result:'It trotted away contentedly. The Duchess looked approving. "Sense."', madness:0},
+          {text:'"This was a child."',                                        good:false, result:'"Only could-have-been," said the Duchess. "Moral: don\'t look back." More pepper.', madness:20},
+          {text:'[Carry the pig. It seems right.]',                          good:true,  result:'The pig smiled. Somehow. "She has a kind heart," said the Duchess grudgingly.', madness:0},
+        ]},
+    ]
+  },
+
+  /* 9 — The Walrus & The Carpenter */
+  {
+    id: 'walrus', title: "The Walrus & the Carpenter", subtitle: 'the time has come · to talk of many things',
+    bgStyle: 'radial-gradient(ellipse 80% 60% at 50% 70%, #020810 0%, #020610 70%, #010208 100%)',
+    sceneRender: drawWalrusScene,
+    steps: [
+      { speaker:'The Walrus',
+        text:'"The time has come," the Walrus said, "to talk of many things — of shoes and ships and sealing-wax, of cabbages and kings." He wept openly. The oysters had been eaten. Only the shells remained.',
+        choices:[
+          {text:'"I weep for you," you said — and meant it.',               good:true,  result:'"She understands sympathy!" the Walrus sobbed. "Even now!"', madness:5},
+          {text:'"Where did the oysters go?"',                               good:false, result:'The Carpenter gave you a very level look. "We\'ve eaten them all." Guilt crept in.', madness:25},
+          {text:'[Say nothing. The shells are enough.]',                     good:true,  result:'The silence felt appropriate. The Walrus nodded through his tears.', madness:0},
+        ]},
+      { speaker:'The Carpenter', ruleIntro:'New rule: you must answer in exactly four words.',
+        text:'"If seven maids with seven mops swept it for half a year," said the Carpenter, "do you suppose that they could get it clear?" He pointed at the sand.',
+        choices:[
+          {text:'"I doubt it," she said.',                                   good:true,  result:'"Exactly four words," noted the Carpenter. "And correct." He swept formally.', madness:0},
+          {text:'"That seems quite impossible."',                            good:true,  result:'"Four words. Acceptable." He marked something with his finger in the sand.', madness:0},
+          {text:'"It would take many years of dedicated labour probably."', good:false, result:'"Too many words," said the Carpenter sharply. "Start again. Four only."', madness:30},
+        ]},
+      { speaker:'The Walrus',
+        text:'"A loaf of bread," the Walrus said, "is what we chiefly need: Pepper and vinegar besides are very good indeed —" He paused. "Alice kept vinegar, you know. For the Queen\'s roses."',
+        choices:[
+          {text:'"Which way did alice go?"',                                  good:true,  result:'"She went toward the light," the Walrus said, wiping an eye. "Always the light."', madness:0},
+          {text:'"The Queen\'s roses?"',                                     good:false, result:'The Carpenter went pale. "Don\'t mention roses. Not here. Not now."', madness:25},
+          {text:'[Follow the direction the Walrus is looking.]',             good:true,  result:'He was looking toward a lantern glow in the distance. You moved that way.', madness:0},
+        ]},
+    ]
+  },
+
+  /* 10 — The Lantern Room (alice found — always last) */
+  {
+    id: 'alice-room', title: "The Lantern Room", subtitle: 'alice has been here · alice is here · alice',
+    bgStyle: 'radial-gradient(ellipse 80% 80% at 50% 40%, #0a0f08 0%, #060908 60%, #020404 100%)',
+    sceneRender: drawAliceRoomScene,
+    steps: [
+      { speaker:'Alice',
+        text:'She is here. Smaller than you expected. Sitting very still with a lantern. She looks at you as if she already knew you were coming — as if she has been waiting since the beginning.',
+        choices:[
+          {text:'"I\'ve been looking for you."',                           good:true,  result:'"I know," said alice. "I left markers. You followed them, even the ones you didn\'t notice."', madness:0},
+          {text:'"The queen is hunting both of us."',                      good:true,  result:'"She always is," said alice calmly. "But she only hunts forward. We go sideways."', madness:0},
+          {text:'"How do we get out?"',                                    good:false, result:'Alice looked at you strangely. "You already know. You\'ve known since the second door."', madness:15},
+        ]},
+      { speaker:'Alice',
+        text:'She held up the lantern. By its light, you could see a door — small, in the floor, ringed by the same golden key-shaped lock as the cursor in your hand.',
+        choices:[
+          {text:'[Kneel and try the key in the lock.]',                   good:true,  result:'"That\'s it," said alice. Her voice was different here. Older, perhaps. More certain.', madness:0},
+          {text:'"Is it safe on the other side?"',                        good:true,  result:'"No," said alice. "But it\'s real. That\'s better than safe."', madness:0},
+          {text:'"Wait — what if this is another wrong door?"',          good:false, result:'The lantern flickered. "Then it\'s the last one," said alice. "Go."', madness:20},
+        ]},
+      { speaker:'Alice',
+        text:'"When you wake up," said alice, "you won\'t remember all of this. Just the feeling of it. That\'s all wonderland ever leaves." She opened the small door in the floor. Light poured up.',
+        choices:[
+          {text:'"Will you come with me?"',                               good:true,  result:'"I\'m always in the story," said alice. "I don\'t have to go anywhere." She smiled.', madness:0},
+          {text:'[Step through without a word.]',                         good:true,  result:'The best answer. The light swallowed you whole. The door closed behind like a book.', madness:0},
+          {text:'"I don\'t want to forget."',                             good:true,  result:'"You won\'t forget that it mattered," said alice. "That\'s enough." She pushed you gently.', madness:0},
+        ]},
+    ]
+  },
+];
+
+/* ════════════════════════════════════════
+   SCENE RENDERERS
+════════════════════════════════════════ */
+function drawTeaScene(el) {
+  el.style.background = '#0e0a04';
+  el.innerHTML = `<svg viewBox="0 0 680 170" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    <rect x="40" y="115" width="600" height="12" rx="2" fill="#2a1f0a" stroke="#4a3520" stroke-width="1"/>
+    <rect x="40" y="105" width="600" height="12" rx="2" fill="#1a3020" stroke="#2a4830" stroke-width="1" opacity="0.7"/>
+    <ellipse cx="160" cy="110" rx="18" ry="7" fill="#c8a84b" opacity="0.12" stroke="#c8a84b" stroke-width="0.7"/>
+    <rect x="144" y="102" width="32" height="9" rx="2" fill="none" stroke="#c8a84b" stroke-width="0.7" opacity="0.35"/>
+    <ellipse cx="340" cy="110" rx="18" ry="7" fill="#c8a84b" opacity="0.12" stroke="#c8a84b" stroke-width="0.7"/>
+    <rect x="324" y="102" width="32" height="9" rx="2" fill="none" stroke="#c8a84b" stroke-width="0.7" opacity="0.35"/>
+    <ellipse cx="520" cy="110" rx="18" ry="7" fill="#c8a84b" opacity="0.12" stroke="#c8a84b" stroke-width="0.7"/>
+    <rect x="504" y="102" width="32" height="9" rx="2" fill="none" stroke="#c8a84b" stroke-width="0.7" opacity="0.35"/>
+    <ellipse cx="340" cy="86" rx="26" ry="20" fill="#2a1f0a" stroke="#c8a84b" stroke-width="0.8" opacity="0.6"/>
+    <path d="M366,82 Q386,77 381,91" fill="none" stroke="#c8a84b" stroke-width="0.8" opacity="0.5"/>
+    <path d="M330,64 Q333,54 328,46" fill="none" stroke="rgba(200,168,75,0.18)" stroke-width="1.5"/>
+    <path d="M340,62 Q343,51 340,44" fill="none" stroke="rgba(200,168,75,0.13)" stroke-width="1.5"/>
+    <path d="M350,64 Q353,53 350,46" fill="none" stroke="rgba(200,168,75,0.18)" stroke-width="1.5"/>
+    <rect x="140" y="28" width="40" height="48" rx="4" fill="#120e06" stroke="#3a2d18" stroke-width="1" opacity="0.9"/>
+    <rect x="130" y="24" width="60" height="7" rx="1" fill="#1a1408" stroke="#3a2d18" stroke-width="1"/>
+    <rect x="134" y="17" width="52" height="9" rx="2" fill="#120e06" stroke="#3a2d18" stroke-width="1"/>
+    <circle cx="160" cy="56" r="14" fill="#1a1408" stroke="#3a2d18" stroke-width="1"/>
+    <circle cx="520" cy="60" r="14" fill="#1a1408" stroke="#3a2d18" stroke-width="1"/>
+    <path d="M512,46 Q508,18 512,8" fill="none" stroke="#3a2d18" stroke-width="2"/>
+    <path d="M528,46 Q534,20 530,10" fill="none" stroke="#3a2d18" stroke-width="2"/>
+    <rect x="500" y="60" width="40" height="40" rx="4" fill="#120e06" stroke="#3a2d18" stroke-width="1" opacity="0.9"/>
+    <ellipse cx="340" cy="96" rx="20" ry="7" fill="#1a1408" stroke="#3a2d18" stroke-width="1" opacity="0.6"/>
+    <radialGradient id="tg" cx="50%" cy="70%" r="60%"><stop offset="0%" stop-color="#c8a84b" stop-opacity="0.05"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+    <rect x="0" y="0" width="680" height="170" fill="url(#tg)"/>
+  </svg>`;
+}
+
+function drawMushroomScene(el) {
+  el.style.background = '#060d04';
+  el.innerHTML = `<svg viewBox="0 0 680 170" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    <rect x="0" y="135" width="680" height="35" fill="#0a1206"/>
+    <rect x="300" y="75" width="80" height="68" rx="8" fill="#1a2a14" stroke="#2a4020" stroke-width="1"/>
+    <ellipse cx="340" cy="75" rx="100" ry="48" fill="#1e0a0a" stroke="#3a1010" stroke-width="1.5"/>
+    <ellipse cx="340" cy="84" rx="84" ry="17" fill="#2a1010" opacity="0.6"/>
+    <circle cx="310" cy="60" r="8" fill="#260808" stroke="#3a1010" stroke-width="0.5" opacity="0.8"/>
+    <circle cx="360" cy="54" r="6" fill="#260808" stroke="#3a1010" stroke-width="0.5" opacity="0.8"/>
+    <circle cx="385" cy="66" r="5" fill="#260808" stroke="#3a1010" stroke-width="0.5" opacity="0.8"/>
+    <ellipse cx="340" cy="48" rx="30" ry="12" fill="#1a2e0e" stroke="#2a4018" stroke-width="1"/>
+    <circle cx="368" cy="44" r="10" fill="#162408" stroke="#2a3a14" stroke-width="1"/>
+    <path d="M372,34 Q382,24 368,14 Q360,6 370,-2" fill="none" stroke="rgba(100,140,80,0.25)" stroke-width="2"/>
+    <path d="M60" y="135" Q40,96 60,76 Q80,96 100,135" fill="none"/><path d="M60,135 Q40,96 60,76 Q80,96 100,135" fill="#0a1a06" stroke="#142810" stroke-width="1"/>
+    <path d="M580,135 Q560,106 580,86 Q600,106 620,135" fill="#0a1a06" stroke="#142810" stroke-width="1"/>
+    <radialGradient id="mg" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#2a4818" stop-opacity="0.07"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+    <rect x="0" y="0" width="680" height="170" fill="url(#mg)"/>
+  </svg>`;
+}
+
+function drawCroquetScene(el) {
+  el.style.background = '#0d0202';
+  el.innerHTML = `<svg viewBox="0 0 680 170" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    <rect x="0" y="126" width="680" height="44" fill="#0e0a02"/>
+    <circle cx="80"  cy="96" r="26" fill="#1a0404" stroke="#3a0808" stroke-width="1"/>
+    <circle cx="100" cy="84" r="19" fill="#1a0404" stroke="#3a0808" stroke-width="1"/>
+    <circle cx="65"  cy="84" r="17" fill="#1a0404" stroke="#3a0808" stroke-width="1"/>
+    <circle cx="600" cy="96" r="26" fill="#1a0404" stroke="#3a0808" stroke-width="1"/>
+    <circle cx="620" cy="84" r="19" fill="#1a0404" stroke="#3a0808" stroke-width="1"/>
+    <circle cx="584" cy="84" r="17" fill="#1a0404" stroke="#3a0808" stroke-width="1"/>
+    <circle cx="78"  cy="94" r="4" fill="#600808"/><circle cx="96" cy="82" r="3" fill="#600808"/>
+    <circle cx="598" cy="94" r="4" fill="#600808"/><circle cx="618" cy="82" r="3" fill="#600808"/>
+    <path d="M300,126 L300,76 Q340,56 380,76 L380,126" fill="none" stroke="#c8a84b" stroke-width="2" opacity="0.45"/>
+    <circle cx="200" cy="56" r="16" fill="#1a0808" stroke="#3a1010" stroke-width="1"/>
+    <path d="M200,72 Q195,96 192,116 Q188,130 195,135" fill="none" stroke="#3a1010" stroke-width="3"/>
+    <path d="M192,116 Q180,122 174,120" fill="none" stroke="#3a1010" stroke-width="3"/>
+    <circle cx="340" cy="122" r="10" fill="#1a1206" stroke="#3a2a10" stroke-width="1"/>
+    <rect x="500" y="66" width="24" height="58" rx="2" fill="#1a0404" stroke="#3a0808" stroke-width="1" opacity="0.8"/>
+    <rect x="536" y="56" width="24" height="68" rx="2" fill="#1a0404" stroke="#3a0808" stroke-width="1" opacity="0.8"/>
+    <text x="510" y="104" font-size="12" fill="#600808" opacity="0.7" text-anchor="middle">♥</text>
+    <text x="546" y="96"  font-size="12" fill="#600808" opacity="0.7" text-anchor="middle">♥</text>
+    <radialGradient id="cg" cx="50%" cy="80%" r="60%"><stop offset="0%" stop-color="#600808" stop-opacity="0.05"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+    <rect x="0" y="0" width="680" height="170" fill="url(#cg)"/>
+  </svg>`;
+}
+
+function drawCheshireScene(el) {
+  el.style.background = '#060810';
+  el.innerHTML = `<svg viewBox="0 0 680 170" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    <rect x="0" y="0" width="680" height="170" fill="#040610"/>
+    <rect x="60"  y="38" width="20" height="132" fill="#080c14"/>
+    <rect x="140" y="18" width="16" height="152" fill="#060a12"/>
+    <rect x="220" y="28" width="22" height="142" fill="#080c14"/>
+    <rect x="440" y="18" width="18" height="152" fill="#060a12"/>
+    <rect x="520" y="33" width="20" height="137" fill="#080c14"/>
+    <rect x="600" y="13" width="24" height="157" fill="#060a12"/>
+    <path d="M240,68 Q340,106 440,68" fill="none" stroke="rgba(180,220,180,0.5)" stroke-width="3" stroke-linecap="round"/>
+    <line x1="278" y1="74" x2="280" y2="86" stroke="rgba(220,240,220,0.45)" stroke-width="2"/>
+    <line x1="296" y1="82" x2="298" y2="94" stroke="rgba(220,240,220,0.45)" stroke-width="2"/>
+    <line x1="315" y1="88" x2="316" y2="100" stroke="rgba(220,240,220,0.45)" stroke-width="2"/>
+    <line x1="340" y1="90" x2="340" y2="102" stroke="rgba(220,240,220,0.45)" stroke-width="2"/>
+    <line x1="364" y1="88" x2="365" y2="100" stroke="rgba(220,240,220,0.45)" stroke-width="2"/>
+    <line x1="382" y1="82" x2="383" y2="94" stroke="rgba(220,240,220,0.45)" stroke-width="2"/>
+    <line x1="400" y1="74" x2="401" y2="86" stroke="rgba(220,240,220,0.45)" stroke-width="2"/>
+    <ellipse cx="290" cy="46" rx="14" ry="8" fill="rgba(180,240,180,0.1)" stroke="rgba(180,240,180,0.35)" stroke-width="1"/>
+    <ellipse cx="390" cy="46" rx="14" ry="8" fill="rgba(180,240,180,0.1)" stroke="rgba(180,240,180,0.35)" stroke-width="1"/>
+    <circle cx="290" cy="46" r="4" fill="rgba(100,200,100,0.45)"/>
+    <circle cx="390" cy="46" r="4" fill="rgba(100,200,100,0.45)"/>
+    <radialGradient id="gg" cx="50%" cy="52%" r="30%"><stop offset="0%" stop-color="#80c080" stop-opacity="0.05"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+    <rect x="0" y="0" width="680" height="170" fill="url(#gg)"/>
+  </svg>`;
+}
+
+function drawTrialScene(el) {
+  el.style.background = '#0e0404';
+  el.innerHTML = `<svg viewBox="0 0 680 170" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    ${Array.from({length:8},(_,i)=>`<rect x="${i*85}" y="136" width="85" height="34" fill="${i%2===0?'#0a0202':'#0e0404'}"/>`).join('')}
+    <rect x="0" y="0" width="680" height="136" fill="#0c0202"/>
+    <rect x="20" y="56" width="200" height="80" rx="2" fill="#140606" stroke="#2a0a0a" stroke-width="1"/>
+    <rect x="30" y="51" width="180" height="10" rx="1" fill="#1a0808"/>
+    <rect x="50" y="26" width="20" height="30" fill="#1a0404" stroke="#2a0808" stroke-width="1"/>
+    <rect x="80" y="22" width="20" height="34" fill="#1a0404" stroke="#2a0808" stroke-width="1"/>
+    <rect x="110" y="26" width="20" height="30" fill="#1a0404" stroke="#2a0808" stroke-width="1"/>
+    <text x="58" y="46" font-size="10" fill="#500808" text-anchor="middle">♥</text>
+    <text x="88" y="42" font-size="10" fill="#500808" text-anchor="middle">♥</text>
+    <text x="118" y="46" font-size="10" fill="#500808" text-anchor="middle">♥</text>
+    <rect x="300" y="26" width="80" height="110" rx="3" fill="#1a0606" stroke="#3a0a0a" stroke-width="1.5"/>
+    <rect x="290" y="22" width="100" height="14" rx="2" fill="#200808" stroke="#400a0a" stroke-width="1"/>
+    <path d="M305,22 L310,6 L340,14 L370,6 L375,22" fill="none" stroke="#600808" stroke-width="2"/>
+    <text x="340" y="78" font-size="26" fill="#500808" text-anchor="middle" opacity="0.65">♥</text>
+    <rect x="460" y="56" width="200" height="80" rx="2" fill="#140606" stroke="#2a0a0a" stroke-width="1"/>
+    <rect x="470" y="51" width="180" height="10" rx="1" fill="#1a0808"/>
+    <circle cx="490" cy="40" r="8" fill="#1a1206" stroke="#2a1a0a" stroke-width="1"/>
+    <circle cx="516" cy="36" r="8" fill="#1a1206" stroke="#2a1a0a" stroke-width="1"/>
+    <circle cx="542" cy="40" r="8" fill="#1a1206" stroke="#2a1a0a" stroke-width="1"/>
+    <radialGradient id="trg" cx="45%" cy="30%" r="40%"><stop offset="0%" stop-color="#600808" stop-opacity="0.07"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+    <rect x="0" y="0" width="680" height="170" fill="url(#trg)"/>
+  </svg>`;
+}
+
+function drawLookingGlassScene(el) {
+  el.style.background = '#060810';
+  el.innerHTML = `<svg viewBox="0 0 680 170" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    <rect x="200" y="10" width="280" height="150" rx="6" fill="#08101a" stroke="rgba(140,160,200,0.3)" stroke-width="2"/>
+    <rect x="210" y="18" width="260" height="134" rx="4" fill="#0a1422" opacity="0.8"/>
+    <!-- mirror frame ornate -->
+    <rect x="195" y="6" width="290" height="158" rx="8" fill="none" stroke="rgba(160,180,220,0.2)" stroke-width="3"/>
+    <rect x="188" y="2" width="304" height="166" rx="10" fill="none" stroke="rgba(140,160,200,0.12)" stroke-width="2"/>
+    <!-- reflection figure (backwards silhouette) -->
+    <circle cx="340" cy="60" r="20" fill="#101828" stroke="rgba(140,180,220,0.3)" stroke-width="1"/>
+    <rect x="320" y="80" width="40" height="60" rx="4" fill="#101828" stroke="rgba(140,180,220,0.2)" stroke-width="1"/>
+    <path d="M320,140 L310,160 M360,140 L370,160" stroke="rgba(140,180,220,0.2)" stroke-width="2"/>
+    <!-- mirror sheen -->
+    <line x1="220" y1="20" x2="260" y2="100" stroke="rgba(180,200,240,0.06)" stroke-width="20"/>
+    <!-- lantern glow in mirror -->
+    <circle cx="380" cy="100" r="14" fill="rgba(200,180,80,0.08)" stroke="rgba(200,168,75,0.2)" stroke-width="1"/>
+    <circle cx="380" cy="100" r="6"  fill="rgba(200,168,75,0.15)"/>
+    <radialGradient id="lglow" cx="56%" cy="59%" r="10%"><stop offset="0%" stop-color="#c8a84b" stop-opacity="0.1"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+    <rect x="0" y="0" width="680" height="170" fill="url(#lglow)"/>
+    <!-- edge darkness -->
+    <radialGradient id="ldark" cx="50%" cy="50%" r="70%"><stop offset="40%" stop-color="transparent"/><stop offset="100%" stop-color="#020308" stop-opacity="0.8"/></radialGradient>
+    <rect x="0" y="0" width="680" height="170" fill="url(#ldark)"/>
+  </svg>`;
+}
+
+function drawTweedleScene(el) {
+  el.style.background = '#060806';
+  el.innerHTML = `<svg viewBox="0 0 680 170" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    <rect x="0" y="130" width="680" height="40" fill="#0a0c08"/>
+    <!-- trees -->
+    <rect x="0"   y="0" width="80"  height="170" fill="#060808"/>
+    <rect x="600" y="0" width="80"  height="170" fill="#060808"/>
+    <rect x="100" y="20" width="40" height="150" fill="#080a06"/>
+    <rect x="540" y="20" width="40" height="150" fill="#080a06"/>
+    <!-- Tweedledee -->
+    <ellipse cx="270" cy="100" rx="34" ry="40" fill="#1a1a10" stroke="#2a2a18" stroke-width="1.5"/>
+    <circle cx="270" cy="66"  r="22" fill="#1a1a10" stroke="#2a2a18" stroke-width="1.5"/>
+    <text x="270" y="74" font-size="11" fill="rgba(200,168,75,0.4)" text-anchor="middle" font-style="italic">DEE</text>
+    <!-- bolster -->
+    <rect x="240" y="56" width="60" height="8" rx="4" fill="#2a2a18" stroke="#3a3a24" stroke-width="1"/>
+    <!-- Tweedledum -->
+    <ellipse cx="410" cy="100" rx="34" ry="40" fill="#1a1a10" stroke="#2a2a18" stroke-width="1.5"/>
+    <circle cx="410" cy="66"  r="22" fill="#1a1a10" stroke="#2a2a18" stroke-width="1.5"/>
+    <text x="410" y="74" font-size="11" fill="rgba(200,168,75,0.4)" text-anchor="middle" font-style="italic">DUM</text>
+    <!-- "NOHOW" text fragments -->
+    <text x="200" y="40" font-size="9" fill="rgba(180,165,140,0.2)" font-style="italic" letter-spacing="3">NOHOW</text>
+    <text x="430" y="36" font-size="9" fill="rgba(180,165,140,0.2)" font-style="italic" letter-spacing="3">CONTRARIWISE</text>
+    <radialGradient id="twg" cx="50%" cy="60%" r="50%"><stop offset="0%" stop-color="#2a2a18" stop-opacity="0.05"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+    <rect x="0" y="0" width="680" height="170" fill="url(#twg)"/>
+  </svg>`;
+}
+
+function drawAliceRoomScene(el) {
+  el.style.background = '#020608';
+  el.innerHTML = `<svg viewBox="0 0 680 170" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    <!-- room -->
+    <rect x="0" y="0" width="680" height="170" fill="#030808"/>
+    <!-- floor door glow -->
+    <ellipse cx="340" cy="148" rx="60" ry="12" fill="rgba(200,168,75,0.12)"/>
+    <rect x="290" y="136" width="100" height="20" rx="3" fill="#1a1408" stroke="rgba(200,168,75,0.3)" stroke-width="1.5"/>
+    <!-- floor door keyhole -->
+    <circle cx="340" cy="144" r="4" fill="rgba(200,168,75,0.4)"/>
+    <rect x="337" y="146" width="6" height="6" rx="1" fill="rgba(200,168,75,0.3)"/>
+    <!-- alice silhouette seated -->
+    <circle cx="340" cy="70"  r="18" fill="#0a1210" stroke="#162018" stroke-width="1"/>
+    <rect x="320" y="88"  width="40" height="48" rx="4" fill="#0a1210" stroke="#162018" stroke-width="1"/>
+    <path d="M320,88 Q300,90 295,110" fill="none" stroke="#162018" stroke-width="2"/><!-- arm -->
+    <!-- lantern -->
+    <rect x="290" y="98" width="14" height="18" rx="2" fill="#1a1408" stroke="rgba(200,168,75,0.4)" stroke-width="1"/>
+    <ellipse cx="297" cy="98" rx="6" ry="4" fill="rgba(200,168,75,0.25)"/>
+    <circle cx="297" cy="107" r="5" fill="rgba(200,168,75,0.18)"/>
+    <!-- lantern glow -->
+    <radialGradient id="ag" cx="44%" cy="63%" r="20%"><stop offset="0%" stop-color="#c8a84b" stop-opacity="0.15"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+    <rect x="0" y="0" width="680" height="170" fill="url(#ag)"/>
+    <!-- small door light leak -->
+    <radialGradient id="ag2" cx="50%" cy="88%" r="15%"><stop offset="0%" stop-color="#c8d8a0" stop-opacity="0.12"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+    <rect x="0" y="0" width="680" height="170" fill="url(#ag2)"/>
+    <!-- edge vignette -->
+    <radialGradient id="av" cx="50%" cy="50%" r="70%"><stop offset="40%" stop-color="transparent"/><stop offset="100%" stop-color="#020608" stop-opacity="0.9"/></radialGradient>
+    <rect x="0" y="0" width="680" height="170" fill="url(#av)"/>
+  </svg>`;
+}
+
+function drawHumptyScene(el) {
+  el.style.background = '#080614';
+  el.innerHTML = `<svg viewBox="0 0 680 170" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    <rect x="0" y="0" width="680" height="170" fill="#06040e"/>
+    <!-- wall -->
+    <rect x="0" y="110" width="680" height="60" fill="#100e1a" stroke="#1e1a2e" stroke-width="1"/>
+    ${Array.from({length:14},(_,i)=>`<rect x="${i*50-5}" y="110" width="48" height="14" rx="1" fill="${i%2===0?'#0e0c1a':'#120f1e'}" stroke="#1e1a2e" stroke-width="0.5"/>`).join('')}
+    ${Array.from({length:14},(_,i)=>`<rect x="${i*50+20}" y="124" width="48" height="14" rx="1" fill="${i%2===0?'#120f1e':'#0e0c1a'}" stroke="#1e1a2e" stroke-width="0.5"/>`).join('')}
+    ${Array.from({length:14},(_,i)=>`<rect x="${i*50-5}" y="138" width="48" height="14" rx="1" fill="${i%2===0?'#0e0c1a':'#120f1e'}" stroke="#1e1a2e" stroke-width="0.5"/>`).join('')}
+    <!-- Humpty body — large egg -->
+    <ellipse cx="340" cy="82" rx="52" ry="64" fill="#1a1828" stroke="#2e2a40" stroke-width="2"/>
+    <ellipse cx="340" cy="72" rx="38" ry="48" fill="#141226" opacity="0.5"/>
+    <!-- face -->
+    <ellipse cx="322" cy="72" rx="6" ry="7" fill="#0a0818"/>
+    <ellipse cx="358" cy="72" rx="6" ry="7" fill="#0a0818"/>
+    <circle cx="323" cy="71" r="2.5" fill="rgba(200,168,75,0.5)"/>
+    <circle cx="359" cy="71" r="2.5" fill="rgba(200,168,75,0.5)"/>
+    <path d="M318,88 Q340,98 362,88" fill="none" stroke="#2e2a40" stroke-width="2"/>
+    <!-- cravat -->
+    <path d="M310,108 Q340,118 370,108 L380,116 Q340,128 300,116 Z" fill="#2a1a30" stroke="#3a2a40" stroke-width="1"/>
+    <!-- legs dangling -->
+    <path d="M300,140 L280,160" stroke="#1a1828" stroke-width="8" stroke-linecap="round"/>
+    <path d="M380,140 L400,160" stroke="#1a1828" stroke-width="8" stroke-linecap="round"/>
+    <radialGradient id="hg" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#2a1a40" stop-opacity="0.08"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+    <rect x="0" y="0" width="680" height="170" fill="url(#hg)"/>
+  </svg>`;
+}
+
+function drawDuchessScene(el) {
+  el.style.background = '#0e0602';
+  el.innerHTML = `<svg viewBox="0 0 680 170" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    <rect x="0" y="0" width="680" height="170" fill="#0c0502"/>
+    <!-- smoke wisps -->
+    <path d="M100,170 Q120,130 110,80 Q105,50 115,20" fill="none" stroke="rgba(180,140,80,0.06)" stroke-width="30"/>
+    <path d="M580,170 Q560,140 570,90 Q575,60 565,30" fill="none" stroke="rgba(180,140,80,0.05)" stroke-width="25"/>
+    <!-- cauldron -->
+    <ellipse cx="200" cy="130" rx="55" ry="18" fill="#120a04" stroke="#2a1808" stroke-width="1.5"/>
+    <path d="M145,120 Q145,80 200,74 Q255,80 255,120" fill="#1a0c06" stroke="#2a1808" stroke-width="1.5"/>
+    <ellipse cx="200" cy="74" rx="55" ry="12" fill="#100802" stroke="#1e1006" stroke-width="1"/>
+    <!-- bubbles -->
+    <circle cx="185" cy="68" r="5" fill="#1e1006" stroke="#c8a84b" stroke-width="0.5" opacity="0.4"/>
+    <circle cx="210" cy="64" r="4" fill="#1e1006" stroke="#c8a84b" stroke-width="0.5" opacity="0.4"/>
+    <circle cx="198" cy="70" r="3" fill="#1e1006" stroke="#c8a84b" stroke-width="0.5" opacity="0.3"/>
+    <!-- fire -->
+    <path d="M170,140 Q180,116 190,128 Q198,108 200,128 Q210,112 220,128 Q228,118 230,140" fill="#2a1004" stroke="#c86020" stroke-width="0.5" opacity="0.7"/>
+    <!-- Duchess silhouette -->
+    <ellipse cx="440" cy="100" rx="30" ry="44" fill="#1a0c06" stroke="#2a1408" stroke-width="1"/>
+    <circle  cx="440" cy="56" r="24" fill="#1a0c06" stroke="#2a1408" stroke-width="1"/>
+    <!-- bonnet -->
+    <path d="M416,48 Q440,22 464,48" fill="#220e08" stroke="#3a1808" stroke-width="1.5"/>
+    <!-- baby bundle -->
+    <ellipse cx="474" cy="92" rx="18" ry="14" fill="#120804" stroke="#221008" stroke-width="1"/>
+    <!-- cook throwing ladle -->
+    <circle cx="560" cy="68" r="16" fill="#120806" stroke="#201008" stroke-width="1"/>
+    <path d="M560,84 L555,120 L570,118 L572,84 Z" fill="#120806" stroke="#201008" stroke-width="1"/>
+    <path d="M570,80 L620,56" stroke="#3a1808" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="626" cy="52" rx="12" ry="6" fill="#2a1008" stroke="#3a1808" stroke-width="1"/>
+    <!-- pepper smoke -->
+    <path d="M200,64 Q210,44 205,30" fill="none" stroke="rgba(200,168,75,0.1)" stroke-width="8"/>
+    <path d="M200,64 Q190,50 195,36" fill="none" stroke="rgba(200,168,75,0.08)" stroke-width="6"/>
+    <radialGradient id="dg" cx="30%" cy="50%" r="40%"><stop offset="0%" stop-color="#c86020" stop-opacity="0.04"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+    <rect x="0" y="0" width="680" height="170" fill="url(#dg)"/>
+  </svg>`;
+}
+
+function drawWalrusScene(el) {
+  el.style.background = '#010610';
+  el.innerHTML = `<svg viewBox="0 0 680 170" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    <rect x="0" y="0" width="680" height="170" fill="#010408"/>
+    <!-- moonlit sea -->
+    <rect x="0" y="120" width="680" height="50" fill="#030810"/>
+    ${Array.from({length:6},(_,i)=>`<path d="M${i*120},120 Q${i*120+30},112 ${i*120+60},120 Q${i*120+90},128 ${i*120+120},120" fill="none" stroke="rgba(100,140,180,0.08)" stroke-width="2"/>`).join('')}
+    <!-- moon reflection -->
+    <ellipse cx="340" cy="130" rx="40" ry="6" fill="rgba(180,200,220,0.04)"/>
+    <!-- moon -->
+    <circle cx="340" cy="30" r="20" fill="#08101e" stroke="rgba(180,200,220,0.15)" stroke-width="1"/>
+    <circle cx="345" cy="26" r="16" fill="rgba(180,200,220,0.06)"/>
+    <!-- oyster shells on sand -->
+    <rect x="0" y="116" width="680" height="8" fill="#0a0e10"/>
+    ${Array.from({length:12},(_,i)=>`<ellipse cx="${60+i*50}" cy="118" rx="12" ry="5" fill="#0e1214" stroke="#182028" stroke-width="0.7"/>`).join('')}
+    <!-- Walrus silhouette (large, left) -->
+    <ellipse cx="190" cy="100" rx="60" ry="50" fill="#060c14" stroke="#0e1a24" stroke-width="1.5"/>
+    <circle cx="170" cy="62" r="32" fill="#060c14" stroke="#0e1a24" stroke-width="1.5"/>
+    <!-- walrus tusks -->
+    <path d="M155,88 L140,108" stroke="#141e28" stroke-width="5" stroke-linecap="round"/>
+    <path d="M183,88 L175,110" stroke="#141e28" stroke-width="5" stroke-linecap="round"/>
+    <!-- tear drop -->
+    <ellipse cx="158" cy="78" rx="2" ry="3" fill="rgba(140,180,220,0.3)"/>
+    <!-- Carpenter silhouette (tall, right) -->
+    <rect x="468" y="56" width="28" height="76" rx="3" fill="#060c10" stroke="#0e1820" stroke-width="1"/>
+    <circle cx="482" cy="48" r="18" fill="#060c10" stroke="#0e1820" stroke-width="1"/>
+    <!-- carpenter hat -->
+    <rect x="465" y="26" width="34" height="10" rx="2" fill="#0a1018" stroke="#162028" stroke-width="1"/>
+    <rect x="470" y="18" width="24" height="10" rx="2" fill="#0a1018" stroke="#162028" stroke-width="1"/>
+    <!-- distant lantern glow (alice hint) -->
+    <circle cx="580" cy="80" r="12" fill="rgba(200,168,75,0.04)" stroke="rgba(200,168,75,0.12)" stroke-width="1"/>
+    <circle cx="580" cy="80" r="5"  fill="rgba(200,168,75,0.1)"/>
+    <radialGradient id="wg" cx="85%" cy="47%" r="15%"><stop offset="0%" stop-color="#c8a84b" stop-opacity="0.06"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+    <rect x="0" y="0" width="680" height="170" fill="url(#wg)"/>
+    <radialGradient id="wg2" cx="50%" cy="50%" r="70%"><stop offset="40%" stop-color="transparent"/><stop offset="100%" stop-color="#010408" stop-opacity="0.8"/></radialGradient>
+    <rect x="0" y="0" width="680" height="170" fill="url(#wg2)"/>
+  </svg>`;
+}
+
+
+function showScreen(id, cb) {
+  const fade = document.getElementById('transition-fade');
+  fade.classList.add('fading');
+  setTimeout(() => {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    fade.classList.remove('fading');
+    if(cb) cb();
+  }, 800);
+}
+
+/* ════════════════════════════════════════
+   GAME START
+════════════════════════════════════════ */
+function beginGame() {
+  gs.reset();
+  gs.totalEvents = EVENTS.filter(e => e.id !== 'alice-room').length;
+  prologueIdx = 0;
+  showScreen('prologue-screen', () => {
+    document.getElementById('prologue-continue').style.display = 'none';
+    showPrologueLine();
+  });
+}
+
+function showHallIntro(title, sub) {
+  const el = document.getElementById('hall-intro');
+  document.getElementById('hall-intro-title').textContent = title;
+  document.getElementById('hall-intro-sub').textContent   = sub;
+  el.style.opacity = '1';
+  setTimeout(() => { el.style.transition = 'opacity 1.5s'; el.style.opacity = '0'; }, 2200);
+  setTimeout(() => { el.style.transition = ''; }, 4000);
+}
+
+/* ════════════════════════════════════════
+   DOOR BUILDER — max 5, always shuffled, no glow hints
+════════════════════════════════════════ */
+function buildHall() {
+  const row = document.getElementById('door-row');
+  row.innerHTML = '';
+  gs.wrongsThisHall = 0;
+
+  // Pick next event — alice-room always last
+  const nonFinalEvents = EVENTS.filter(e => e.id !== 'alice-room');
+  const unusedEvents = nonFinalEvents.filter(e => !gs.usedEventIds.includes(e.id));
+  let nextEvent;
+  if(gs.eventsCleared >= gs.totalEvents) {
+    // Final event — alice-room
+    nextEvent = EVENTS.find(e => e.id === 'alice-room');
+  } else {
+    const eventPool = unusedEvents.length > 0 ? unusedEvents : nonFinalEvents;
+    nextEvent = eventPool[Math.floor(Math.random() * eventPool.length)];
+  }
+
+  // 3-5 doors, max 5
+  const doorCount = Math.min(3 + Math.floor(gs.eventsCleared / 2), 5);
+
+  // Build door positions: 1 right, rest wrong — SHUFFLED
+  let positions = Array.from({length:doorCount}, (_,i) => i);
+  // Shuffle positions array for display order
+  const shuffled = [...positions].sort(() => Math.random() - 0.5);
+  const rightPos = Math.floor(Math.random() * doorCount);
+
+  // Pick wrong door data pool (shuffle each time)
+  const wrongPool = [...WRONG_DOORS].sort(() => Math.random() - 0.5);
+  // Pick ambiguous whispers (shuffled each hall)
+  const whisperPool = [...ALL_WHISPERS].sort(() => Math.random() - 0.5);
+  let wrongUsed = 0;
+  let whisperUsed = 0;
+
+  const romanNumerals = ['Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ'];
+
+  for(let i = 0; i < doorCount; i++) {
+    const door = document.createElement('div');
+    door.className = 'door';
+
+    const isRight = (i === rightPos);
+    const doorNum = romanNumerals[i];
+    const whisper = whisperPool[whisperUsed++ % whisperPool.length];
+
+    const frameHTML = `
+      <div class="door-arch"></div>
+      <div class="door-frame">
+        <div class="door-top"></div>
+        <div class="door-bottom"></div>
+        <div class="door-knob"></div>
+        <div class="door-num">${doorNum}</div>
+      </div>
+      <div class="door-whisper">${whisper}</div>
+    `;
+
+    door.innerHTML = frameHTML;
+
+    if(isRight) {
+      door.addEventListener('click', () => openRightDoor(nextEvent));
+      door.addEventListener('mouseenter', () => cursorEl.classList.add('glow'));
+      door.addEventListener('mouseleave', () => cursorEl.classList.remove('glow'));
+    } else {
+      const wd = wrongPool[wrongUsed++ % wrongPool.length];
+      door.addEventListener('click', () => openWrongDoor(door, wd));
+      door.addEventListener('mouseenter', () => cursorEl.classList.remove('glow'));
+    }
+
+    row.appendChild(door);
+  }
+
+  updateProgress();
+  updateShrink();
+}
+
+function updateProgress() {
+  const p = document.getElementById('hall-progress');
+  const remaining = gs.totalEvents - gs.eventsCleared;
+  if(remaining <= 0) p.textContent = 'one last door · alice is close';
+  else p.textContent = `${gs.eventsCleared} of ${gs.totalEvents} · alice is waiting · find the door`;
+}
+
+/* ════════════════════════════════════════
+   WRONG DOOR
+════════════════════════════════════════ */
+function openWrongDoor(doorEl, wd) {
+  // Increase threat
+  gs.jabber = Math.min(100, gs.jabber + 20);
+  gs.queen  = Math.min(100, gs.queen  + 16);
+  gs.wrongsThisHall++;
+  updateMeters();
+  updateShrink();
+
+  if(wd.lethal && gs.jabber >= 60) {
+    // Lethal door + already in danger = death
+    const deathEl = document.getElementById('death-screen');
+    const sub = document.getElementById('death-subtitle');
+    sub.textContent = LETHAL_DEATHS[Math.floor(Math.random() * LETHAL_DEATHS.length)];
+    deathEl.classList.add('show');
+    return;
+  }
+
+  // Show wrong flash
+  const wf = document.getElementById('wrong-flash');
+  document.getElementById('wrong-flash-title').textContent = wd.title;
+  document.getElementById('wrong-flash-desc').textContent  = wd.desc;
+  document.getElementById('wrong-flash-warning').textContent = wd.lethal
+    ? 'death came close · · · too close · the jabberwock is nearly here'
+    : 'the jabberwock heard · · · the queen stirs · one wrong door too many';
+  wf.classList.add('show');
+
+  const jc = document.getElementById('jabber-creep');
+  jc.classList.add('show');
+
+  // Show queen warning if queen meter is high
+  if(gs.queen >= 50) {
+    const qw = document.getElementById('queen-warning');
+    qw.classList.add('show');
+    setTimeout(() => qw.classList.remove('show'), 3000);
+  }
+
+  setTimeout(() => {
+    wf.classList.remove('show');
+    if(gs.jabber >= 100 || gs.queen >= 100) {
+      triggerGameOver();
+      return;
+    }
+    if(gs.jabber < 60 && gs.queen < 60) jc.classList.remove('show');
+  }, 2800);
+}
+
+function deathContinue() {
+  document.getElementById('death-screen').classList.remove('show');
+  // Reduce lives but continue
+  gs.lives--;
+  updateLivesDisplay();
+  if(gs.lives <= 0) {
+    triggerGameOver();
+  } else {
+    // Rebuild hall with higher threat
+    gs.jabber = Math.min(80, gs.jabber + 15);
+    gs.queen  = Math.min(80, gs.queen  + 10);
+    updateMeters();
+    updateShrink();
+    buildHall();
+    showHallIntro('death came close · · ·', `${gs.lives} ${gs.lives === 1 ? 'chance remains' : 'chances remain'} · find the door`);
+  }
+}
+
+/* ════════════════════════════════════════
+   RIGHT DOOR — enter event
+════════════════════════════════════════ */
+function openRightDoor(event) {
+  launchEvent(event);
+}
+
+/* ════════════════════════════════════════
+   METERS
+════════════════════════════════════════ */
+function updateLivesDisplay() {
+  const pips = document.getElementById('lives-pips');
+  if(!pips) return;
+  pips.innerHTML = '';
+  for(let i = 0; i < 3; i++) {
+    const pip = document.createElement('div');
+    pip.style.cssText = `width:8px;height:8px;border-radius:50%;border:1px solid rgba(200,168,75,0.4);background:${i < gs.lives ? 'rgba(200,168,75,0.6)' : 'rgba(200,168,75,0.08)'};transition:background 0.5s;`;
+    pips.appendChild(pip);
+  }
+}
+
+function initHallParticles() {
+  const c = document.getElementById('hall-particles');
+  if(!c) return;
+  const ctx = c.getContext('2d');
+  c.width = window.innerWidth; c.height = window.innerHeight;
+  const motes = Array.from({length:30}, () => ({
+    x: Math.random()*c.width, y: Math.random()*c.height,
+    r: Math.random()*0.8+0.2, o: Math.random()*0.15+0.03,
+    dx: (Math.random()-0.5)*0.06, dy: -Math.random()*0.12-0.02,
+  }));
+  function drawH() {
+    ctx.clearRect(0,0,c.width,c.height);
+    motes.forEach(p => {
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle = `rgba(200,168,75,${p.o})`; ctx.fill();
+      p.x += p.dx; p.y += p.dy;
+      if(p.y < 0) { p.y = c.height; p.x = Math.random()*c.width; }
+      if(p.x<0)p.x=c.width; if(p.x>c.width)p.x=0;
+    });
+    requestAnimationFrame(drawH);
+  }
+  drawH();
+}
+
+
+  document.getElementById('jabber-fill').style.width = gs.jabber + '%';
+  document.getElementById('queen-fill').style.width  = gs.queen  + '%';
+  if(gs.jabber > 70) document.getElementById('jabber-fill').style.background = 'linear-gradient(to right,#4a10a0,#a020f0)';
+  if(gs.queen  > 70) document.getElementById('queen-fill').style.background  = 'linear-gradient(to right,#a00020,#e03050)';
+  const jc = document.getElementById('jabber-creep');
+  if(gs.jabber >= 40 || gs.queen >= 40) jc.classList.add('show');
+  else jc.classList.remove('show');
+}
+
+function updateShrink() {
+  const overlay = document.getElementById('hall-shrink-overlay');
+  const total = gs.jabber + gs.queen;
+  if(total > 60) overlay.classList.add('shrinking');
+  else overlay.classList.remove('shrinking');
+}
+
+/* ════════════════════════════════════════
+   EVENT ENGINE
+════════════════════════════════════════ */
+let eventState = { event:null, stepIdx:0, madness:0, currentRule:null };
+
+function launchEvent(event) {
+  eventState.event   = event;
+  eventState.stepIdx = 0;
+  eventState.madness = 0;
+  eventState.currentRule = null;
+
+  document.getElementById('event-bg').style.background = event.bgStyle;
+  document.getElementById('event-title').textContent    = event.title;
+  document.getElementById('event-subtitle').textContent = event.subtitle;
+  event.sceneRender(document.getElementById('event-scene'));
+
+  showScreen('event-screen', () => { renderEventStep(); });
+}
+
+function renderEventStep() {
+  const ev   = eventState.event;
+  const step = ev.steps[eventState.stepIdx];
+  if(!step) { eventVictory(); return; }
+
+  if(step.ruleIntro && step.ruleIntro !== eventState.currentRule) {
+    eventState.currentRule = step.ruleIntro;
+    const rn = document.getElementById('rule-notice');
+    rn.textContent = '✦ ' + step.ruleIntro;
+    rn.classList.add('show');
+    setTimeout(() => rn.classList.remove('show'), 3400);
+  }
+
+  document.getElementById('event-speaker').textContent  = step.speaker;
+  document.getElementById('event-dialogue').textContent = step.text;
+  updateMadness(0);
+
+  const area = document.getElementById('choice-area');
+  area.innerHTML = '';
+
+  // Shuffle choices so position doesn't hint good/bad
+  const shuffledChoices = [...step.choices].sort(() => Math.random() - 0.5);
+
+  shuffledChoices.forEach(ch => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = ch.text;
+    btn.addEventListener('click', () => handleChoice(ch));
+    area.appendChild(btn);
+  });
+}
+
+function handleChoice(choice) {
+  document.getElementById('event-dialogue').textContent = choice.result;
+  document.getElementById('choice-area').innerHTML = '';
+
+  if(choice.madness) {
+    eventState.madness = Math.min(100, eventState.madness + choice.madness);
+    updateMadness(0);
+    if(!choice.good) {
+      gs.jabber = Math.min(100, gs.jabber + 6);
+      gs.queen  = Math.min(100, gs.queen  + 5);
+      updateMeters(); updateShrink();
+    }
+  }
+
+  if(eventState.madness >= 100) { setTimeout(() => triggerGameOver('madness'), 1200); return; }
+  if(gs.jabber >= 100 || gs.queen >= 100) { setTimeout(() => triggerGameOver(), 1200); return; }
+
+  setTimeout(() => {
+    eventState.stepIdx++;
+    if(eventState.stepIdx >= eventState.event.steps.length) eventVictory();
+    else renderEventStep();
+  }, 1700);
+}
+
+function updateMadness(delta) {
+  eventState.madness = Math.min(100, Math.max(0, eventState.madness + delta));
+  document.getElementById('madness-fill').style.width = eventState.madness + '%';
+}
+
+function eventVictory() {
+  gs.eventsCleared++;
+  gs.usedEventIds.push(eventState.event.id);
+
+  const res = document.getElementById('event-result');
+  const tit = document.getElementById('event-result-title');
+  const sub = document.getElementById('event-result-sub');
+
+  if(gs.eventsCleared >= gs.totalEvents && eventState.event.id === 'alice-room') {
+    // Won the game
+    tit.textContent = 'the garden door';
+    tit.style.color = '#ece3d0';
+    tit.style.textShadow = '0 0 60px rgba(100,200,120,0.5)';
+    sub.textContent = 'alice has been found · · · the way out is open';
+    res.classList.add('show');
+    setTimeout(() => { res.classList.remove('show'); showScreen('win-screen'); }, 3200);
+    return;
+  }
+
+  if(gs.eventsCleared >= gs.totalEvents && eventState.event.id !== 'alice-room') {
+    // All non-final events done — send to alice-room via hall
+    tit.textContent = 'the lantern room · · ·';
+    tit.style.color = 'rgba(200,220,180,0.9)';
+    tit.style.textShadow = '0 0 60px rgba(100,200,100,0.4)';
+    sub.textContent = 'she is here · alice is here · one last door';
+    res.classList.add('show');
+    setTimeout(() => {
+      res.classList.remove('show');
+      tit.style.color = ''; tit.style.textShadow = '';
+      showScreen('hall-screen', () => {
+        buildHall();
+        showHallIntro('the lantern · · ·', 'alice is here · find the door · now');
+        updateMeters();
+      });
+    }, 2800);
+    return;
+  }
+
+  tit.textContent = 'survived · · ·';
+  tit.style.color = '';
+  tit.style.textShadow = '';
+  if(eventState.madness > 60) {
+    tit.style.color = '#c8a84b';
+    sub.textContent = 'barely · the room let you go · · · the hall awaits';
+  } else {
+    sub.textContent = eventState.event.title.toLowerCase() + ' released you · the hall of doors again';
+  }
+  res.classList.add('show');
+
+  setTimeout(() => {
+    res.classList.remove('show');
+    tit.style.color = '';
+    tit.style.textShadow = '';
+
+    showScreen('hall-screen', () => {
+      buildHall();
+      const round = gs.eventsCleared;
+      const intros = [
+        ['the hall again · · ·',         'alice is closer now · keep moving'],
+        ['deeper',                         'the doors multiply · choose carefully'],
+        ['the walls are closer',           'the queen\'s voice echoes · find alice'],
+        ['almost',                         'one wrong door · and it ends here'],
+        ['you can feel the garden',        'she is waiting · find the last door'],
+        ['the jabberwock is very close',   'do not stop now · do not stop'],
+        ['the lantern · · ·',             'you can almost see its light · go'],
+        ['through the looking glass',      'behind one door · she waits · which one'],
+        ['the queen\'s shadow',            'she is close · alice is closer · move'],
+        ['one final door',                 'alice is here · you are almost home'],
+      ];
+      const [title, sub2] = intros[Math.min(round-1, intros.length-1)];
+      showHallIntro(title, sub2);
+      updateMeters();
+    });
+  }, 2800);
+}
+
+/* ════════════════════════════════════════
+   GAME OVER / WIN
+════════════════════════════════════════ */
+function triggerGameOver(cause) {
+  const sub = document.getElementById('gameover-sub');
+  if(cause === 'madness') {
+    sub.innerHTML = 'the madness took her · · ·<br>she forgot which door led to alice<br>she forgot why she was looking';
+  } else if(gs.jabber >= 100) {
+    sub.innerHTML = 'the jabberwock found her · · ·<br>it had been close for a long time<br>alice waited · no one came';
+  } else {
+    sub.innerHTML = 'the queen\'s guards arrived · · ·<br>the wrong doors had said too much<br>alice was found · by the wrong hands';
+  }
+  showScreen('gameover-screen');
+}
+
+function restartGame() {
+  gs.reset();
+  gs.totalEvents = EVENTS.filter(e => e.id !== 'alice-room').length;
+  prologueIdx = 0;
+  showScreen('title-screen');
+}
+
+/* ════════════════════════════════════════
+   INIT
+════════════════════════════════════════ */
+window.addEventListener('load', () => {
+  setTimeout(() => { cursorEl.style.opacity = '1'; }, 200);
+  initHallParticles();
+  gs.totalEvents = EVENTS.filter(e => e.id !== 'alice-room').length;
+  updateLivesDisplay();
+});
+</script>
+</body>
+</html>
